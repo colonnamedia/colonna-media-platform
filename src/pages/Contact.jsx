@@ -36,6 +36,21 @@ export default function Contact() {
     e.preventDefault();
     setLoading(true);
     await base44.entities.ContactInquiry.create(form);
+
+    await base44.integrations.Core.SendEmail({
+      to: "colonnamedia@gmail.com",
+      subject: `📬 New Inquiry — ${form.name}${form.business_name ? ` | ${form.business_name}` : ""}`,
+      body: `
+<h2>New Contact Form Inquiry</h2>
+<p><strong>Name:</strong> ${form.name}</p>
+<p><strong>Email:</strong> ${form.email}</p>
+<p><strong>Business:</strong> ${form.business_name || "Not provided"}</p>
+<p><strong>Service Needed:</strong> ${form.service_needed || "Not specified"}</p>
+<hr/>
+<p><strong>Message:</strong><br/>${form.message || "No message provided."}</p>
+      `.trim(),
+    });
+
     setLoading(false);
     setSubmitted(true);
     toast({ title: "Inquiry sent!", description: "We'll be in touch soon." });
