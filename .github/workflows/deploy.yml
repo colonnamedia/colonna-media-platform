@@ -1,0 +1,36 @@
+name: Deploy to Bluehost
+
+on:
+  push:
+    branches:
+      - main  # Triggers only on pushes to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Copy files via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }} # Or use 'key: ${{ secrets.SSH_KEY }}'
+          port: ${{ secrets.PORT }}
+          source: "." # Copies all files from your repo
+          target: "~/public_html" # Adjust this to your site's directory
+          strip_components: 0
+
+      - name: Run post-deployment commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            echo "Deployment successful!"
+            # Add other commands here, like 'npm install' or 'git pull' if needed
