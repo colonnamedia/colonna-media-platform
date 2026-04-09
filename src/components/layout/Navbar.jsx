@@ -43,11 +43,11 @@ export default function Navbar() {
   useEffect(() => { setOpen(false); }, [location]);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-sm" : "bg-background/40 backdrop-blur-sm"}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-sm" : "bg-transparent"}`}>
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link to="/" className="flex items-center gap-2">
-            <span className="font-display text-2xl font-semibold tracking-tight text-foreground">Colonna</span>
+            <span className="font-display text-2xl font-semibold tracking-tight text-white">Colonna</span>
             <span className="font-display text-2xl font-light italic text-primary">Media</span>
           </Link>
 
@@ -56,7 +56,7 @@ export default function Navbar() {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary ${location.pathname === link.path ? "text-primary" : "text-foreground/70"}`}
+                className={`text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary ${location.pathname === link.path ? "text-primary" : scrolled ? "text-foreground/70" : "text-white/90"}`}
               >
                 {link.label}
               </Link>
@@ -66,7 +66,7 @@ export default function Navbar() {
             <div className="relative" ref={toolsRef}>
               <button
                 onClick={() => setToolsOpen(!toolsOpen)}
-                className="flex items-center gap-1 text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary text-foreground/70"
+                className={`flex items-center gap-1 text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary ${scrolled ? "text-foreground/70" : "text-white/90"}`}
               >
                 Tools <ChevronDown className={`w-3.5 h-3.5 transition-transform ${toolsOpen ? "rotate-180" : ""}`} />
               </button>
