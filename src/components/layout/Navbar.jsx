@@ -13,9 +13,9 @@ const navLinks = [
 ];
 
 const toolsDropdown = [
-  { label: "Content Creation", desc: "AI-powered content generator", href: "https://fire-works-content-ai.base44.app" },
-  { label: "SEO Auditor", desc: "Local SEO visibility strategy", href: "https://seo-auditor-pro-copy-7436d8be.base44.app" },
   { label: "Website Builder", desc: "Lead-generating web pages", href: "https://papaya-launch-site-flow.base44.app" },
+  { label: "SEO Auditor", desc: "Local SEO visibility strategy", href: "https://seo-auditor-pro-copy-7436d8be.base44.app" },
+  { label: "Content Creation", desc: "AI-powered content generator", href: "https://fire-works-content-ai.base44.app" },
   { label: "Customer Journey", desc: "Map & optimize your marketing blueprint", href: "https://marketing-blueprint-build.base44.app" },
 ];
 
