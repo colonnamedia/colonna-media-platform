@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
@@ -12,10 +12,27 @@ const navLinks = [
   { label: "Contact", path: "/contact" },
 ];
 
+const toolsDropdown = [
+  { label: "Content Creation", desc: "AI-powered content generator", href: "https://fire-works-content-ai.base44.app" },
+  { label: "SEO Auditor", desc: "Local SEO visibility strategy", href: "https://seo-auditor-pro-copy-7436d8be.base44.app" },
+  { label: "Website Builder", desc: "Lead-generating web pages", href: "https://papaya-launch-site-flow.base44.app" },
+  { label: "Customer Journey", desc: "Map & optimize your marketing blueprint", href: "https://marketing-blueprint-build.base44.app" },
+];
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const toolsRef = useRef(null);
   const location = useLocation();
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (toolsRef.current && !toolsRef.current.contains(e.target)) setToolsOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -44,6 +61,46 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+
+            {/* Tools Dropdown */}
+            <div className="relative" ref={toolsRef}>
+              <button
+                onClick={() => setToolsOpen(!toolsOpen)}
+                className="flex items-center gap-1 text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary text-foreground/70"
+              >
+                Tools <ChevronDown className={`w-3.5 h-3.5 transition-transform ${toolsOpen ? "rotate-180" : ""}`} />
+              </button>
+              <AnimatePresence>
+                {toolsOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 8 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full right-0 mt-3 w-64 bg-background border border-border shadow-lg z-50"
+                  >
+                    {toolsDropdown.map((tool) => (
+                      <a
+                        key={tool.label}
+                        href={tool.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setToolsOpen(false)}
+                        className="flex items-start justify-between gap-2 px-5 py-4 hover:bg-secondary transition-colors group border-b border-border last:border-0"
+                      >
+                        <div>
+                          <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{tool.label}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{tool.desc}</p>
+                        </div>
+                        <ExternalLink className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
+                      </a>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+
             <Link
               to="/bookings"
               className="bg-primary text-primary-foreground px-6 py-2.5 text-sm font-medium tracking-wide uppercase hover:bg-primary/90 transition-colors"
@@ -76,6 +133,20 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              <div className="pt-2 border-t border-border">
+                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-3">Tools</p>
+                {toolsDropdown.map((tool) => (
+                  <a
+                    key={tool.label}
+                    href={tool.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between py-2.5 text-base font-medium text-foreground/70 hover:text-primary transition-colors"
+                  >
+                    {tool.label} <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                ))}
+              </div>
               <Link
                 to="/bookings"
                 className="bg-primary text-primary-foreground px-6 py-3 text-sm font-medium tracking-wide uppercase text-center hover:bg-primary/90 transition-colors mt-2"
