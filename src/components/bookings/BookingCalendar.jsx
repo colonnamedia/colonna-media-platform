@@ -10,10 +10,8 @@ import { ArrowRight, CheckCircle, Clock } from "lucide-react";
 import { format } from "date-fns";
 
 const timeSlots = [
-  "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM",
-  "11:00 AM", "11:30 AM", "12:00 PM", "1:00 PM",
-  "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM",
-  "3:30 PM", "4:00 PM", "4:30 PM",
+  "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM",
+  "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", "5:00 PM",
 ];
 
 const serviceOptions = [
@@ -117,11 +115,11 @@ export default function BookingCalendar() {
                 mode="single"
                 selected={selectedDate}
                 onSelect={handleDateSelect}
-                disabled={(date) => date < new Date() || date.getDay() === 0 || date.getDay() === 6}
+                disabled={(date) => { const today = new Date(); today.setHours(0,0,0,0); return date < today || date.getDay() === 0 || date.getDay() === 6; }}
                 className="rounded-none border border-border"
               />
             </div>
-            <p className="text-xs text-muted-foreground text-center mt-4">Available Monday – Friday</p>
+            <p className="text-xs text-muted-foreground text-center mt-4">Available Monday – Friday, 1:00 PM – 5:00 PM ET</p>
           </motion.div>
         )}
 

@@ -5,6 +5,7 @@ import SectionHeader from "../components/shared/SectionHeader";
 import CTABanner from "../components/shared/CTABanner";
 
 const TEAM_IMAGE = "https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/2e5689bf7_IMG_5011.jpg";
+const FOUNDER_IMAGE = "https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/bee9e92dd_PittsburghPunch-PGH-ColonnaMedia1of1-5.jpg";"https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/2e5689bf7_IMG_5011.jpg";
 const STREET_IMAGE = "https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/20719a314_IMG_3614.jpg";
 
 const pillars = [
@@ -38,7 +39,11 @@ export default function About() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="relative">
               <div className="aspect-[3/4] overflow-hidden">
-                <img src={STREET_IMAGE} alt="Colonna Media founder" className="w-full h-full object-cover" />
+                <img src={FOUNDER_IMAGE} alt="Anthony Colonna — Founder, Colonna Media" className="w-full h-full object-cover" />
+              </div>
+              <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground p-4 hidden lg:block">
+                <p className="font-display text-sm font-semibold">Anthony Colonna</p>
+                <p className="text-xs opacity-80">Founder & Creative Director</p>
               </div>
             </motion.div>
             <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
