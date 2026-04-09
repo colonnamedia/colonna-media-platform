@@ -19,6 +19,7 @@ const services = [
     desc: "Strategic content that tells your story, engages your audience, and supports your campaigns.",
     items: ["Branded Visual Content", "Social Media Assets", "Short-Form Content", "Campaign Materials", "Content Planning"],
     link: "/content-creation",
+    externalLink: "https://fire-works-content-ai.base44.app",
     img: "https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/6fa25dcb7_IMG_3665.jpg",
   },
   {
@@ -35,6 +36,7 @@ const services = [
     desc: "Audit and optimize how leads move through your business — from first touchpoint to conversion.",
     items: ["Lead Flow Audits", "Conversion Point Optimization", "Messaging Clarity", "Digital Touchpoint Mapping"],
     link: "/strategy",
+    externalLink: "https://marketing-blueprint-build.base44.app/",
     img: "https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/8e8ca9b37_IMG_3608.jpg",
   },
   {
@@ -43,6 +45,7 @@ const services = [
     desc: "High-converting landing pages and service pages designed to turn visitors into real inquiries.",
     items: ["Landing Pages", "Offer Pages", "Campaign Pages", "Lead Form Pages", "Service Business Web Pages"],
     link: "/contact",
+    externalLink: "https://papaya-launch-site-flow.base44.app",
     img: null,
   },
   {
@@ -51,6 +54,7 @@ const services = [
     desc: "Local SEO support and visibility strategy to make sure the right people find your business.",
     items: ["Local SEO", "Website Visibility", "On-Page Optimization", "Content Strategy", "Lead Visibility"],
     link: "/contact",
+    externalLink: "https://seo-auditor-pro-copy-7436d8be.base44.app",
     img: null,
   },
   {
@@ -118,9 +122,16 @@ export default function Services() {
                       </li>
                     ))}
                   </ul>
-                  <Link to={service.link} className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 text-sm font-medium uppercase tracking-wider hover:bg-primary/90 transition-colors">
-                    Ask About This Service <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  <div className="flex flex-wrap gap-3">
+                    <Link to={service.link} className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 text-sm font-medium uppercase tracking-wider hover:bg-primary/90 transition-colors">
+                      Ask About This Service <ArrowRight className="w-4 h-4" />
+                    </Link>
+                    {service.externalLink && (
+                      <a href={service.externalLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 border border-primary text-primary px-6 py-3 text-sm font-medium uppercase tracking-wider hover:bg-primary/10 transition-colors">
+                        Try It <ArrowRight className="w-4 h-4" />
+                      </a>
+                    )}
+                  </div>
                 </div>
                 {service.img && i % 2 !== 0 && (
                   <div className="aspect-[4/3] overflow-hidden hidden lg:block">
