@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Play } from "lucide-react";
 import { motion } from "framer-motion";
 
-const HERO_IMAGE = "https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/6f78c5fc4_IMG_5020.JPG";
+const HERO_IMAGE = "https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/88b601d8d_IMG_5316.jpg";"https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/6f78c5fc4_IMG_5020.JPG";
 
 export default function HeroSection() {
   return (
@@ -11,7 +11,7 @@ export default function HeroSection() {
       {/* Background image */}
       <div className="absolute inset-0">
         <img src={HERO_IMAGE} alt="Colonna Media creative photography" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-foreground/90 via-foreground/70 to-foreground/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-foreground/85 via-foreground/55 to-foreground/20" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full pt-32 pb-20 lg:pt-0 lg:pb-0">
