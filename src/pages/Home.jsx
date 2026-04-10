@@ -15,10 +15,10 @@ export default function Home() {
       <HeroSection />
       <BrandIntro />
       <ClientsStrip />
+      <Testimonials />
       <ServicesOverview />
       <WhyColonna />
       <FeaturedWork />
-      <Testimonials />
       <FloatingCTA />
       <CTABanner
         headline="Ready to Grow Your Brand?"
