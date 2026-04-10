@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap');:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap');:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,8 +6,8 @@
 
 @layer base {
   :root {
-    --font-body: 'Inter', sans-serif;
-    --font-display: 'Playfair Display', serif;
+    --font-body: 'Barlow', sans-serif;
+    --font-display: 'Oswald', sans-serif;
 
     --background: 40 20% 98%;
     --foreground: 0 0% 12%;
