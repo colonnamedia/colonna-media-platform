@@ -1,4 +1,5 @@
 import React from "react";
+import ColonnaLogo from "../shared/ColonnaLogo";
 import { Link } from "react-router-dom";
 import { Mail, MapPin, ArrowUpRight } from "lucide-react";
 
@@ -9,8 +10,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div className="lg:col-span-1">
             <div className="mb-6">
-              <span className="font-display text-2xl font-semibold">Colonna</span>
-              <span className="font-display text-2xl font-light italic opacity-70"> Media</span>
+              <ColonnaLogo light={true} />
             </div>
             <p className="text-background/60 text-sm leading-relaxed">
               Creative media, smart strategy, and conversion-focused digital growth. Based in Pittsburgh, PA.

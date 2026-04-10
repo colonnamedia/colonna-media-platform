@@ -5,6 +5,7 @@ import ServicesOverview from "../components/home/ServicesOverview";
 import WhyColonna from "../components/home/WhyColonna";
 import FeaturedWork from "../components/home/FeaturedWork";
 import CTABanner from "../components/shared/CTABanner";
+import ClientsStrip from "../components/home/ClientsStrip";
 import Testimonials from "../components/home/Testimonials";
 import FloatingCTA from "../components/shared/FloatingCTA";
 
@@ -13,6 +14,7 @@ export default function Home() {
     <div>
       <HeroSection />
       <BrandIntro />
+      <ClientsStrip />
       <ServicesOverview />
       <WhyColonna />
       <FeaturedWork />

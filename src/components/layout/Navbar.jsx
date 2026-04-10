@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown, ExternalLink } from "lucide-react";
+import ColonnaLogo from "../shared/ColonnaLogo";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
@@ -46,9 +47,8 @@ export default function Navbar() {
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-sm" : "bg-transparent"}`}>
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="font-display text-2xl font-semibold tracking-tight text-white">Colonna</span>
-            <span className="font-display text-2xl font-light italic text-primary">Media</span>
+          <Link to="/">
+            <ColonnaLogo light={!scrolled} />
           </Link>
 
           <div className="hidden lg:flex items-center gap-8">
