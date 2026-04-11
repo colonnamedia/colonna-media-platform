@@ -7,6 +7,8 @@ import FeaturedWork from "../components/home/FeaturedWork";
 import CTABanner from "../components/shared/CTABanner";
 import ClientsStrip from "../components/home/ClientsStrip";
 import Testimonials from "../components/home/Testimonials";
+import CoreOffers from "../components/home/CoreOffers";
+import ToolsSection from "../components/home/ToolsSection";
 import FloatingCTA from "../components/shared/FloatingCTA";
 
 export default function Home() {
@@ -14,19 +16,21 @@ export default function Home() {
     <div>
       <HeroSection />
       <BrandIntro />
+      <CoreOffers />
       <ClientsStrip />
-      <Testimonials />
       <ServicesOverview />
       <WhyColonna />
       <FeaturedWork />
+      <ToolsSection />
+      <Testimonials />
       <FloatingCTA />
       <CTABanner
-        headline="Ready to Grow Your Brand?"
-        subtitle="From first impression to conversion — let's create media that moves people to act."
-        ctaText="Start a Project"
-        ctaLink="/contact"
-        secondaryCta="Book a Call"
-        secondaryLink="/bookings"
+        headline="Ready to Build Something Better?"
+        subtitle="Whether you need visuals, strategy, a campaign page, or a smarter customer journey — Colonna Media brings the full picture together."
+        ctaText="Book a Consultation"
+        ctaLink="/bookings"
+        secondaryCta="Contact Us"
+        secondaryLink="/contact"
       />
     </div>
   );
