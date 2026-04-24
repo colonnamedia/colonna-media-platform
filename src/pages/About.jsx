@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import { Target, Eye, Lightbulb, TrendingUp } from "lucide-react";
+import { Target, Eye, Lightbulb, TrendingUp, ArrowDown } from "lucide-react";
 import SectionHeader from "../components/shared/SectionHeader";
-import CTABanner from "../components/shared/CTABanner";
 import ProjectsSection from "../components/about/ProjectsSection";
+
+const scrollToCalendly = () => {
+  document.getElementById("book-consultation")?.scrollIntoView({ behavior: "smooth" });
+};
 
 const TEAM_IMAGE = "https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/2e5689bf7_IMG_5011.jpg";
 const FOUNDER_IMAGE = "https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/bee9e92dd_PittsburghPunch-PGH-ColonnaMedia1of1-5.jpg";"https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/2e5689bf7_IMG_5011.jpg";
@@ -27,9 +30,18 @@ export default function About() {
             <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight mb-6">
               We Help Businesses <span className="italic font-light">Stand Out</span> and <span className="italic font-light">Convert</span>
             </motion.h1>
-            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-muted-foreground text-lg leading-relaxed">
+            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-muted-foreground text-lg leading-relaxed mb-8">
               Colonna Media is a Pittsburgh-based media and technology company that helps businesses and personal brands stand out with strategic content and stronger digital systems.
             </motion.p>
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              onClick={scrollToCalendly}
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 text-sm font-medium uppercase tracking-wider hover:bg-primary/90 transition-colors"
+            >
+              Book a Free Consultation <ArrowDown className="w-4 h-4" />
+            </motion.button>
           </div>
         </div>
       </section>
@@ -83,16 +95,74 @@ export default function About() {
               </motion.div>
             ))}
           </div>
+          <div className="text-center mt-12">
+            <button
+              onClick={scrollToCalendly}
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 text-sm font-medium uppercase tracking-wider hover:bg-primary/90 transition-colors"
+            >
+              Book a Free Consultation <ArrowDown className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </section>
 
       <ProjectsSection />
 
-      <CTABanner
-        headline="Let's Talk About Your Business"
-        subtitle="Whether you're starting fresh or looking to level up, we'll help you build a brand and a system that actually works."
-        ctaText="Get in Touch"
-      />
+      {/* Calendly Booking Section */}
+      <section id="book-consultation" className="py-24 lg:py-32 bg-secondary/50">
+        <div className="max-w-4xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-4">Free Consultation</p>
+            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight mb-4">
+              Book a Strategy Call
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+              Pick a time that works for you. We'll talk through your business, your goals, and what it would take to grow.
+            </p>
+          </div>
+          <CalendlyEmbed />
+        </div>
+      </section>
+
+      {/* Bottom CTA */}
+      <section className="py-20 bg-foreground text-background text-center">
+        <div className="max-w-2xl mx-auto px-6">
+          <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4">Ready to Get Started?</h2>
+          <p className="text-background/60 text-lg mb-8">Scroll up and grab a time on the calendar — or reach out directly.</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={scrollToCalendly}
+              className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 text-sm font-medium uppercase tracking-wider hover:bg-primary/90 transition-colors"
+            >
+              Book a Consultation <ArrowDown className="w-4 h-4" />
+            </button>
+            <a
+              href="mailto:colonnamedia@gmail.com"
+              className="inline-flex items-center justify-center gap-2 border border-background/30 text-background px-8 py-4 text-sm font-medium uppercase tracking-wider hover:bg-background/10 transition-colors"
+            >
+              Email Us
+            </a>
+          </div>
+        </div>
+      </section>
     </div>
+  );
+}
+
+function CalendlyEmbed() {
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://assets.calendly.com/assets/external/widget.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => { document.body.removeChild(script); };
+  }, []);
+
+  return (
+    <div
+      className="calendly-inline-widget"
+      data-url="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&hide_gdpr_banner=1"
+      style={{ minWidth: "320px", height: "700px" }}
+    />
   );
 }
