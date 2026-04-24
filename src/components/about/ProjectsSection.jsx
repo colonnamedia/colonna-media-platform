@@ -11,7 +11,7 @@ const projects = [
     link: "https://card-market-index.com",
     linkLabel: "card-market-index.com",
     tag: "Personal Project",
-    img: "https://images.unsplash.com/photo-1591951425600-bf9dc3b96f9c?w=800&q=80",
+    img: "https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/fb11ea752_030FC343-F51F-4B3D-A7D8-3400C1854B51.png",
   },
   {
     name: "Apex Boxing Lesson App",
