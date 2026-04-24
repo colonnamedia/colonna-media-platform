@@ -1,57 +1,132 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { Camera, Globe, Search, Megaphone, Users, TrendingUp, ArrowRight } from "lucide-react";
 
-const ABOUT_IMAGE = "https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/2e5689bf7_IMG_5011.jpg";
+const scrollToBooking = () => {
+  document.getElementById("book-consultation")?.scrollIntoView({ behavior: "smooth" });
+};
+
+const services = [
+  { icon: Camera, label: "Brand Photography", desc: "Professional visuals that make first impressions count." },
+  { icon: Globe, label: "Lead-Gen Web Pages", desc: "Conversion-focused pages that turn visitors into clients." },
+  { icon: Search, label: "SEO & Local Visibility", desc: "Get found by the right people at the right time." },
+  { icon: Megaphone, label: "Ad Campaigns", desc: "Targeted ads that drive real inquiries and ROI." },
+  { icon: Users, label: "Customer Journey Strategy", desc: "Map every touchpoint from awareness to booked client." },
+  { icon: TrendingUp, label: "Content Creation", desc: "On-brand content that builds trust and authority." },
+];
 
 export default function BrandIntro() {
   return (
-    <section className="py-24 lg:py-32">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-          >
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-4">More Than Photography</p>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight mb-6">
-              Creative Meets <span className="italic font-light">Conversion</span>
-            </h2>
-            <p className="text-muted-foreground text-lg leading-relaxed mb-6">
-              Colonna Media is a media and technology company that combines high-end creative work with marketing intelligence. We don't just make things look good — we make them work.
-            </p>
-            <p className="text-muted-foreground leading-relaxed mb-8">
-              From brand photography and content creation to customer journey strategy, lead-generating web pages, SEO, and ad campaigns — every service we offer is designed to help your business attract attention, build trust, and convert.
-            </p>
-            <div className="flex gap-12">
-              {[
-                { num: "50+", label: "Clients Served" },
-                { num: "8+", label: "Services Offered" },
-                { num: "100%", label: "Growth Focused" },
-              ].map((stat) => (
-                <div key={stat.label}>
-                  <p className="font-display text-3xl font-semibold text-primary">{stat.num}</p>
-                  <p className="text-xs uppercase tracking-wider text-muted-foreground mt-1">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+    <section className="relative py-24 lg:py-32 overflow-hidden">
+      {/* Blue/purple gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0f0c29] via-[#1a1060] to-[#302b63]" />
+      {/* Subtle glow orbs */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-600/25 rounded-full blur-[100px] pointer-events-none" />
 
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative"
+            className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-400 mb-4"
           >
-            <div className="aspect-[4/5] overflow-hidden">
-              <img src={ABOUT_IMAGE} alt="Colonna Media team at work" className="w-full h-full object-cover" />
-            </div>
-            <div className="absolute -bottom-6 -left-6 bg-primary text-primary-foreground p-6 hidden lg:block">
-              <p className="font-display text-lg font-semibold">Pittsburgh, PA</p>
-              <p className="text-sm opacity-80">Colonna Media LLC</p>
-            </div>
-          </motion.div>
+            What We Help You With
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.05 }}
+            className="font-display text-3xl md:text-5xl font-semibold leading-tight text-white mb-4"
+          >
+            Everything Your Business Needs{" "}
+            <span className="italic font-light text-blue-300">to Grow</span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-white/60 text-lg max-w-2xl mx-auto"
+          >
+            We combine high-end creative work with real marketing strategy — so every dollar you spend actually moves the needle.
+          </motion.p>
         </div>
+
+        {/* Services Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-16">
+          {services.map((service, i) => {
+            const Icon = service.icon;
+            return (
+              <motion.div
+                key={service.label}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.07 }}
+                className="group flex items-start gap-4 p-6 border border-white/10 bg-white/5 hover:bg-white/10 hover:border-blue-400/40 transition-all duration-300 backdrop-blur-sm"
+              >
+                <div className="w-10 h-10 bg-blue-500/20 flex items-center justify-center shrink-0 group-hover:bg-blue-500/30 transition-colors">
+                  <Icon className="w-5 h-5 text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="font-display text-base font-semibold text-white mb-1 group-hover:text-blue-300 transition-colors">
+                    {service.label}
+                  </h3>
+                  <p className="text-white/50 text-sm leading-relaxed">{service.desc}</p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* CTA Funnel */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3 }}
+          className="relative border border-blue-400/20 bg-gradient-to-r from-blue-900/40 to-purple-900/40 p-10 text-center backdrop-blur-sm"
+        >
+          <div className="absolute -top-px left-1/2 -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400" />
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-400 mb-3">Free · No Pressure</p>
+          <h3 className="font-display text-2xl md:text-3xl font-semibold text-white mb-3">
+            Not Sure Where to Start?
+          </h3>
+          <p className="text-white/60 text-base max-w-xl mx-auto mb-8">
+            Book a free 30-minute strategy call. We'll look at your current situation, identify the gaps, and map out exactly what would make the biggest impact for your business.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={scrollToBooking}
+              className="inline-flex items-center justify-center gap-2 bg-blue-500 text-white px-8 py-4 text-sm font-medium uppercase tracking-wider hover:bg-blue-400 transition-colors"
+            >
+              Book Your Free Call <ArrowRight className="w-4 h-4" />
+            </button>
+            <a
+              href="/services"
+              className="inline-flex items-center justify-center gap-2 border border-white/20 text-white/80 px-8 py-4 text-sm font-medium uppercase tracking-wider hover:bg-white/10 transition-colors"
+            >
+              See All Services
+            </a>
+          </div>
+          {/* Stats */}
+          <div className="flex flex-wrap justify-center gap-10 mt-10 pt-8 border-t border-white/10">
+            {[
+              { num: "50+", label: "Clients Served" },
+              { num: "8+", label: "Services Offered" },
+              { num: "100%", label: "Growth Focused" },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <p className="font-display text-3xl font-semibold text-blue-300">{stat.num}</p>
+                <p className="text-xs uppercase tracking-wider text-white/40 mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </section>
   );
