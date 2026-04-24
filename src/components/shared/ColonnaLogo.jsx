@@ -14,7 +14,7 @@ export default function ColonnaLogo({ light = false, size = "md" }) {
         <span className={`font-display ${textClass} font-semibold tracking-[0.04em] ${light ? "text-white" : "text-foreground"}`}>
           Colonna
         </span>
-        <span className="font-display text-xs font-light italic tracking-[0.3em] uppercase text-primary -mt-0.5">
+        <span className="font-display text-xs font-light italic tracking-[0.3em] uppercase -mt-0.5" style={{ color: "#d4c5a9" }}>
           Media
         </span>
       </div>
