@@ -109,7 +109,7 @@ export default function Navbar() {
             </Link>
           </div>
 
-          <button onClick={() => setOpen(!open)} className="lg:hidden text-foreground">
+          <button onClick={() => setOpen(!open)} className={`lg:hidden transition-colors ${scrolled ? "text-foreground" : "text-white"}`}>
             {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
