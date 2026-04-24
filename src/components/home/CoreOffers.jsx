@@ -65,15 +65,7 @@ export default function CoreOffers() {
   return (
     <section className="py-24 lg:py-12 bg-background">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="text-center mb-14">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-4">Where Do You Start?</p>
-          <h2 className="font-display text-3xl md:text-5xl font-semibold leading-tight">
-            Find Your <span className="italic font-light">Starting Point</span>
-          </h2>
-          <p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
-            Whether you need visuals, strategy, a campaign page, or smarter systems — pick the path that fits where you are right now.
-          </p>
-        </div>
+
 
 
       </div>
