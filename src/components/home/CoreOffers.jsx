@@ -63,7 +63,7 @@ const offers = [
 
 export default function CoreOffers() {
   return (
-    <section className="py-24 lg:py-32 bg-background">
+    <section className="py-24 lg:py-12 bg-background">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center mb-14">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-4">Where Do You Start?</p>
@@ -75,42 +75,7 @@ export default function CoreOffers() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {offers.map((offer, i) => {
-            const Icon = offer.icon;
-            const isAnchor = offer.link.startsWith("#");
-            const cardContent = (
-              <motion.div
-                key={offer.title}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.07 }}
-                className={`group flex flex-col border rounded-none p-8 hover:shadow-lg transition-all duration-300 cursor-pointer ${offer.accent}`}
-              >
-                <div className={`w-12 h-12 ${offer.iconBg} flex items-center justify-center mb-6`}>
-                  <Icon className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="font-display text-xl font-semibold mb-3 group-hover:text-primary transition-colors">
-                  {offer.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed flex-1">{offer.description}</p>
-                <div className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wider text-primary group-hover:gap-3 transition-all">
-                  {offer.cta} <ArrowRight className="w-3.5 h-3.5" />
-                </div>
-              </motion.div>
-            );
 
-            if (offer.isBooking) {
-              return <button key={offer.title} onClick={scrollToBooking} className="text-left w-full">{cardContent}</button>;
-            }
-            return isAnchor ? (
-              <a key={offer.title} href={offer.link}>{cardContent}</a>
-            ) : (
-              <Link key={offer.title} to={offer.link}>{cardContent}</Link>
-            );
-          })}
-        </div>
       </div>
     </section>
   );
