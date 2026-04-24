@@ -1,7 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Camera, Brain, Globe, Wrench, ArrowRight } from "lucide-react";
+import { Camera, Brain, Globe, Wrench, ArrowRight, CalendarDays } from "lucide-react";
 import { motion } from "framer-motion";
+
+const scrollToBooking = () => {
+  document.getElementById("book-consultation")?.scrollIntoView({ behavior: "smooth" });
+};
 
 const offers = [
   {
@@ -44,6 +48,17 @@ const offers = [
     accent: "bg-stone-50 border-stone-200",
     iconBg: "bg-stone-100",
   },
+  {
+    icon: CalendarDays,
+    title: "Book a Free Consultation",
+    description:
+      "Not sure where to start? Jump on a free strategy call and we'll figure out the best path forward for your business.",
+    cta: "Book Now",
+    link: "#book",
+    isBooking: true,
+    accent: "bg-primary/5 border-primary/20",
+    iconBg: "bg-primary/10",
+  },
 ];
 
 export default function CoreOffers() {
@@ -60,7 +75,7 @@ export default function CoreOffers() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {offers.map((offer, i) => {
             const Icon = offer.icon;
             const isAnchor = offer.link.startsWith("#");
@@ -86,6 +101,9 @@ export default function CoreOffers() {
               </motion.div>
             );
 
+            if (offer.isBooking) {
+              return <button key={offer.title} onClick={scrollToBooking} className="text-left w-full">{cardContent}</button>;
+            }
             return isAnchor ? (
               <a key={offer.title} href={offer.link}>{cardContent}</a>
             ) : (
