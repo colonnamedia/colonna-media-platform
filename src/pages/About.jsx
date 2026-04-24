@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Target, Eye, Lightbulb, TrendingUp } from "lucide-react";
 import SectionHeader from "../components/shared/SectionHeader";
 import CTABanner from "../components/shared/CTABanner";
+import ProjectsSection from "../components/about/ProjectsSection";
 
 const TEAM_IMAGE = "https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/2e5689bf7_IMG_5011.jpg";
 const FOUNDER_IMAGE = "https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/bee9e92dd_PittsburghPunch-PGH-ColonnaMedia1of1-5.jpg";"https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/2e5689bf7_IMG_5011.jpg";
@@ -47,15 +48,16 @@ export default function About() {
               </div>
             </motion.div>
             <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-4">Our Story</p>
-              <h2 className="font-display text-3xl md:text-4xl font-semibold leading-tight mb-6">
-                Built on Creativity. <span className="italic font-light">Driven by Results.</span>
-              </h2>
-              <div className="space-y-4 text-muted-foreground leading-relaxed">
-                <p>Colonna Media started as a photography studio with one mission: help businesses look their absolute best. But we quickly realized that great visuals alone weren't enough.</p>
-                <p>Businesses needed more than beautiful photos — they needed strategy. They needed content that told a story, web pages that converted, and systems that turned attention into action.</p>
-                <p>Today, Colonna Media is a full-service creative strategy company. We combine photography, content creation, consulting, SEO, ad campaigns, and lead generation into one cohesive growth engine for our clients.</p>
-              </div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-4">The Story</p>
+            <h2 className="font-display text-3xl md:text-4xl font-semibold leading-tight mb-6">
+              Built on Creativity. <span className="italic font-light">Driven by Results.</span>
+            </h2>
+            <div className="space-y-4 text-muted-foreground leading-relaxed">
+              <p>Anthony Colonna is a Pittsburgh-based photographer, strategist, and builder. What started with a camera and a passion for capturing real moments evolved into something much bigger — a full-service creative and growth company that helps businesses stand out and convert.</p>
+              <p>Anthony's background spans professional photography, brand strategy, digital marketing, and software development. He doesn't just create content — he builds systems. From brand photo shoots and lead-generating web pages to custom apps and AI-powered tools, he approaches every project with the same mindset: what actually moves the needle?</p>
+              <p>He's worked with boxing gyms, fitness studios, restaurants, real estate professionals, and service businesses across Pittsburgh and beyond. He's also launched several personal projects — including a sports card market platform, a boxing lesson app, and a suite of AI-powered marketing tools — all built to solve real problems he saw in the market.</p>
+              <p>Colonna Media is the umbrella for it all — photography, content, consulting, web pages, ad strategy, SEO, and the growing ecosystem of tools built to support business owners who want real growth, not just good-looking content.</p>
+            </div>
             </motion.div>
           </div>
         </div>
@@ -83,6 +85,8 @@ export default function About() {
           </div>
         </div>
       </section>
+
+      <ProjectsSection />
 
       <CTABanner
         headline="Let's Talk About Your Business"
