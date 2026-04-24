@@ -65,7 +65,7 @@ export default function BookingCalendar() {
       status: "new",
     });
 
-    await base44.integrations.Core.SendEmail({
+    await base44.functions.invoke("sendContactEmail", {
       to: "colonnamedia@gmail.com",
       subject: `📅 New Booking Request — ${form.name} | ${dateStr} at ${selectedTime}`,
       body: `
