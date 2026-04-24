@@ -21,13 +21,13 @@ export default function Home() {
       <HeroSection />
       <BrandIntro />
       <CoreOffers />
+      <CalendlySection />
       <ClientsStrip />
       <ServicesOverview />
       <WhyColonna />
       <FeaturedWork />
       <ToolsSection />
       <Testimonials />
-      <CalendlySection />
       <FloatingCTA />
 
       {/* Bottom CTA */}
