@@ -17,8 +17,8 @@ const projects = [
     name: "Apex Boxing Lesson App",
     role: "Founder & Developer",
     description:
-      "A dedicated booking and lesson management app for boxing coaches and gyms. Streamlines scheduling, client management, and lesson tracking for individual trainers and small boxing studios.",
-    tag: "Personal Project",
+      "A web app designed to teach boxing fundamentals — built for students learning the basics and coaches looking for a structured way to teach technique. Covers stance, footwork, combinations, and coaching cues in a clean, accessible format.",
+    tag: "In Development",
     img: "https://images.unsplash.com/photo-1517438322307-e67111335449?w=800&q=80",
   },
   {
@@ -64,6 +64,7 @@ const projects = [
 const tagColors = {
   "Personal Project": "bg-blue-100 text-blue-700",
   "Client Project": "bg-violet-100 text-violet-700",
+  "In Development": "bg-amber-100 text-amber-700",
 };
 
 export default function ProjectsSection() {
