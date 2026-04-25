@@ -19,6 +19,17 @@ export default function Home() {
   return (
     <div>
       <HeroSection />
+
+      {/* Team collaboration image strip */}
+      <div className="relative w-full h-72 md:h-96 overflow-hidden">
+        <img
+          src="https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/3fb85829c_generated_image.png"
+          alt="Small business team collaborating"
+          className="w-full h-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+      </div>
+
       <BrandIntro />
       <CoreOffers />
       <CalendlySection />
