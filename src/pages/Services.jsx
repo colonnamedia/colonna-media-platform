@@ -55,6 +55,7 @@ const services = [
     items: ["Landing Pages", "Offer Pages", "Campaign Pages", "Lead Form Pages", "Service Business Web Pages"],
     link: "/contact",
     externalLink: "https://papaya-launch-site-flow.base44.app",
+    img: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=800&q=80",
     color: "from-blue-500 to-cyan-600",
   },
   {
@@ -65,6 +66,7 @@ const services = [
     items: ["Local SEO", "Website Visibility", "On-Page Optimization", "Content Strategy", "Lead Visibility"],
     link: "/contact",
     externalLink: "https://seo-auditor-pro-copy-7436d8be.base44.app",
+    img: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80",
     color: "from-teal-600 to-teal-800",
   },
   {
@@ -74,6 +76,7 @@ const services = [
     desc: "Conversion-focused ad strategy — from messaging and creative direction to landing page alignment.",
     items: ["Ad Messaging", "Campaign Structure", "Creative Direction", "Landing Page Alignment", "Funnel Strategy"],
     link: "/contact",
+    img: "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=800&q=80",
     color: "from-blue-700 to-indigo-700",
   },
   {
@@ -83,6 +86,7 @@ const services = [
     desc: "End-to-end systems for attracting inquiries — offer positioning, messaging, and conversion pathways.",
     items: ["Inquiry Attraction", "Offer Positioning", "Messaging Strategy", "Conversion Pathways", "Ads + Pages + Follow-Up"],
     link: "/contact",
+    img: "https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=800&q=80",
     color: "from-indigo-700 to-violet-700",
   },
 ];
@@ -162,8 +166,22 @@ export default function Services() {
                   transition={{ delay: i * 0.06 }}
                   className="group relative bg-card border border-border overflow-hidden hover:shadow-xl hover:border-primary/30 transition-all duration-300"
                 >
-                  {/* Top color bar */}
-                  <div className={`h-1 w-full bg-gradient-to-r ${service.color}`} />
+                  {/* Top image */}
+                  {service.img ? (
+                    <div className="aspect-video overflow-hidden relative">
+                      <img
+                        src={service.img}
+                        alt={service.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                      <span className={`absolute top-3 right-3 text-[10px] font-bold uppercase tracking-[0.18em] px-3 py-1 ${tagColors[service.tag]}`}>
+                        {service.tag}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className={`h-1 w-full bg-gradient-to-r ${service.color}`} />
+                  )}
 
                   <div className="p-8">
                     {/* Header row */}
@@ -171,9 +189,11 @@ export default function Services() {
                       <div className={`w-12 h-12 bg-gradient-to-br ${service.color} flex items-center justify-center`}>
                         <Icon className="w-5 h-5 text-white" />
                       </div>
-                      <span className={`text-[10px] font-bold uppercase tracking-[0.18em] px-3 py-1 ${tagColors[service.tag]}`}>
-                        {service.tag}
-                      </span>
+                      {!service.img && (
+                        <span className={`text-[10px] font-bold uppercase tracking-[0.18em] px-3 py-1 ${tagColors[service.tag]}`}>
+                          {service.tag}
+                        </span>
+                      )}
                     </div>
 
                     {/* Title + desc */}
@@ -181,17 +201,6 @@ export default function Services() {
                       {service.title}
                     </h2>
                     <p className="text-muted-foreground text-sm leading-relaxed mb-6">{service.desc}</p>
-
-                    {/* Optional image */}
-                    {service.img && (
-                      <div className="aspect-video overflow-hidden mb-6 border border-border">
-                        <img
-                          src={service.img}
-                          alt={service.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      </div>
-                    )}
 
                     {/* Items */}
                     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-8">
