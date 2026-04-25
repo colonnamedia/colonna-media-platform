@@ -10,22 +10,15 @@ const scrollToBooking = () => {
 export default function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Design background — no photo */}
-      <div className="absolute inset-0 bg-[#0a0a0f]" />
-      {/* Grid overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.07]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }}
-      />
-      {/* Glow orbs */}
-      <div className="absolute top-[-10%] left-[-5%] w-[700px] h-[700px] rounded-full bg-blue-600/20 blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full bg-purple-600/20 blur-[120px] pointer-events-none" />
-      {/* Diagonal accent line */}
-      <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-white/10 to-transparent hidden lg:block" style={{ left: "58%" }} />
+      {/* Background photo */}
+      <div className="absolute inset-0">
+        <img
+          src="https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/ad499cf42_IMG_5315.jpg"
+          alt="Big marketing for small companies"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/30" />
+      </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full pt-32 pb-20 lg:pt-0 lg:pb-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center min-h-screen">
@@ -46,9 +39,9 @@ export default function HeroSection() {
               transition={{ delay: 0.3 }}
               className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold text-white leading-[1.05] mb-6"
             >
-              Creative Media.{" "}
-              <span className="italic font-light text-blue-400">Smart Strategy.</span>{" "}
-              Real Leads.
+              Big Marketing.{" "}
+              <span className="italic font-light text-blue-400">Small Companies.</span>{" "}
+              Real Results.
             </motion.h1>
 
             <motion.p
