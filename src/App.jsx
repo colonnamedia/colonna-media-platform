@@ -16,6 +16,7 @@ import ContentCreation from './pages/ContentCreation';
 import Strategy from './pages/Strategy';
 import Clients from './pages/Clients';
 import Bookings from './pages/Bookings';
+import Dashboard from './pages/Dashboard';
 import Contact from './pages/Contact';
 
 const AuthenticatedApp = () => {
@@ -51,6 +52,7 @@ const AuthenticatedApp = () => {
         <Route path="/clients" element={<Clients />} />
         <Route path="/bookings" element={<Bookings />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
