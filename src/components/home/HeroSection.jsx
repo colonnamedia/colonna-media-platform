@@ -13,7 +13,7 @@ export default function HeroSection() {
       {/* Background photo */}
       <div className="absolute inset-0">
         <img
-          src="https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/ad499cf42_IMG_5315.jpg"
+          src="https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/8c9937850_IMG_5316.jpg"
           alt="Big marketing for small companies"
           className="w-full h-full object-cover"
         />
