@@ -102,7 +102,7 @@ export default function BrandIntro() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={scrollToBooking}
-              className="inline-flex items-center justify-center gap-2 bg-blue-500 text-white px-8 py-4 text-sm font-medium uppercase tracking-wider hover:bg-blue-400 transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-[#E11D48] text-white px-8 py-4 text-sm font-medium uppercase tracking-wider hover:bg-[#be1a3d] transition-colors"
             >
               Book Your Free Call <ArrowRight className="w-4 h-4" />
             </button>
