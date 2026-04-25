@@ -44,7 +44,7 @@ export default function Navbar() {
   useEffect(() => { setOpen(false); }, [location]);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-sm" : "bg-transparent"}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-black/30 backdrop-blur-sm"}`}>
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link to="/">
@@ -56,7 +56,7 @@ export default function Navbar() {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary ${location.pathname === link.path ? "text-primary" : scrolled ? "text-foreground/70" : "text-white/90"}`}
+                className={`text-sm font-medium tracking-wide uppercase transition-colors hover:text-blue-500 ${location.pathname === link.path ? "text-blue-500" : scrolled ? "text-foreground/70" : "text-white/90"}`}
               >
                 {link.label}
               </Link>
@@ -66,7 +66,7 @@ export default function Navbar() {
             <div className="relative" ref={toolsRef}>
               <button
                 onClick={() => setToolsOpen(!toolsOpen)}
-                className={`flex items-center gap-1 text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary ${scrolled ? "text-foreground/70" : "text-white/90"}`}
+                className={`flex items-center gap-1 text-sm font-medium tracking-wide uppercase transition-colors hover:text-blue-500 ${scrolled ? "text-foreground/70" : "text-white/90"}`}
               >
                 Tools <ChevronDown className={`w-3.5 h-3.5 transition-transform ${toolsOpen ? "rotate-180" : ""}`} />
               </button>
@@ -101,12 +101,18 @@ export default function Navbar() {
             </div>
 
 
-            <Link
-              to="/bookings"
-              className="bg-primary text-primary-foreground px-6 py-2.5 text-sm font-medium tracking-wide uppercase hover:bg-primary/90 transition-colors"
+            <button
+              onClick={() => {
+                if (window.location.pathname === "/") {
+                  document.getElementById("book-consultation")?.scrollIntoView({ behavior: "smooth" });
+                } else {
+                  window.location.href = "/#book-consultation";
+                }
+              }}
+              className="bg-blue-500 text-white px-6 py-2.5 text-sm font-medium tracking-wide uppercase hover:bg-blue-400 transition-colors"
             >
               Book a Call
-            </Link>
+            </button>
           </div>
 
           <button onClick={() => setOpen(!open)} className={`lg:hidden transition-colors ${scrolled ? "text-foreground" : "text-white"}`}>
@@ -147,12 +153,19 @@ export default function Navbar() {
                   </a>
                 ))}
               </div>
-              <Link
-                to="/bookings"
-                className="bg-primary text-primary-foreground px-6 py-3 text-sm font-medium tracking-wide uppercase text-center hover:bg-primary/90 transition-colors mt-2"
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  if (window.location.pathname === "/") {
+                    document.getElementById("book-consultation")?.scrollIntoView({ behavior: "smooth" });
+                  } else {
+                    window.location.href = "/#book-consultation";
+                  }
+                }}
+                className="bg-blue-500 text-white px-6 py-3 text-sm font-medium tracking-wide uppercase text-center hover:bg-blue-400 transition-colors mt-2 w-full"
               >
                 Book a Call
-              </Link>
+              </button>
             </div>
           </motion.div>
         )}
