@@ -12,7 +12,7 @@ const services = [
   desc: "Professional brand photography that captures the essence of your business and elevates your visual presence.",
   items: ["Brand Photography", "Portraits & Headshots", "Studio Sessions", "On-Location Shoots", "Business Photography", "Content-Day Photography"],
   link: "/photography",
-  img: "https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/f875a32dc_IMG_3663.jpg",
+  img: "https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/d96007afa_IMG_9390.jpg",
   color: "from-blue-600 to-blue-800"
 },
 {
@@ -188,7 +188,7 @@ export default function Services() {
                         <img
                           src={service.img}
                           alt={service.title}
-                          className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${service.title === "Consulting" ? "object-[center_20%]" : "object-cover"}`}
+                          className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${service.title === "Consulting" ? "object-[center_20%]" : service.title === "Content Creation" ? "object-[center_60%]" : "object-center"}`}
                         />
                       </div>
                     }
