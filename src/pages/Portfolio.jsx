@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ExternalLink } from "lucide-react";
 import SectionHeader from "../components/shared/SectionHeader";
 import CTABanner from "../components/shared/CTABanner";
 
@@ -37,6 +38,19 @@ export default function Portfolio() {
             title="Our Work Speaks for Itself"
             subtitle="A selection of photography, branding, and content work across industries and styles."
           />
+
+          {/* Behance link */}
+          <div className="flex justify-center mb-8">
+            <a
+              href="https://www.behance.net/colonnamedia/projects"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-[#1769ff] text-white px-6 py-3 text-sm font-semibold uppercase tracking-wider hover:bg-[#0052cc] transition-colors"
+            >
+              <ExternalLink className="w-4 h-4" />
+              View Full Portfolio on Behance
+            </a>
+          </div>
 
           {/* Filter tabs */}
           <div className="flex flex-wrap justify-center gap-2 mb-12">
