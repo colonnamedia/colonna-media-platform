@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
 import { Users, Clock, CheckCircle, AlertCircle, TrendingUp, Mail, Building } from "lucide-react";
+import LeadProgressChart from "../components/dashboard/LeadProgressChart";
 
 const STATUS_COLORS = {
   new: "bg-blue-100 text-blue-700",
@@ -119,6 +120,8 @@ export default function Dashboard() {
             );
           })}
         </div>
+
+        <LeadProgressChart leads={leads} />
 
         {/* Leads Table */}
         <div className="bg-card border border-border overflow-hidden">
