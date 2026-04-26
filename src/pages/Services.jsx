@@ -33,7 +33,7 @@ const services = [
   desc: "Business and marketing consulting to sharpen your positioning and accelerate measurable growth.",
   items: ["Business Consulting", "Marketing Consulting", "Brand Positioning", "Growth Strategy", "Offer Strategy"],
   link: "/strategy",
-  img: "https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/7ef16c686_IMG_3612.jpg",
+  img: "https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/98ba57307_IMG_5011.jpg",
   color: "from-violet-600 to-violet-800"
 },
 {
