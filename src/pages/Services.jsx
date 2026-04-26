@@ -188,7 +188,7 @@ export default function Services() {
                         <img
                           src={service.img}
                           alt={service.title}
-                          className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${service.title === "Consulting" ? "object-[center_20%]" : service.title === "Content Creation" ? "object-[center_80%]" : "object-center"}`}
+                          className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${service.title === "Consulting" ? "object-[center_20%]" : service.title === "Content Creation" ? "object-[center_30%]" : "object-center"}`}
                         />
                       </div>
                     }
