@@ -90,8 +90,12 @@ export default function HeroSection() {
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-48 h-48 bg-gradient-to-br from-blue-600/30 to-purple-700/30 backdrop-blur-sm border border-white/10 flex items-center justify-center">
                   <div className="text-center">
-                    <p className="font-display text-4xl font-semibold text-white">CM</p>
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-white/40 mt-1">Colonna Media</p>
+                    <img
+                      src="https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/be63203ab_colonnacolumn.png"
+                      alt="Colonna Media"
+                      className="w-20 h-20 object-contain mx-auto opacity-90"
+                    />
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-white/40 mt-2">Colonna Media</p>
                   </div>
                 </div>
               </div>

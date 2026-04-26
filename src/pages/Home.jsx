@@ -46,9 +46,10 @@ export default function Home() {
         </div>
       </section>
 
-      <FeaturedWork />
       <Testimonials />
+      <FeaturedWork />
       <ServicesOverview />
+      <div className="py-12 bg-foreground" />
       <FloatingCTA />
 
 
