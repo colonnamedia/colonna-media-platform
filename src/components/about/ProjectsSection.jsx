@@ -1,8 +1,41 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, ArrowRight } from "lucide-react";
+
+const ecosystemTools = [
+  {
+    title: "Fire-Works — Content AI",
+    tag: "Content",
+    href: "https://fire-works-content-ai.base44.app",
+  },
+  {
+    title: "SEO Auditor",
+    tag: "SEO & Visibility",
+    href: "https://seo-auditor-pro-copy-7436d8be.base44.app",
+  },
+  {
+    title: "Marketing Blueprint",
+    tag: "Customer Journey",
+    href: "https://marketing-blueprint-build.base44.app",
+  },
+  {
+    title: "Website Builder",
+    tag: "Web Pages",
+    href: "https://papaya-launch-site-flow.base44.app",
+  },
+];
 
 const projects = [
+{
+  name: "Fire-Works — Content AI",
+  role: "Founder & Developer",
+  description:
+  "An AI-powered content creation tool that generates on-brand social media content, campaign copy, and web page text. Built as part of the Colonna Media ecosystem to help businesses scale their content output.",
+  link: "https://fire-works-content-ai.base44.app",
+  linkLabel: "fire-works-content-ai.base44.app",
+  tag: "Personal Project",
+  img: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=800&q=80"
+},
 {
   name: "Cuz Cards — Card Market Index",
   role: "Founder & Developer",
@@ -29,16 +62,7 @@ const projects = [
   tag: "Client Project",
   img: "https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/bee9e92dd_PittsburghPunch-PGH-ColonnaMedia1of1-5.jpg"
 },
-{
-  name: "Fire Works — Content AI",
-  role: "Developer & Product Lead",
-  description:
-  "An AI-powered content creation tool that generates on-brand social media content, campaign copy, and web page text. Built as part of the Colonna Media ecosystem to help businesses scale their content output.",
-  link: "https://fire-works-content-ai.base44.app",
-  linkLabel: "fire-works-content-ai.base44.app",
-  tag: "Personal Project",
-  img: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=800&q=80"
-},
+
 {
   name: "Marketing Blueprint Builder",
   role: "Developer & Product Lead",
@@ -79,6 +103,28 @@ export default function ProjectsSection() {
           <p className="mt-4 text-muted-foreground text-lg max-w-2xl">
             A mix of client work, personal projects, and tools built to solve real problems — from boxing gyms to card markets to AI content platforms.
           </p>
+        </div>
+
+        {/* Ecosystem strip */}
+        <div className="mb-12">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-5">The Colonna Ecosystem — 4 Tools</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {ecosystemTools.map((tool) => (
+              <a
+                key={tool.title}
+                href={tool.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center justify-between border border-border bg-card px-5 py-4 hover:border-primary/40 hover:shadow-md transition-all duration-200"
+              >
+                <div>
+                  <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-primary block mb-1">{tool.tag}</span>
+                  <span className="font-display text-sm font-semibold group-hover:text-primary transition-colors">{tool.title}</span>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0 ml-3" />
+              </a>
+            ))}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
