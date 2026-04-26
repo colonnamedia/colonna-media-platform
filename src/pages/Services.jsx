@@ -185,7 +185,7 @@ export default function Services() {
                     {/* Optional image */}
                     {service.img &&
                     <div className="aspect-video overflow-hidden mb-6 border border-border">
-                        <img src="https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/49b287946_Colonna_Media-00266.jpg"
+                        <img src="https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/49f7d49b4_IMG_3616.JPG"
 
                       alt={service.title} className="w-full h-full object-cover object-[center_20%] group-hover:scale-105 transition-transform duration-500" />
 
