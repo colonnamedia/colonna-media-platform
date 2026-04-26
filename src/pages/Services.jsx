@@ -188,7 +188,7 @@ export default function Services() {
                         <img
                           src={service.img}
                           alt={service.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                         />
                       </div>
                     )}
