@@ -63,7 +63,7 @@ const offers = [
 
 export default function CoreOffers() {
   return (
-    <section className="bg-background lg:py-12">
+    <section className="bg-background lg:py-12 hidden">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
 
