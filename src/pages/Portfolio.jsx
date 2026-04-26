@@ -25,9 +25,30 @@ const photos = [
   { src: "https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/26d2d043d_IMG_3675.png", cat: "Campaign", title: "Lucid Juice Campaign" },
 ];
 
+const PhotoGrid = ({ items }) => (
+  <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+    {items.map((photo) => (
+      <motion.div
+        key={photo.src}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+        className="group relative overflow-hidden break-inside-avoid"
+      >
+        <img src={photo.src} alt={photo.title} className="w-full object-cover group-hover:scale-105 transition-transform duration-700" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
+          <span className="text-[10px] uppercase tracking-wider text-white/60">{photo.cat}</span>
+          <h3 className="text-sm font-semibold text-white">{photo.title}</h3>
+        </div>
+      </motion.div>
+    ))}
+  </div>
+);
+
 export default function Portfolio() {
   const [active, setActive] = useState("All");
-  const filtered = active === "All" ? photos : photos.filter((p) => p.cat === active);
+  const cats = categories.filter((c) => c !== "All");
 
   return (
     <div>
@@ -69,29 +90,26 @@ export default function Portfolio() {
             ))}
           </div>
 
-          {/* Grid */}
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-            <AnimatePresence mode="popLayout">
-              {filtered.map((photo) => (
-                <motion.div
-                  key={photo.src}
-                  layout
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
-                  className="group relative overflow-hidden break-inside-avoid"
-                >
-                  <img src={photo.src} alt={photo.title} className="w-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                    <span className="text-[10px] uppercase tracking-wider text-white/60">{photo.cat}</span>
-                    <h3 className="text-sm font-semibold text-white">{photo.title}</h3>
+          {/* All view — sectioned by category */}
+          {active === "All" ? (
+            <div className="space-y-16">
+              {cats.map((cat) => {
+                const items = photos.filter((p) => p.cat === cat);
+                if (!items.length) return null;
+                return (
+                  <div key={cat}>
+                    <div className="flex items-center gap-4 mb-6">
+                      <h2 className="font-display text-xl font-semibold uppercase tracking-wider">{cat}</h2>
+                      <div className="flex-1 h-px bg-border" />
+                    </div>
+                    <PhotoGrid items={items} />
                   </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <PhotoGrid items={photos.filter((p) => p.cat === active)} />
+          )}
         </div>
       </section>
 
