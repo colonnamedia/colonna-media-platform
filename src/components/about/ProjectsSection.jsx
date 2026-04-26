@@ -26,16 +26,7 @@ const ecosystemTools = [
 ];
 
 const projects = [
-{
-  name: "Fire-Works — Content AI",
-  role: "Founder & Developer",
-  description:
-  "An AI-powered content creation tool that generates on-brand social media content, campaign copy, and web page text. Built as part of the Colonna Media ecosystem to help businesses scale their content output.",
-  link: "https://fire-works-content-ai.base44.app",
-  linkLabel: "fire-works-content-ai.base44.app",
-  tag: "Personal Project",
-  img: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=800&q=80"
-},
+
 {
   name: "Cuz Cards — Card Market Index",
   role: "Founder & Developer",
@@ -63,26 +54,7 @@ const projects = [
   img: "https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/bee9e92dd_PittsburghPunch-PGH-ColonnaMedia1of1-5.jpg"
 },
 
-{
-  name: "Marketing Blueprint Builder",
-  role: "Developer & Product Lead",
-  description:
-  "A strategic planning tool that guides business owners through mapping their customer journey, identifying conversion gaps, and building a clear path from awareness to booked client.",
-  link: "https://marketing-blueprint-build.base44.app",
-  linkLabel: "marketing-blueprint-build.base44.app",
-  tag: "Personal Project",
-  img: "https://images.unsplash.com/photo-1542626991-cbc4e32524cc?w=800&q=80"
-},
-{
-  name: "Lead-Generating Website Builder",
-  role: "Developer & Product Lead",
-  description:
-  "A focused web page builder designed specifically for service businesses. Helps owners launch high-converting landing pages and service pages without needing a developer.",
-  link: "https://papaya-launch-site-flow.base44.app",
-  linkLabel: "papaya-launch-site-flow.base44.app",
-  tag: "Personal Project",
-  img: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=800&q=80"
-}];
+];
 
 
 const tagColors = {
