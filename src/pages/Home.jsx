@@ -24,7 +24,6 @@ export default function Home() {
       <CoreOffers />
       <CalendlySection />
       <ClientsStrip />
-      <ServicesOverview />
       <WhyColonna />
 
       {/* Team collaboration image with title */}
@@ -48,8 +47,8 @@ export default function Home() {
       </section>
 
       <FeaturedWork />
-      <ToolsSection />
       <Testimonials />
+      <ServicesOverview />
       <FloatingCTA />
 
 

@@ -16,14 +16,15 @@ const services = [
 
 export default function ServicesOverview() {
   return (
-    <section className="py-24 lg:py-32 bg-secondary/50">
+    <section className="py-24 lg:py-32 bg-foreground">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <SectionHeader
-          eyebrow="What We Do"
-          title="Services Built for Growth"
+          eyebrow="Full Service Offering"
+          title="Everything We Do"
           subtitle="Every service is designed to help your business look better, communicate better, and convert better."
+          light={true}
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 border border-border">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
           {services.map((service, i) => {
             const Icon = service.icon;
             return (
@@ -33,14 +34,14 @@ export default function ServicesOverview() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
-                className="group relative overflow-hidden border-r border-b border-border last:border-r-0 p-8 hover:bg-foreground transition-colors duration-300"
+                className="group bg-foreground hover:bg-white/5 p-8 transition-colors duration-300"
               >
-                <div className="w-10 h-10 bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center mb-5 transition-colors">
-                  <Icon className="w-5 h-5 text-primary" />
+                <div className="w-10 h-10 bg-white/10 group-hover:bg-blue-500/20 flex items-center justify-center mb-5 transition-colors">
+                  <Icon className="w-5 h-5 text-blue-400" />
                 </div>
-                <h3 className="font-display text-lg font-semibold mb-2 group-hover:text-background transition-colors">{service.title}</h3>
-                <p className="text-sm text-muted-foreground group-hover:text-background/60 leading-relaxed transition-colors">{service.description}</p>
-                <div className="mt-4 w-6 h-0.5 bg-primary group-hover:w-10 transition-all duration-300" />
+                <h3 className="font-display text-lg font-semibold mb-2 text-white">{service.title}</h3>
+                <p className="text-sm text-white/40 group-hover:text-white/60 leading-relaxed transition-colors">{service.description}</p>
+                <div className="mt-4 w-6 h-0.5 bg-blue-500/50 group-hover:w-10 transition-all duration-300" />
               </motion.div>
             );
           })}
