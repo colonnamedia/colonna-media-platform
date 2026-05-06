@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -32,14 +31,26 @@ export default function Contact() {
     message: "",
   });
 
-  const res = await fetch("/api/send-email", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(form),
-});
-    setLoading(false);
-    setSubmitted(true);
-    toast({ title: "Inquiry sent!", description: "We'll be in touch soon." });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) throw new Error("Failed to send");
+
+      setSubmitted(true);
+      toast({ title: "Inquiry sent!", description: "We'll be in touch soon." });
+    } catch (err) {
+      toast({ title: "Something went wrong.", description: "Please try again or email us directly.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,7 +58,6 @@ export default function Contact() {
       <section className="pt-32 pb-24 lg:pt-40 lg:pb-32">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            {/* Left */}
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-4">Contact</p>
               <h1 className="font-display text-4xl md:text-5xl font-semibold leading-tight mb-6">
@@ -56,7 +66,6 @@ export default function Contact() {
               <p className="text-muted-foreground text-lg leading-relaxed mb-10">
                 Whether you're ready to book a session, explore consulting, or just want to talk about your business — we'd love to hear from you.
               </p>
-
               <div className="space-y-6">
                 <a href="mailto:Colonnamedia@gmail.com" className="flex items-center gap-3 text-foreground hover:text-primary transition-colors">
                   <div className="w-10 h-10 bg-primary/10 flex items-center justify-center">
@@ -73,7 +82,6 @@ export default function Contact() {
               </div>
             </motion.div>
 
-            {/* Right — Form */}
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
               {submitted ? (
                 <div className="bg-card border border-border p-12 text-center">
