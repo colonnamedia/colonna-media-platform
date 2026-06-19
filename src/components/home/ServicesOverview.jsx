@@ -2,7 +2,6 @@ import React from "react";
 import { Camera, Palette, Users, Route, Globe, Search, Megaphone, Target } from "lucide-react";
 import { motion } from "framer-motion";
 import SectionHeader from "../shared/SectionHeader";
-
 const services = [
   { icon: Camera, title: "Photography", description: "Brand photography, portraits, headshots, studio and on-location sessions designed to elevate your visual identity." },
   { icon: Palette, title: "Content Creation", description: "Branded visual content, social media assets, and campaign materials that tell your story with clarity." },
@@ -13,7 +12,6 @@ const services = [
   { icon: Megaphone, title: "Ad Campaigns", description: "Conversion-focused ad messaging, creative direction, and funnel strategy that drives measurable results." },
   { icon: Target, title: "Lead Generation", description: "End-to-end lead generation strategy — from offer positioning and messaging to conversion pathways." },
 ];
-
 export default function ServicesOverview() {
   return (
     <section className="py-24 lg:py-32 bg-foreground">
@@ -36,12 +34,12 @@ export default function ServicesOverview() {
                 transition={{ delay: i * 0.05 }}
                 className="group bg-foreground hover:bg-white/5 p-8 transition-colors duration-300"
               >
-                <div className="w-10 h-10 bg-white/10 group-hover:bg-blue-500/20 flex items-center justify-center mb-5 transition-colors">
-                  <Icon className="w-5 h-5 text-blue-400" />
+                <div className="w-10 h-10 bg-white/10 group-hover:bg-primary/20 flex items-center justify-center mb-5 transition-colors">
+                  <Icon className="w-5 h-5 text-primary" />
                 </div>
                 <h3 className="font-display text-lg font-semibold mb-2 text-white">{service.title}</h3>
                 <p className="text-sm text-white/40 group-hover:text-white/60 leading-relaxed transition-colors">{service.description}</p>
-                <div className="mt-4 w-6 h-0.5 bg-blue-500/50 group-hover:w-10 transition-all duration-300" />
+                <div className="mt-4 w-6 h-0.5 bg-primary/50 group-hover:w-10 transition-all duration-300" />
               </motion.div>
             );
           })}
