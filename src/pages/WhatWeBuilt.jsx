@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Zap, Map, Megaphone, ArrowUpRight } from "lucide-react";
+import { Zap, Map, Megaphone, Globe, ArrowUpRight } from "lucide-react";
 import SectionHeader from "../components/shared/SectionHeader";
 
 const projects = [
@@ -47,7 +47,7 @@ export default function WhatWeBuilt() {
         </div>
       </section>
       <section className="pb-24">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {projects.map((p, i) => {
             const Icon = p.icon;
             return (
