@@ -28,7 +28,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-xs font-semibold uppercase tracking-[0.25em] text-blue-400 mb-6"
+              className="text-xs font-semibold uppercase tracking-[0.25em] text-primary mb-6"
             >
               Photography &middot; Consulting &middot; Lead Generation
             </motion.p>
@@ -40,7 +40,7 @@ export default function HeroSection() {
               className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold text-white leading-[1.05] mb-6"
             >
               Big Marketing.{" "}
-              <span className="italic font-light text-blue-400">Small Companies.</span>{" "}
+              <span className="italic font-light text-primary">Small Companies.</span>{" "}
               Real Results.
             </motion.h1>
 
@@ -61,7 +61,7 @@ export default function HeroSection() {
             >
               <button
                 onClick={scrollToBooking}
-                className="inline-flex items-center justify-center gap-2 bg-blue-500 text-white px-8 py-4 text-sm font-medium uppercase tracking-wider hover:bg-blue-400 transition-colors"
+                className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 text-sm font-medium uppercase tracking-wider hover:bg-primary/90 transition-colors"
               >
                 Book a Free Call <ArrowRight className="w-4 h-4" />
               </button>
@@ -84,11 +84,11 @@ export default function HeroSection() {
             <div className="relative w-[420px] h-[420px]">
               {/* Outer ring */}
               <div className="absolute inset-0 rounded-full border border-white/10" />
-              <div className="absolute inset-8 rounded-full border border-blue-500/20" />
-              <div className="absolute inset-16 rounded-full border border-purple-500/20" />
+              <div className="absolute inset-8 rounded-full border border-primary/20" />
+              <div className="absolute inset-16 rounded-full border border-white/10" />
               {/* Center glow block */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-48 h-48 bg-gradient-to-br from-blue-600/30 to-purple-700/30 backdrop-blur-sm border border-white/10 flex items-center justify-center">
+                <div className="w-48 h-48 bg-gradient-to-br from-primary/30 to-primary/10 backdrop-blur-sm border border-white/10 flex items-center justify-center">
                   <div className="text-center">
                     <img
                       src="https://media.base44.com/images/public/69d4f3aa11b90aa126fe1431/be63203ab_colonnacolumn.png"
@@ -101,11 +101,11 @@ export default function HeroSection() {
               </div>
               {/* Floating stat chips */}
               <div className="absolute top-6 right-0 bg-white/5 border border-white/10 backdrop-blur-sm px-4 py-2 text-center">
-                <p className="font-display text-xl font-semibold text-blue-300">50+</p>
+                <p className="font-display text-xl font-semibold text-primary">50+</p>
                 <p className="text-[9px] uppercase tracking-wider text-white/40">Clients</p>
               </div>
               <div className="absolute bottom-6 left-0 bg-white/5 border border-white/10 backdrop-blur-sm px-4 py-2 text-center">
-                <p className="font-display text-xl font-semibold text-purple-300">8+</p>
+                <p className="font-display text-xl font-semibold text-primary">8+</p>
                 <p className="text-[9px] uppercase tracking-wider text-white/40">Services</p>
               </div>
             </div>
