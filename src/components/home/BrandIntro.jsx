@@ -1,11 +1,9 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-
 const scrollToBooking = () => {
   document.getElementById("book-consultation")?.scrollIntoView({ behavior: "smooth" });
 };
-
 export default function BrandIntro() {
   return (
     <section className="relative py-24 lg:py-32 bg-secondary/40">
