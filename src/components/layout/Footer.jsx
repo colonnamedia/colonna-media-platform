@@ -2,7 +2,6 @@ import React from "react";
 import ColonnaLogo from "../shared/ColonnaLogo";
 import { Link } from "react-router-dom";
 import { Mail, MapPin, ArrowUpRight } from "lucide-react";
-
 export default function Footer() {
   return (
     <footer className="bg-foreground text-background">
@@ -16,7 +15,6 @@ export default function Footer() {
               Creative media, smart strategy, and conversion-focused digital growth. Based in Pittsburgh, PA.
             </p>
           </div>
-
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-widest mb-6 text-background/40">Services</h4>
             <div className="flex flex-col gap-3">
@@ -25,7 +23,6 @@ export default function Footer() {
               ))}
             </div>
           </div>
-
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-widest mb-6 text-background/40">Company</h4>
             <div className="flex flex-col gap-3">
@@ -33,6 +30,7 @@ export default function Footer() {
                 { label: "About", path: "/about" },
                 { label: "Portfolio", path: "/portfolio" },
                 { label: "Clients", path: "/clients" },
+                { label: "What We've Built", path: "/built" },
                 { label: "Bookings", path: "/bookings" },
                 { label: "Contact", path: "/contact" },
               ].map((link) => (
@@ -40,7 +38,6 @@ export default function Footer() {
               ))}
             </div>
           </div>
-
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-widest mb-6 text-background/40">Get in Touch</h4>
             <div className="flex flex-col gap-4">
@@ -56,10 +53,11 @@ export default function Footer() {
             </div>
           </div>
         </div>
-
         <div className="border-t border-background/10 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-background/40">&copy; {new Date().getFullYear()} Colonna Media LLC. All rights reserved.</p>
-          <p className="text-xs text-background/40">Creative Media &middot; Strategy &middot; Lead Generation</p>
+          <p className="text-xs text-background/40">
+            Creators of the <Link to="/built" className="underline hover:text-background">Fire-Works ecosystem</Link>
+          </p>
         </div>
       </div>
     </footer>
