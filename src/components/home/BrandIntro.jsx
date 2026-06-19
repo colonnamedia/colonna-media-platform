@@ -47,7 +47,7 @@ export default function BrandIntro() {
           >
             Book a Free Call <ArrowRight className="w-4 h-4" />
           </button>
-          
+          <a
             href="/services"
             className="inline-flex items-center justify-center gap-2 border border-border text-foreground/80 px-8 py-4 text-sm font-medium uppercase tracking-wider hover:bg-background transition-colors"
           >
