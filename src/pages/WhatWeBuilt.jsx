@@ -9,21 +9,28 @@ const projects = [
     title: "Fire-Works",
     tag: "Lead Funnel Systems",
     description: "A full lead funnel platform — landing pages, lead capture, email notifications, lead dashboards, and analytics for businesses that want a complete system, not just a website.",
-    link: "https://fire-works.io", // confirm actual URL
+    link: "https://www.fireworks-eco.com/",
   },
   {
-    icon: Map,
-    title: "Blueprint Builder",
-    tag: "90-Day Business Roadmap",
-    description: "A guided tool that lays out a 90-day marketing roadmap for startups and growing businesses — what to focus on first, second, and beyond.",
-    link: "https://fireworks-businessblueprint.com",
+    icon: Globe,
+    title: "Website Builder",
+    tag: "Pro Website Builds",
+    description: "Professional website builds for businesses that want a polished, conversion-ready site without the lead funnel system attached.",
+    link: "https://fireworks-websitebuilder.com",
   },
   {
     icon: Megaphone,
     title: "Campaign Builder",
     tag: "AI Ad Campaign Generator",
     description: "A self-serve tool that helps businesses generate ad headlines, body copy, and calls-to-action with AI — no campaign management required.",
-    link: "https://fireworks-campaignbuilder.com",
+    link: "https://www.fireworks-campaignbuilder.com/",
+  },
+  {
+    icon: Map,
+    title: "Blueprint Builder",
+    tag: "90-Day Business Roadmap",
+    description: "A guided tool that lays out a 90-day marketing roadmap for startups and growing businesses — what to focus on first, second, and beyond.",
+    link: "https://www.fireworks-businessblueprint.com/",
   },
 ];
 
