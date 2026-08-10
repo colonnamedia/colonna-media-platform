@@ -110,3 +110,26 @@ assets/
 - **Page content or SEO text:** edit the page body in `build.py` (or the `.html` directly) and the
   `META` block in `build.py` for titles/descriptions, then rebuild.
 - **Calendly link:** it's in `assets/app.js` and `contact.html` (`calendly.com/colonnamedia/...`).
+
+---
+
+## 7. Troubleshooting a deploy (blank page / 404s)
+
+If, after deploying, sections are blank or links 404, the cause is almost always that **not all files
+reached the server at the site root.** Check the following:
+
+- The deployed root must contain `index.html`, `contact.html`, `services.html`, `built.html`,
+  `about.html`, `404.html`, and the `assets/` folder — all at the **top level**, not inside an extra
+  `colonna-media-site/` subfolder. In your GitHub repo, `index.html` should be the first file you see.
+- Confirm `assets/app.js`, `assets/styles.css`, and `assets/img/` all uploaded.
+- Hard-refresh after redeploy (Vercel + browsers cache aggressively): on iPhone, close the tab and reopen.
+
+This version is also built to **degrade gracefully**: even if a script fails to load, all content stays
+visible, and every "Book" button opens the Calendly scheduler on its own — so the page is never blank
+and booking always works.
+
+### Quick redeploy (drag-and-drop)
+1. Unzip this package.
+2. In your GitHub repo → **Add file → Upload files** → drag in **everything inside** the unzipped folder
+   (so `index.html` lands at the repo root) → Commit.
+3. Vercel auto-redeploys. Hard-refresh the site.

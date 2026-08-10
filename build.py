@@ -1,7 +1,7 @@
 # Assembles all Colonna Media pages with a shared header + footer.
 import os
 
-SITE = "https://www.colonnamedia.com"   # <-- set to your real domain (canonical, OG, sitemap)
+SITE = "https://colonnamedia.com"   # <-- set to your real domain (canonical, OG, sitemap)
 
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com" />'
          '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />'
@@ -53,6 +53,7 @@ def head(name):
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script>document.documentElement.className += ' js';</script>
 <title>{title}</title>
 <meta name="description" content="{desc}" />
 <meta name="robots" content="{robots}" />
@@ -132,6 +133,10 @@ def jsonld(name):
             {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"},
             {"@type": "ListItem", "position": 2, "name": m["crumb"], "item": SITE + m["path"]},
         ]})
+    if name == "index.html":
+        graph.append({"@type": "FAQPage", "mainEntity": [
+            {"@type": "Question", "name": q,
+             "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in FAQ]})
     if name == "about.html":
         graph.append({"@type": "Person", "name": "Anthony Colonna",
                       "jobTitle": "Marketing Strategist & Photographer", "worksFor": {"@id": SITE + "/#business"}})
@@ -154,10 +159,10 @@ def header(active):
     <div class="bar">
       {brand}
       <nav class="nav-links">{links}</nav>
-      <a href="contact.html#book" class="btn btn-green nav-cta">Book free session</a>
+      <a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-green nav-cta">Book free session</a>
       <button class="menu-toggle" aria-label="Menu" aria-expanded="false"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
     </div>
-    <div class="mobile-menu" id="mobileMenu">{mlinks}<a href="contact.html#book" class="btn btn-green">Book free session</a></div>
+    <div class="mobile-menu" id="mobileMenu">{mlinks}<a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-green">Book free session</a></div>
   </div>
 </header>'''
 
@@ -171,13 +176,27 @@ FOOTER = '''<footer>
       <div class="foot-cols">
         <div class="foot-col"><h4>Company</h4><a href="index.html">Home</a><a href="services.html">Services</a><a href="built.html">Work</a><a href="about.html">About</a></div>
         <div class="foot-col"><h4>Services</h4><a href="services.html">Strategy</a><a href="services.html">Lead Gen</a><a href="services.html">Campaigns</a><a href="services.html">Content</a></div>
-        <div class="foot-col"><h4>Get started</h4><a href="contact.html#book">Book free session</a><a href="contact.html">Contact</a><a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a></div>
+        <div class="foot-col"><h4>Get started</h4><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener">Book free session</a><a href="contact.html">Contact</a><a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a></div>
       </div>
     </div>
     <div class="foot-bottom"><span>&copy; 2026 Colonna Media</span><span>Pittsburgh, PA &middot; Nationwide</span></div>
   </div>
 </footer>
 <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+<script>
+(function(){var d=document;
+  var h=d.querySelector('header');
+  if(h){var f=function(){h.classList.toggle('scrolled',window.scrollY>30);};addEventListener('scroll',f,{passive:true});f();}
+  var t=d.querySelector('.menu-toggle'),m=d.getElementById('mobileMenu');
+  if(t&&m){t.addEventListener('click',function(){var o=m.classList.toggle('open');t.setAttribute('aria-expanded',o?'true':'false');});
+    m.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){m.classList.remove('open');});});}
+  var els=d.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});return;}
+  var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.12});
+  els.forEach(function(e){io.observe(e);});
+  addEventListener('load',function(){setTimeout(function(){els.forEach(function(e){if(e.getBoundingClientRect().top<innerHeight)e.classList.add('in');});},250);});
+})();
+</script>
 <script src="assets/app.js"></script>
 </body>
 </html>'''
@@ -194,10 +213,30 @@ FINAL_CTA = '''<section class="final">
       <div class="colb"><i style="height:40%;background:var(--blue)"></i><i style="height:70%;background:var(--yellow)"></i><i style="height:100%;background:var(--green)"></i><i style="height:60%;background:var(--blue)"></i><i style="height:80%;background:var(--yellow)"></i></div>
       <h2>Ready to grow your business?</h2>
       <p>Book your free 30-minute session and let's map the fastest path to more customers.</p>
-      <a href="contact.html#book" class="btn btn-green btn-lg">Start my free session →</a>
+      <a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-green btn-lg">Start my free session →</a>
     </div>
   </div>
 </section>'''
+
+FAQ = [
+  ("Do you work with businesses outside Pittsburgh?",
+   "Yes. We consult on-site with businesses around Pittsburgh and work virtually with startups and small businesses nationwide."),
+  ("What happens on the free 30-minute session?",
+   "We learn about your business and goals, pinpoint what's holding growth back, and outline a clear next step — no pressure and no obligation."),
+  ("What kind of businesses do you help?",
+   "Mostly startups and small businesses — owners who want more leads, stronger branding, and marketing that actually runs. We help you start up, grow, or revamp."),
+  ("How much does marketing consulting cost?",
+   "Every business is different, so we tailor scope and pricing to your goals. The first 30-minute session is always free."),
+  ("How soon can we get started?",
+   "Often within a week or two of your free session, depending on the scope of what you need."),
+]
+FAQ_SECTION = ('<section class="block" style="background:var(--cream)"><div class="wrap">'
+  '<div class="head reveal"><span class="eyebrow"><span class="dot"></span>FAQ</span>'
+  '<h2>Questions? We\'ve got answers</h2>'
+  '<p>A few things Pittsburgh business owners ask us before booking a session.</p></div>'
+  '<div class="faq-wrap reveal">'
+  + "".join('<details class="faq"><summary>%s</summary><p>%s</p></details>' % (q, a) for q, a in FAQ)
+  + '</div></div></section>\n\n')
 
 TICKER = '''<div class="ticker">
   <div class="row">
@@ -227,7 +266,7 @@ home_body = '''<section class="hero" id="top">
       </div>
       <div class="hero-visual">
         <div class="badge"><span class="d"></span>Anthony &middot; your guide</div>
-        <div class="photo-card"><img src="assets/img/anthony.jpg" alt="Anthony Colonna, founder of Colonna Media" /></div>
+        <div class="photo-card"><img src="assets/img/anthony.jpg" alt="Anthony Colonna, Pittsburgh marketing consultant and photographer" width="800" height="1200" fetchpriority="high" decoding="async" /></div>
         <div class="hero-bars"><i></i><i></i><i></i><i></i></div>
       </div>
     </div>
@@ -244,9 +283,9 @@ home_body = '''<section class="hero" id="top">
       <p>Just getting started, ready to grow, or stuck and needing a reset — we meet you there and build the plan from the ground up.</p>
     </div>
     <div class="paths">
-      <div class="path p1 reveal"><span class="cap"></span><div class="ic">🚀</div><h3>Start it up</h3><p>Launching something new? We help you nail your offer, brand, and first customers so you start with momentum instead of guessing.</p><a href="contact.html#book" class="go">Start here →</a></div>
-      <div class="path p2 reveal"><span class="cap"></span><div class="ic">📈</div><h3>Grow it bigger</h3><p>Already running? We build the campaigns, lead systems, and automations that turn steady into scaling — without the chaos.</p><a href="contact.html#book" class="go">Let's grow →</a></div>
-      <div class="path p3 reveal"><span class="cap"></span><div class="ic">🔄</div><h3>Revamp &amp; reset</h3><p>Feeling stuck? We diagnose what's holding you back and rebuild the strategy to pull the business out of the hole.</p><a href="contact.html#book" class="go">Get unstuck →</a></div>
+      <div class="path p1 reveal"><span class="cap"></span><div class="ic">🚀</div><h3>Start it up</h3><p>Launching something new? We help you nail your offer, brand, and first customers so you start with momentum instead of guessing.</p><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="go">Start here →</a></div>
+      <div class="path p2 reveal"><span class="cap"></span><div class="ic">📈</div><h3>Grow it bigger</h3><p>Already running? We build the campaigns, lead systems, and automations that turn steady into scaling — without the chaos.</p><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="go">Let's grow →</a></div>
+      <div class="path p3 reveal"><span class="cap"></span><div class="ic">🔄</div><h3>Revamp &amp; reset</h3><p>Feeling stuck? We diagnose what's holding you back and rebuild the strategy to pull the business out of the hole.</p><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="go">Get unstuck →</a></div>
     </div>
   </div>
 </section>
@@ -309,7 +348,7 @@ home_body = '''<section class="hero" id="top">
         <h3>You're all set, <span id="s-name">friend</span>!</h3>
         <p>Here's what we'll focus on in your free 30-minute session:</p>
         <div class="recap" id="recap"></div>
-        <a href="#" class="btn btn-green btn-lg" id="cal-btn">Pick your time →</a>
+        <a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" target="_blank" rel="noopener" class="btn btn-green btn-lg" id="cal-btn">Pick your time →</a>
         <p style="margin-top:16px;font-size:13px">Prefer email? Email us at <b><a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a></b></p>
       </div>
     </div>
@@ -338,7 +377,7 @@ home_body = '''<section class="hero" id="top">
 <section class="block guide">
   <div class="wrap">
     <div class="guide-grid">
-      <div class="guide-photo reveal"><img src="assets/img/anthony.jpg" alt="Anthony Colonna with camera" /><span class="guide-tag">📷 Anthony Colonna</span></div>
+      <div class="guide-photo reveal"><img src="assets/img/anthony.jpg" alt="Anthony Colonna, Pittsburgh marketing strategist, holding a camera" loading="lazy" decoding="async" /><span class="guide-tag">📷 Anthony Colonna</span></div>
       <div class="reveal">
         <span class="eyebrow green"><span class="dot"></span>Meet your guide</span>
         <h2>We don't just hand you a plan — we walk it with you.</h2>
@@ -353,7 +392,7 @@ home_body = '''<section class="hero" id="top">
 <section class="block client">
   <div class="wrap">
     <div class="client-grid">
-      <div class="client-photo reveal"><img src="assets/img/maura.jpg" alt="A Colonna Media client at work" /></div>
+      <div class="client-photo reveal"><img src="assets/img/maura.jpg" alt="Maura, a Colonna Media client, working on her laptop" loading="lazy" decoding="async" /></div>
       <div class="reveal">
         <div class="quote-mark">&ldquo;</div>
         <blockquote>Working with Colonna Media gave our brand the clarity and momentum we'd been missing.</blockquote>
@@ -367,11 +406,11 @@ home_body = '''<section class="hero" id="top">
 <section class="block power">
   <div class="wrap">
     <div class="power-inner reveal">
-      <img src="assets/img/nyc.jpg" alt="Bold brand photography by Colonna Media" />
+      <img src="assets/img/nyc.jpg" alt="Bold brand photography by Colonna Media" width="1300" height="960" loading="lazy" decoding="async" />
       <div class="power-copy">
         <h2>Marketing with a <em>punch</em>.</h2>
         <p>Bold strategy, bold visuals, bold results. We help small businesses show up with the kind of energy that makes people stop and pay attention.</p>
-        <a href="contact.html#book" class="btn btn-green btn-lg">Let's build yours →</a>
+        <a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-green btn-lg">Let's build yours →</a>
       </div>
     </div>
   </div>
@@ -384,16 +423,17 @@ home_body = '''<section class="hero" id="top">
       <a href="built.html" class="built-link">See everything we've built →</a>
     </div>
     <div class="built-grid reveal">
-      <div class="bcard"><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/8e8ca9b37_IMG_3608.jpg" alt=""><span>Cardello</span></div>
-      <div class="bcard"><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/1878d50f9_IMG_3673.png" alt=""><span>Nemacolin</span></div>
-      <div class="bcard"><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/535ff1389_IMG_3667.png" alt=""><span>Jenni G</span></div>
-      <div class="bcard"><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/86e44a60c_IMG_3678.png" alt=""><span>Fabus Fitness</span></div>
-      <div class="bcard"><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/0c8d64c6c_IMG_3672.png" alt=""><span>Book Buddies</span></div>
+      <div class="bcard"><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/8e8ca9b37_IMG_3608.jpg" alt="Cardello project by Colonna Media" loading="lazy" decoding="async"><span>Cardello</span></div>
+      <div class="bcard"><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/1878d50f9_IMG_3673.png" alt="Nemacolin project by Colonna Media" loading="lazy" decoding="async"><span>Nemacolin</span></div>
+      <div class="bcard"><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/535ff1389_IMG_3667.png" alt="Jenni G project by Colonna Media" loading="lazy" decoding="async"><span>Jenni G</span></div>
+      <div class="bcard"><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/86e44a60c_IMG_3678.png" alt="Fabus Fitness project by Colonna Media" loading="lazy" decoding="async"><span>Fabus Fitness</span></div>
+      <div class="bcard"><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/0c8d64c6c_IMG_3672.png" alt="Book Buddies project by Colonna Media" loading="lazy" decoding="async"><span>Book Buddies</span></div>
     </div>
   </div>
 </section>
 
 ''' + FINAL_CTA
+home_body = home_body.replace(FINAL_CTA, FAQ_SECTION + FINAL_CTA)
 page("index.html", "index.html", home_body)
 
 # ---------- SERVICES ----------
@@ -403,7 +443,7 @@ services_body = '''<section class="page-header">
     <span class="eyebrow"><span class="dot"></span>What we do</span>
     <h1>Services that <span class="u-green">grow</span> your business</h1>
     <p>Everything is consulting-led and built around your goals. Start with strategy, or let us run the whole engine — leads, campaigns, automations, and content.</p>
-    <div style="margin-top:26px"><a href="contact.html#book" class="btn btn-green btn-lg">Book a free session →</a></div>
+    <div style="margin-top:26px"><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-green btn-lg">Book a free session →</a></div>
   </div></div>
 </section>
 
@@ -412,12 +452,12 @@ services_body = '''<section class="page-header">
 <section class="block services">
   <div class="wrap">
     <div class="svc-list">
-      <div class="svc reveal"><div class="svc-ic">🧭</div><div><h3>Marketing Strategy</h3><p>We audit where you are and build a clear, practical plan — positioning, offer, messaging, and the customer journey that ties it all together.</p><ul><li>Brand &amp; offer clarity</li><li>Customer journey map</li><li>90-day growth plan</li></ul></div><a href="contact.html#book" class="btn btn-outline svc-cta">Start →</a></div>
-      <div class="svc reveal"><div class="svc-ic">🎯</div><div><h3>Lead Generation</h3><p>Turn attention into inquiries with funnels, offers, and outreach designed to bring in qualified leads you can actually close.</p><ul><li>Lead funnels</li><li>Landing pages</li><li>Follow-up sequences</li></ul></div><a href="contact.html#book" class="btn btn-outline svc-cta">Start →</a></div>
-      <div class="svc reveal"><div class="svc-ic">📣</div><div><h3>Brand Awareness</h3><p>Get seen by the right people. Content and positioning that make you the obvious choice in your market — locally or nationally.</p><ul><li>Content strategy</li><li>Social presence</li><li>Local visibility</li></ul></div><a href="contact.html#book" class="btn btn-outline svc-cta">Start →</a></div>
-      <div class="svc reveal"><div class="svc-ic">🚀</div><div><h3>Ad Campaigns</h3><p>Conversion-focused Meta &amp; Google campaigns — creative, setup, targeting, and optimization built to bring in real inquiries.</p><ul><li>Creative &amp; copy</li><li>Campaign setup</li><li>Ongoing optimization</li></ul></div><a href="contact.html#book" class="btn btn-outline svc-cta">Start →</a></div>
-      <div class="svc reveal"><div class="svc-ic">⚙️</div><div><h3>Automations &amp; Systems</h3><p>Put the follow-ups, booking, and busywork on autopilot so nothing slips and the business runs smoother on its own.</p><ul><li>CRM &amp; booking setup</li><li>Email/SMS automation</li><li>Workflow cleanup</li></ul></div><a href="contact.html#book" class="btn btn-outline svc-cta">Start →</a></div>
-      <div class="svc reveal"><div class="svc-ic">📸</div><div><h3>Content &amp; Photography</h3><p>Scroll-stopping photo, video, and branded content that makes a small business look like the big player in the room.</p><ul><li>Brand photography</li><li>Video &amp; reels</li><li>Campaign content</li></ul></div><a href="contact.html#book" class="btn btn-outline svc-cta">Start →</a></div>
+      <div class="svc reveal"><div class="svc-ic">🧭</div><div><h3>Marketing Strategy</h3><p>We audit where you are and build a clear, practical plan — positioning, offer, messaging, and the customer journey that ties it all together.</p><ul><li>Brand &amp; offer clarity</li><li>Customer journey map</li><li>90-day growth plan</li></ul></div><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-outline svc-cta">Start →</a></div>
+      <div class="svc reveal"><div class="svc-ic">🎯</div><div><h3>Lead Generation</h3><p>Turn attention into inquiries with funnels, offers, and outreach designed to bring in qualified leads you can actually close.</p><ul><li>Lead funnels</li><li>Landing pages</li><li>Follow-up sequences</li></ul></div><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-outline svc-cta">Start →</a></div>
+      <div class="svc reveal"><div class="svc-ic">📣</div><div><h3>Brand Awareness</h3><p>Get seen by the right people. Content and positioning that make you the obvious choice in your market — locally or nationally.</p><ul><li>Content strategy</li><li>Social presence</li><li>Local visibility</li></ul></div><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-outline svc-cta">Start →</a></div>
+      <div class="svc reveal"><div class="svc-ic">🚀</div><div><h3>Ad Campaigns</h3><p>Conversion-focused Meta &amp; Google campaigns — creative, setup, targeting, and optimization built to bring in real inquiries.</p><ul><li>Creative &amp; copy</li><li>Campaign setup</li><li>Ongoing optimization</li></ul></div><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-outline svc-cta">Start →</a></div>
+      <div class="svc reveal"><div class="svc-ic">⚙️</div><div><h3>Automations &amp; Systems</h3><p>Put the follow-ups, booking, and busywork on autopilot so nothing slips and the business runs smoother on its own.</p><ul><li>CRM &amp; booking setup</li><li>Email/SMS automation</li><li>Workflow cleanup</li></ul></div><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-outline svc-cta">Start →</a></div>
+      <div class="svc reveal"><div class="svc-ic">📸</div><div><h3>Content &amp; Photography</h3><p>Scroll-stopping photo, video, and branded content that makes a small business look like the big player in the room.</p><ul><li>Brand photography</li><li>Video &amp; reels</li><li>Campaign content</li></ul></div><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-outline svc-cta">Start →</a></div>
     </div>
   </div>
 </section>
@@ -468,7 +508,7 @@ built_body = f'''<section class="page-header">
     <span class="eyebrow"><span class="dot"></span>Our work</span>
     <h1>Things we've <span class="u-pink">built</span> &amp; created</h1>
     <p>Brands, campaigns, content, and tools we've made for real businesses — a lot of it right here in Pittsburgh. Here's a look.</p>
-    <div style="margin-top:26px"><a href="contact.html#book" class="btn btn-green btn-lg">Start your project →</a></div>
+    <div style="margin-top:26px"><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-green btn-lg">Start your project →</a></div>
   </div></div>
 </section>
 
@@ -501,13 +541,13 @@ about_body = '''<section class="page-header">
 <section class="block guide" style="background:#fff">
   <div class="wrap">
     <div class="guide-grid">
-      <div class="guide-photo reveal"><img src="assets/img/anthony.jpg" alt="Anthony Colonna" /><span class="guide-tag">📷 Anthony Colonna</span></div>
+      <div class="guide-photo reveal"><img src="assets/img/anthony.jpg" alt="Anthony Colonna, founder of Colonna Media in Pittsburgh" loading="lazy" decoding="async" /><span class="guide-tag">📷 Anthony Colonna</span></div>
       <div class="reveal">
         <span class="eyebrow green"><span class="dot"></span>Meet the founder</span>
         <h2>Hi, I'm Anthony.</h2>
         <p>I started Colonna Media to give small businesses the kind of marketing usually reserved for big budgets — sharp strategy paired with content that actually looks the part. As a photographer and marketing strategist, I don't just hand over a plan; I guide you through it and help create the work that brings it to life.</p>
         <p>My last name, Colonna, is Italian for <b>column</b>. That idea runs through everything we do: we build marketing on strong pillars — clear strategy, real content, and systems designed to hold steady growth.</p>
-        <a href="contact.html#book" class="btn btn-green btn-lg" style="margin-top:12px">Book a session with me →</a>
+        <a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-green btn-lg" style="margin-top:12px">Book a session with me →</a>
       </div>
     </div>
   </div>
@@ -530,7 +570,7 @@ about_body = '''<section class="page-header">
 <section class="block client" style="background:#fff">
   <div class="wrap">
     <div class="client-grid">
-      <div class="client-photo reveal"><img src="assets/img/maura.jpg" alt="A Colonna Media client at work" /></div>
+      <div class="client-photo reveal"><img src="assets/img/maura.jpg" alt="Maura, a Colonna Media client, working on her laptop" loading="lazy" decoding="async" /></div>
       <div class="reveal">
         <div class="quote-mark">&ldquo;</div>
         <blockquote>Working with Colonna Media gave our brand the clarity and momentum we'd been missing.</blockquote>
@@ -573,7 +613,7 @@ contact_body = '''<section class="page-header" style="padding-bottom:40px">
         <div class="cal-embed">
           <div class="calendly-inline-widget" data-url="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&hide_gdpr_banner=1" style="min-width:320px;height:680px;"></div>
         </div>
-        <p style="text-align:center;color:var(--muted);font-size:13px;margin-top:14px">Trouble seeing the calendar? <a href="#" data-calendly style="color:var(--blue);font-weight:600">Open the scheduler →</a></p>
+        <p style="text-align:center;color:var(--muted);font-size:13px;margin-top:14px">Trouble seeing the calendar? <a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" style="color:var(--blue);font-weight:600">Open the scheduler →</a></p>
       </div>
     </div>
   </div>

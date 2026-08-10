@@ -245,8 +245,8 @@
   .foot-col a:hover{color:var(--blue)}
   .foot-bottom{margin-top:40px;padding-top:22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;color:var(--muted);font-size:13px;font-weight:500}
 
-  .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
-  .reveal.in{opacity:1;transform:none}
+  html.js .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+  html.js .reveal.in{opacity:1;transform:none}
 
   @media (max-width:940px){
     .hero{padding-top:130px}
@@ -267,7 +267,7 @@
     .jhead,.jbody,.prog,.prog-label{padding-left:20px;padding-right:20px}
     .hero-bars{left:-10px}
   }
-  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html.js .reveal{opacity:1;transform:none}}
   :focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 
 /* ============ ADDED: multi-page components ============ */
@@ -370,3 +370,12 @@
 .nf{min-height:70vh;display:grid;place-items:center;text-align:center;padding:120px 20px 60px}
 .nf h1{font-size:clamp(4rem,14vw,9rem);line-height:.9;color:var(--blue)}
 .nf p{color:var(--muted);font-size:1.15rem;margin:14px 0 26px}
+
+/* FAQ */
+.faq-wrap{max-width:820px;margin:0 auto;display:grid;gap:12px}
+.faq{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--shadow-sm);overflow:hidden}
+.faq summary{cursor:pointer;list-style:none;padding:22px 24px;font-family:var(--disp);font-weight:700;font-size:1.08rem;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-size:1.5rem;line-height:1;color:var(--green);transition:transform .2s;flex:none}
+.faq[open] summary::after{transform:rotate(45deg)}
+.faq p{padding:0 24px 22px;color:var(--muted);margin:0}

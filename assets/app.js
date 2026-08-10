@@ -2,34 +2,8 @@
 (function () {
   var CAL = 'https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&hide_gdpr_banner=1';
 
-  /* header background on scroll */
-  var hdr = document.querySelector('header');
-  if (hdr) {
-    var onScroll = function () { hdr.classList.toggle('scrolled', window.scrollY > 30); };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-  }
+  /* header scroll, mobile menu & reveal are handled by the inline bootstrap script in each page (robust even if this file fails to load). */
 
-  /* mobile menu */
-  var toggle = document.querySelector('.menu-toggle');
-  var menu = document.getElementById('mobileMenu');
-  if (toggle && menu) {
-    toggle.addEventListener('click', function () {
-      var open = menu.classList.toggle('open');
-      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    });
-    menu.querySelectorAll('a').forEach(function (a) {
-      a.addEventListener('click', function () { menu.classList.remove('open'); });
-    });
-  }
-
-  /* scroll reveal */
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
-    });
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
 
   /* open Calendly popup (with new-tab fallback) */
   function openCalendly() {
