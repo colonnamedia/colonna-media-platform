@@ -58,6 +58,7 @@ def head(name):
 <meta name="description" content="{desc}" />
 <meta name="robots" content="{robots}" />
 <meta name="author" content="Colonna Media" />
+<meta name="google-site-verification" content="Kg5jyZcAGl9bcMo_rSJbHcH_5CoXPPchFYriwT2xkIA" />
 <link rel="canonical" href="{url}" />
 <meta name="theme-color" content="#221C3A" />
 
