@@ -51,11 +51,11 @@
   <div class="wrap">
     <div class="bar">
       <a class="brand" href="index.html"><span class="colonnade"><i></i><i></i><i></i><i></i><i></i></span><b>Colonna <span>Media</span></b></a>
-      <nav class="nav-links"><a href="index.html">Home</a><a href="services.html">Services</a><a href="built.html">Work</a><a href="about.html">About</a><a href="contact.html">Contact</a></nav>
+      <nav class="nav-links"><a href="index.html">Home</a><a href="index.html#services">Services</a><a href="index.html#built">Work</a><a href="index.html#about">About</a><a href="index.html#contact">Contact</a></nav>
       <a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-green nav-cta">Book free session</a>
       <button class="menu-toggle" aria-label="Menu" aria-expanded="false"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
     </div>
-    <div class="mobile-menu" id="mobileMenu"><a href="index.html">Home</a><a href="services.html">Services</a><a href="built.html">Work</a><a href="about.html">About</a><a href="contact.html">Contact</a><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-green">Book free session</a></div>
+    <div class="mobile-menu" id="mobileMenu"><a href="index.html">Home</a><a href="index.html#services">Services</a><a href="index.html#built">Work</a><a href="index.html#about">About</a><a href="index.html#contact">Contact</a><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-green">Book free session</a></div>
   </div>
 </header>
 <section class="nf">
@@ -75,9 +75,9 @@
         <p>Marketing consulting for startups and small businesses. Strategy, leads, and content that make your business grow — in Pittsburgh and nationwide.</p>
       </div>
       <div class="foot-cols">
-        <div class="foot-col"><h4>Company</h4><a href="index.html">Home</a><a href="services.html">Services</a><a href="built.html">Work</a><a href="about.html">About</a></div>
-        <div class="foot-col"><h4>Services</h4><a href="services.html">Strategy</a><a href="services.html">Lead Gen</a><a href="services.html">Campaigns</a><a href="services.html">Content</a></div>
-        <div class="foot-col"><h4>Get started</h4><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener">Book free session</a><a href="contact.html">Contact</a><a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a></div>
+        <div class="foot-col"><h4>Company</h4><a href="index.html">Home</a><a href="index.html#services">Services</a><a href="index.html#built">Work</a><a href="index.html#about">About</a></div>
+        <div class="foot-col"><h4>Explore</h4><a href="index.html#services">Services</a><a href="index.html#built">Work</a><a href="index.html#contact">Contact</a></div>
+        <div class="foot-col"><h4>Get started</h4><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener">Book free session</a><a href="index.html#contact">Contact</a><a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a></div>
       </div>
     </div>
     <div class="foot-bottom"><span>&copy; 2026 Colonna Media</span><span>Pittsburgh, PA &middot; Nationwide</span></div>
@@ -87,17 +87,70 @@
 <script>
 (function(){var d=document;
   var h=d.querySelector('header');
-  if(h){var f=function(){h.classList.toggle('scrolled',window.scrollY>30);};addEventListener('scroll',f,{passive:true});f();}
+  if(h){var hf=function(){h.classList.toggle('scrolled',window.scrollY>30);};addEventListener('scroll',hf,{passive:true});hf();}
   var t=d.querySelector('.menu-toggle'),m=d.getElementById('mobileMenu');
   if(t&&m){t.addEventListener('click',function(){var o=m.classList.toggle('open');t.setAttribute('aria-expanded',o?'true':'false');});
     m.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){m.classList.remove('open');});});}
+  var CAL='https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&hide_gdpr_banner=1';
+  function openCal(){if(window.Calendly&&window.Calendly.initPopupWidget){window.Calendly.initPopupWidget({url:CAL});}else{window.open(CAL,'_blank','noopener');}}
+  d.querySelectorAll('[data-calendly]').forEach(function(x){x.addEventListener('click',function(e){e.preventDefault();openCal();});});
+  var journey=d.getElementById('journey-card');
+  if(journey){
+    var state={step:0,who:null,focus:[],name:'',email:''};
+    var steps=journey.querySelectorAll('.step');
+    var bars=['p0','p1','p2','p3'].map(function(id){return d.getElementById(id);});
+    var back=d.getElementById('back'),next=d.getElementById('next');
+    var label=d.getElementById('prog-label'),title=d.getElementById('j-title');
+    var titles=['Tell us about your business','What matters most to you','Timing','Almost there'];
+    function render(){
+      steps.forEach(function(s){s.classList.toggle('active',+s.dataset.step===state.step);});
+      bars.forEach(function(bb,i){bb.classList.toggle('on',i<=state.step);});
+      label.textContent='Step '+(state.step+1)+' of 4';
+      title.textContent=titles[state.step];
+      back.disabled=state.step===0;
+      next.textContent=state.step===3?'Book my free session \u2192':'Continue \u2192';
+    }
+    journey.querySelectorAll('[data-step="0"] .choice').forEach(function(c){
+      c.addEventListener('click',function(){journey.querySelectorAll('[data-step="0"] .choice').forEach(function(x){x.classList.remove('sel');});c.classList.add('sel');state.who=c.dataset.val;});});
+    journey.querySelectorAll('#focus-chips .chip').forEach(function(c){
+      c.addEventListener('click',function(){c.classList.toggle('sel');var v=c.dataset.val;var i=state.focus.indexOf(v);if(i>-1)state.focus.splice(i,1);else state.focus.push(v);});});
+    journey.querySelectorAll('#timing-chips .chip').forEach(function(c){
+      c.addEventListener('click',function(){journey.querySelectorAll('#timing-chips .chip').forEach(function(x){x.classList.remove('sel');});c.classList.add('sel');});});
+    function validEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);}
+    function shake(el){el.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:280});}
+    next.addEventListener('click',function(){
+      if(state.step===0&&!state.who){shake(next);return;}
+      if(state.step===1&&state.focus.length===0){shake(next);return;}
+      if(state.step===3){
+        var nf=d.getElementById('f-name').parentElement,ef=d.getElementById('f-email').parentElement;
+        state.name=d.getElementById('f-name').value.trim();state.email=d.getElementById('f-email').value.trim();
+        var ok=true;
+        if(!state.name){nf.classList.add('err');ok=false;}else nf.classList.remove('err');
+        if(!validEmail(state.email)){ef.classList.add('err');ok=false;}else ef.classList.remove('err');
+        if(!ok)return;
+        journey.querySelector('.jbody').style.display='none';journey.querySelector('.prog').style.display='none';
+        journey.querySelector('.prog-label').style.display='none';journey.querySelector('.jhead').style.display='none';
+        var su=d.getElementById('success');su.classList.add('on');
+        d.getElementById('s-name').textContent=state.name;
+        var recap=d.getElementById('recap');recap.innerHTML='';
+        [state.who].concat(state.focus.length?state.focus:['We\u2019ll figure it out together']).forEach(function(tg){var el=d.createElement('span');el.textContent=tg;recap.appendChild(el);});
+        su.scrollIntoView({behavior:'smooth',block:'center'});return;}
+      if(state.step<3){state.step++;render();}});
+    back.addEventListener('click',function(){if(state.step>0){state.step--;render();}});
+    var cbtn=d.getElementById('cal-btn');if(cbtn){cbtn.addEventListener('click',function(e){e.preventDefault();openCal();});}
+    render();
+  }
+  var cf=d.getElementById('cform');
+  if(cf){cf.addEventListener('submit',function(e){e.preventDefault();
+    var n=d.getElementById('cf-name').value.trim(),em=d.getElementById('cf-email').value.trim(),ms=d.getElementById('cf-msg').value.trim();
+    location.href='mailto:colonnamedia@gmail.com?subject='+encodeURIComponent('New inquiry from '+(n||'website'))+'&body='+encodeURIComponent('Name: '+n+'\nEmail: '+em+'\n\n'+ms);});}
   var els=d.querySelectorAll('.reveal');
-  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});return;}
-  var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.12});
-  els.forEach(function(e){io.observe(e);});
-  addEventListener('load',function(){setTimeout(function(){els.forEach(function(e){if(e.getBoundingClientRect().top<innerHeight)e.classList.add('in');});},250);});
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.12});
+    els.forEach(function(e){io.observe(e);});
+    addEventListener('load',function(){setTimeout(function(){els.forEach(function(e){if(e.getBoundingClientRect().top<innerHeight)e.classList.add('in');});},250);});
+  }else{els.forEach(function(e){e.classList.add('in');});}
 })();
 </script>
-<script src="assets/app.js"></script>
 </body>
 </html>

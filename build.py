@@ -145,14 +145,18 @@ def jsonld(name):
     return '<script type="application/ld+json">' + json.dumps(data, separators=(",", ":")) + "</script>"
 
 
-NAV = [("Home","index.html"),("Services","services.html"),("Work","built.html"),("About","about.html"),("Contact","contact.html")]
+NAV = [("Home","top"),("Services","services"),("Work","built"),("About","about"),("Contact","contact")]
+
+def _href(anchor, home):
+    if anchor == "top":
+        return "#top" if home else "index.html"
+    return ("#" + anchor) if home else ("index.html#" + anchor)
 
 def header(active):
-    links = "".join(
-        f'<a href="{href}"{" class=\"active\"" if href==active else ""}>{label}</a>'
-        for label,href in NAV)
-    mlinks = "".join(f'<a href="{href}">{label}</a>' for label,href in NAV)
-    brand = ('<a class="brand" href="index.html">'
+    home = (active == "index.html")
+    links = "".join(f'<a href="{_href(a, home)}">{label}</a>' for label, a in NAV)
+    mlinks = links
+    brand = (f'<a class="brand" href="{"#top" if home else "index.html"}">'
              '<span class="colonnade"><i></i><i></i><i></i><i></i><i></i></span>'
              '<b>Colonna <span>Media</span></b></a>')
     return f'''<header>
@@ -167,43 +171,31 @@ def header(active):
   </div>
 </header>'''
 
-FOOTER = '''<footer>
+def footer(active):
+    home = (active == "index.html")
+    def L(a, lbl): return f'<a href="{_href(a, home)}">{lbl}</a>'
+    _foot = f'''<footer>
   <div class="wrap">
     <div class="foot-grid">
       <div class="foot-brand">
-        <a class="brand" href="index.html"><span class="colonnade"><i></i><i></i><i></i><i></i><i></i></span><b>Colonna <span>Media</span></b></a>
+        <a class="brand" href="{"#top" if home else "index.html"}"><span class="colonnade"><i></i><i></i><i></i><i></i><i></i></span><b>Colonna <span>Media</span></b></a>
         <p>Marketing consulting for startups and small businesses. Strategy, leads, and content that make your business grow — in Pittsburgh and nationwide.</p>
       </div>
       <div class="foot-cols">
-        <div class="foot-col"><h4>Company</h4><a href="index.html">Home</a><a href="services.html">Services</a><a href="built.html">Work</a><a href="about.html">About</a></div>
-        <div class="foot-col"><h4>Services</h4><a href="services.html">Strategy</a><a href="services.html">Lead Gen</a><a href="services.html">Campaigns</a><a href="services.html">Content</a></div>
-        <div class="foot-col"><h4>Get started</h4><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener">Book free session</a><a href="contact.html">Contact</a><a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a></div>
+        <div class="foot-col"><h4>Company</h4>{L("top","Home")}{L("services","Services")}{L("built","Work")}{L("about","About")}</div>
+        <div class="foot-col"><h4>Explore</h4>{L("services","Services")}{L("built","Work")}{L("contact","Contact")}</div>
+        <div class="foot-col"><h4>Get started</h4><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener">Book free session</a>{L("contact","Contact")}<a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a></div>
       </div>
     </div>
     <div class="foot-bottom"><span>&copy; 2026 Colonna Media</span><span>Pittsburgh, PA &middot; Nationwide</span></div>
   </div>
-</footer>
-<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
-<script>
-(function(){var d=document;
-  var h=d.querySelector('header');
-  if(h){var f=function(){h.classList.toggle('scrolled',window.scrollY>30);};addEventListener('scroll',f,{passive:true});f();}
-  var t=d.querySelector('.menu-toggle'),m=d.getElementById('mobileMenu');
-  if(t&&m){t.addEventListener('click',function(){var o=m.classList.toggle('open');t.setAttribute('aria-expanded',o?'true':'false');});
-    m.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){m.classList.remove('open');});});}
-  var els=d.querySelectorAll('.reveal');
-  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});return;}
-  var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.12});
-  els.forEach(function(e){io.observe(e);});
-  addEventListener('load',function(){setTimeout(function(){els.forEach(function(e){if(e.getBoundingClientRect().top<innerHeight)e.classList.add('in');});},250);});
-})();
-</script>
-<script src="assets/app.js"></script>
-</body>
-</html>'''
+</footer>'''
+    _js = open("_partials/inline-scripts.html", encoding="utf-8").read()
+    return _foot + "\n" + _js + "\n</body>\n</html>"
+
 
 def page(name, active, body):
-    html = head(name) + "\n" + header(active) + "\n" + body + "\n" + jsonld(name) + "\n" + FOOTER
+    html = head(name) + "\n" + header(active) + "\n" + body + "\n" + jsonld(name) + "\n" + footer(name)
     open(name, "w").write(html)
     print("wrote", name, len(html)//1024, "KB")
 
@@ -371,11 +363,11 @@ home_body = '''<section class="hero" id="top">
       <div class="pillar reveal"><span class="cap"></span><div class="pb"><div class="pi">⚙️</div><h3>Automations &amp; Systems</h3><p>Put follow-ups, booking, and busywork on autopilot so the business runs smoother on its own.</p></div></div>
       <div class="pillar reveal"><span class="cap"></span><div class="pb"><div class="pi">📸</div><h3>Content &amp; Photography</h3><p>Scroll-stopping photo, video, and content that makes a small business look like the big player.</p></div></div>
     </div>
-    <div style="text-align:center;margin-top:40px" class="reveal"><a href="services.html" class="btn btn-outline btn-lg">See all services in detail →</a></div>
+    <div style="text-align:center;margin-top:40px" class="reveal"><a href="#start" class="btn btn-outline btn-lg">Book a free session →</a></div>
   </div>
 </section>
 
-<section class="block guide">
+<section class="block guide" id="about">
   <div class="wrap">
     <div class="guide-grid">
       <div class="guide-photo reveal"><img src="assets/img/anthony.jpg" alt="Anthony Colonna, Pittsburgh marketing strategist, holding a camera" loading="lazy" decoding="async" /><span class="guide-tag">📷 Anthony Colonna</span></div>
@@ -384,7 +376,7 @@ home_body = '''<section class="hero" id="top">
         <h2>We don't just hand you a plan — we walk it with you.</h2>
         <p>Colonna Media is led by Anthony Colonna, a photographer and marketing strategist who helps small businesses look bigger and grow faster. From the first idea to the finished campaign, we guide you through every step and create the content that brings it to life.</p>
         <p>The name Colonna is Italian for <b>column</b> — and that's how we think about marketing: strong pillars, built to hold real growth.</p>
-        <a href="about.html" class="btn btn-ink btn-lg" style="margin-top:12px">More about us →</a>
+        <a href="#contact" class="btn btn-ink btn-lg" style="margin-top:12px">Get in touch →</a>
       </div>
     </div>
   </div>
@@ -421,7 +413,7 @@ home_body = '''<section class="hero" id="top">
   <div class="wrap">
     <div class="built-top reveal">
       <div><span class="eyebrow"><span class="dot"></span>Proof</span><h2>A few things we've built</h2><p>Brands, campaigns, and content we've created for local businesses. The full story lives on one page.</p></div>
-      <a href="built.html" class="built-link">See everything we've built →</a>
+      <a href="#start" class="built-link">Start a project →</a>
     </div>
     <div class="built-grid reveal">
       <div class="bcard"><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/8e8ca9b37_IMG_3608.jpg" alt="Cardello project by Colonna Media" loading="lazy" decoding="async"><span>Cardello</span></div>
@@ -434,7 +426,34 @@ home_body = '''<section class="hero" id="top">
 </section>
 
 ''' + FINAL_CTA
-home_body = home_body.replace(FINAL_CTA, FAQ_SECTION + FINAL_CTA)
+CONTACT_SECTION = '''<section class="block" id="contact" style="background:var(--cream)"><div class="wrap">
+  <div class="head reveal"><span class="eyebrow green"><span class="dot"></span>Contact</span><h2>Let’s talk</h2>
+  <p>Book a free session, send a message, or reach us directly — locally in Pittsburgh or virtually, nationwide.</p></div>
+  <div class="contact-grid">
+    <div class="contact-info reveal"><h3>Get in touch</h3>
+      <div class="contact-item"><div class="ci">✉️</div><div><b>Email</b><a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a></div></div>
+      <div class="contact-item"><div class="ci">📍</div><div><b>Based in</b><span>Pittsburgh, PA — serving clients nationwide</span></div></div>
+      <div class="contact-item"><div class="ci">💻</div><div><b>Consulting</b><span>On-site locally &amp; virtual anywhere in the US</span></div></div>
+      <form class="cform" id="cform">
+        <div class="field"><input id="cf-name" type="text" placeholder="Your name" required></div>
+        <div class="field"><input id="cf-email" type="email" placeholder="Your email" required></div>
+        <div class="field"><textarea id="cf-msg" placeholder="Tell us a bit about your business..."></textarea></div>
+        <button type="submit" class="btn btn-green btn-lg">Send message →</button>
+      </form>
+    </div>
+    <div class="reveal"><div class="cal-embed"><div class="calendly-inline-widget" data-url="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&hide_gdpr_banner=1" style="min-width:320px;height:680px;"></div></div>
+      <p style="text-align:center;color:var(--muted);font-size:13px;margin-top:14px">Trouble seeing the calendar? <a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" style="color:var(--blue);font-weight:600">Open the scheduler →</a></p>
+    </div>
+  </div></div></section>
+
+'''
+_j0 = home_body.index('<section class="block journey"')
+_j1 = home_body.index('</section>', _j0) + len('</section>')
+_journey = home_body[_j0:_j1]
+home_body = home_body[:_j0] + home_body[_j1:]
+_h1 = home_body.index('</section>', home_body.index('<section class="hero"')) + len('</section>')
+home_body = home_body[:_h1] + "\n\n" + _journey + home_body[_h1:]
+home_body = home_body.replace(FINAL_CTA, FAQ_SECTION + CONTACT_SECTION + FINAL_CTA)
 page("index.html", "index.html", home_body)
 
 # ---------- SERVICES ----------
@@ -476,7 +495,7 @@ services_body = '''<section class="page-header">
 </section>
 
 ''' + FINAL_CTA
-page("services.html", "services.html", services_body)
+# page("services.html", "services.html", services_body)  # folded into single-page index
 
 # ---------- BUILT ----------
 GAL = [
@@ -527,7 +546,7 @@ built_body = f'''<section class="page-header">
 </section>
 
 {FINAL_CTA}'''
-page("built.html", "built.html", built_body)
+# page("built.html", "built.html", built_body)  # folded into single-page index
 
 # ---------- ABOUT ----------
 about_body = '''<section class="page-header">
@@ -583,7 +602,7 @@ about_body = '''<section class="page-header">
 </section>
 
 ''' + FINAL_CTA
-page("about.html", "about.html", about_body)
+# page("about.html", "about.html", about_body)  # folded into single-page index
 
 # ---------- CONTACT ----------
 contact_body = '''<section class="page-header" style="padding-bottom:40px">
@@ -619,7 +638,7 @@ contact_body = '''<section class="page-header" style="padding-bottom:40px">
     </div>
   </div>
 </section>'''
-page("contact.html", "contact.html", contact_body)
+# page("contact.html", "contact.html", contact_body)  # folded into single-page index
 
 # ---------- 404 ----------
 nf_body = '''<section class="nf">
@@ -638,8 +657,7 @@ print("\nAll pages built.")
 # ---------- SEO / deploy files ----------
 import json as _json
 _LASTMOD = "2026-08-09"
-_urls = [(SITE + mm["path"], "1.0" if nn == "index.html" else "0.7")
-         for nn, mm in META.items() if not mm.get("noindex")]
+_urls = [(SITE + "/", "1.0")]
 _sm = ['<?xml version="1.0" encoding="UTF-8"?>',
        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
 for _u, _p in _urls:
