@@ -24,13 +24,6 @@
     }
   });
 
-  document.addEventListener('submit', function(event) {
-    var form = event.target;
-    gtag('event', 'generate_lead', {
-      form_id: form.id || 'website_form',
-      form_location: window.location.pathname
-    });
-  });
 </script>
 
 <script>document.documentElement.className += ' js';</script>
@@ -300,10 +293,12 @@
       <div class="contact-item"><div class="ci">📍</div><div><b>Based in</b><span>Pittsburgh, PA — serving clients nationwide</span></div></div>
       <div class="contact-item"><div class="ci">💻</div><div><b>Consulting</b><span>On-site locally &amp; virtual anywhere in the US</span></div></div>
       <form class="cform" id="cform">
+        <div class="hp-field" aria-hidden="true"><label for="cf-website">Website</label><input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
         <div class="field"><input id="cf-name" type="text" placeholder="Your name" required></div>
         <div class="field"><input id="cf-email" type="email" placeholder="Your email" required></div>
         <div class="field"><textarea id="cf-msg" placeholder="Tell us a bit about your business..."></textarea></div>
         <button type="submit" class="btn btn-green btn-lg">Send message →</button>
+        <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
       </form>
     </div>
     <div class="reveal"><div class="cal-embed"><div class="calendly-inline-widget" data-url="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&hide_gdpr_banner=1" style="min-width:320px;height:680px;"></div></div>
@@ -397,9 +392,25 @@
     render();
   }
   var cf=d.getElementById('cform');
-  if(cf){cf.addEventListener('submit',function(e){e.preventDefault();
-    var n=d.getElementById('cf-name').value.trim(),em=d.getElementById('cf-email').value.trim(),ms=d.getElementById('cf-msg').value.trim();
-    location.href='mailto:colonnamedia@gmail.com?subject='+encodeURIComponent('New inquiry from '+(n||'website'))+'&body='+encodeURIComponent('Name: '+n+'\nEmail: '+em+'\n\n'+ms);});}
+  if(cf){cf.addEventListener('submit',async function(e){e.preventDefault();
+    var button=cf.querySelector('button[type="submit"]'),status=d.getElementById('form-status'),original=button.textContent;
+    button.disabled=true;button.textContent='Sending…';status.className='form-status';status.textContent='';
+    try{
+      var response=await fetch('/api/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        name:d.getElementById('cf-name').value.trim(),
+        email:d.getElementById('cf-email').value.trim(),
+        message:d.getElementById('cf-msg').value.trim(),
+        website:d.getElementById('cf-website').value
+      })});
+      if(!response.ok)throw new Error('Submission failed');
+      status.className='form-status success';status.textContent='Thanks — your message was sent. We’ll be in touch soon.';
+      cf.reset();button.textContent='Message sent ✓';
+      if(typeof window.gtag==='function')window.gtag('event','generate_lead',{form_id:'contact_form',form_location:window.location.pathname});
+    }catch(error){
+      status.className='form-status error';status.innerHTML='We couldn’t send that message. Please email <a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a>.';
+      button.disabled=false;button.textContent=original;
+    }
+  });}
   var els=d.querySelectorAll('.reveal');
   if('IntersectionObserver' in window){
     var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.12});

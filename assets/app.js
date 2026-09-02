@@ -91,17 +91,46 @@
     render();
   }
 
-  /* ---- contact form -> mailto ---- */
+  /* ---- contact form submission ---- */
   var cform = document.getElementById('cform');
   if (cform) {
-    cform.addEventListener('submit', function (ev) {
+    cform.addEventListener('submit', async function (ev) {
       ev.preventDefault();
-      var n = document.getElementById('cf-name').value.trim();
-      var e = document.getElementById('cf-email').value.trim();
-      var m = document.getElementById('cf-msg').value.trim();
-      var subject = encodeURIComponent('New inquiry from ' + (n || 'website'));
-      var body = encodeURIComponent('Name: ' + n + '\nEmail: ' + e + '\n\n' + m);
-      window.location.href = 'mailto:colonnamedia@gmail.com?subject=' + subject + '&body=' + body;
+      var button = cform.querySelector('button[type="submit"]');
+      var status = document.getElementById('form-status');
+      var originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Sending…';
+      status.className = 'form-status';
+      status.textContent = '';
+
+      try {
+        var response = await fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: document.getElementById('cf-name').value.trim(),
+            email: document.getElementById('cf-email').value.trim(),
+            message: document.getElementById('cf-msg').value.trim(),
+            website: document.getElementById('cf-website').value
+          })
+        });
+        if (!response.ok) throw new Error('Submission failed');
+
+        status.className = 'form-status success';
+        status.textContent = 'Thanks — your message was sent. We’ll be in touch soon.';
+        cform.reset();
+        button.textContent = 'Message sent ✓';
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'generate_lead', { form_id: 'contact_form', form_location: window.location.pathname });
+        }
+      } catch (error) {
+        status.className = 'form-status error';
+        status.innerHTML = 'We couldn’t send that message. Please email <a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a>.';
+        button.disabled = false;
+        button.textContent = originalText;
+      }
     });
   }
+
 })();

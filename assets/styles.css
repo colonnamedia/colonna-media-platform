@@ -379,3 +379,11 @@
 .faq summary::after{content:"+";font-size:1.5rem;line-height:1;color:var(--green);transition:transform .2s;flex:none}
 .faq[open] summary::after{transform:rotate(45deg)}
 .faq p{padding:0 24px 22px;color:var(--muted);margin:0}
+
+/* Contact form delivery states */
+.hp-field{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
+.cform button[disabled]{opacity:.72;cursor:wait;transform:none}
+.form-status{min-height:24px;font-size:.92rem;font-weight:600;line-height:1.45}
+.form-status.success{color:#0d805a;background:var(--green-soft);border:1px solid rgba(34,197,139,.35);padding:12px 15px;border-radius:var(--r-sm)}
+.form-status.error{color:#9e3156;background:var(--pink-soft);border:1px solid rgba(255,108,158,.38);padding:12px 15px;border-radius:var(--r-sm)}
+.form-status.error a{text-decoration:underline}
