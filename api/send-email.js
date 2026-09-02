@@ -12,7 +12,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  if (!process.env.RESEND_API_KEY) {
+  const resendKey = process.env.RESEND_API_KEY || process.env.VITE_RESEND_API_KEY;
+  if (!resendKey) {
     console.error("RESEND_API_KEY is not configured");
     return res.status(500).json({ error: "Email service is not configured" });
   }
@@ -41,7 +42,7 @@ export default async function handler(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        Authorization: `Bearer ${resendKey}`,
       },
       body: JSON.stringify({
         from: "Colonna Media Website <onboarding@resend.dev>",
