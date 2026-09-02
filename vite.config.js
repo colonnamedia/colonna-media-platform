@@ -1,7 +1,10 @@
 import base44 from "@base44/vite-plugin"
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const rootDir = dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   logLevel: 'error',
@@ -18,15 +21,15 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        services: resolve(__dirname, 'services.html'),
-        work: resolve(__dirname, 'built.html'),
-        about: resolve(__dirname, 'about.html'),
-        contact: resolve(__dirname, 'contact.html'),
-        'startup-marketing-pittsburgh': resolve(__dirname, 'startup-marketing-pittsburgh.html'),
-        'small-business-marketing-pittsburgh': resolve(__dirname, 'small-business-marketing-pittsburgh.html'),
-        'business-photography-pittsburgh': resolve(__dirname, 'business-photography-pittsburgh.html'),
-        'business-videography-pittsburgh': resolve(__dirname, 'business-videography-pittsburgh.html')
+        main: resolve(rootDir, 'index.html'),
+        services: resolve(rootDir, 'services.html'),
+        work: resolve(rootDir, 'built.html'),
+        about: resolve(rootDir, 'about.html'),
+        contact: resolve(rootDir, 'contact.html'),
+        'startup-marketing-pittsburgh': resolve(rootDir, 'startup-marketing-pittsburgh.html'),
+        'small-business-marketing-pittsburgh': resolve(rootDir, 'small-business-marketing-pittsburgh.html'),
+        'business-photography-pittsburgh': resolve(rootDir, 'business-photography-pittsburgh.html'),
+        'business-videography-pittsburgh': resolve(rootDir, 'business-videography-pittsburgh.html')
       }
     }
   }
