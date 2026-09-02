@@ -377,6 +377,7 @@
         if(!state.name){nf.classList.add('err');ok=false;}else nf.classList.remove('err');
         if(!validEmail(state.email)){ef.classList.add('err');ok=false;}else ef.classList.remove('err');
         if(!ok)return;
+        gtag('event','generate_lead',{form_id:'consultation_journey',form_location:window.location.pathname});
         journey.querySelector('.jbody').style.display='none';journey.querySelector('.prog').style.display='none';
         journey.querySelector('.prog-label').style.display='none';journey.querySelector('.jhead').style.display='none';
         var su=d.getElementById('success');su.classList.add('on');
