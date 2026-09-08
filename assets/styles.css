@@ -72,6 +72,9 @@
   .hero h1 .u-blue{color:var(--blue)} .hero h1 .u-pink{color:var(--pink)} .hero h1 .u-green{color:var(--green)}
   .hero p.lead{font-size:clamp(1.05rem,1.5vw,1.25rem);color:var(--muted);max-width:44ch;margin:24px 0 32px}
   .hero-cta{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .hero-email{margin-top:18px;color:var(--muted);font-size:.95rem;font-weight:600}
+  .hero-email a{color:var(--blue);font-weight:700;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px}
+  .hero-email a:hover{color:var(--ink)}
   .trust{display:flex;align-items:center;gap:12px;margin-top:26px;color:var(--muted);font-weight:600;font-size:14px}
   .stars{color:var(--yellow);letter-spacing:2px;font-size:16px}
 

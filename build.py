@@ -12,7 +12,7 @@ META = {
   "index.html": {
     "path": "/",
     "title": "Colonna Media | Pittsburgh Marketing Consulting for Small Business",
-    "desc": "Colonna Media helps Pittsburgh startups and small businesses grow with marketing strategy, lead generation, ad campaigns, automations, and content. Book a free consultation.",
+    "desc": "Pittsburgh marketing consultant connecting websites, local SEO, Google Business, email, ads, photography, and video for startups and small businesses.",
     "crumb": None },
   "services.html": {
     "path": "/services.html",
@@ -101,8 +101,9 @@ def head(name):
 def jsonld(name):
     import json
     m = META[name]
-    services = ["Marketing Strategy", "Lead Generation", "Brand Awareness",
-                "Ad Campaigns", "Automations & Systems", "Content & Photography"]
+    services = ["Marketing Strategy", "Website Design", "Local SEO", "Google Business Profile",
+                "Lead Generation", "Google Ads", "Meta Ads", "Email Marketing",
+                "Marketing Automation", "Commercial Photography", "Business Videography", "Content Creation"]
     business = {
       "@type": ["ProfessionalService", "LocalBusiness"],
       "@id": SITE + "/#business",
@@ -110,7 +111,7 @@ def jsonld(name):
       "url": SITE + "/",
       "image": SITE + "/assets/img/og-image.jpg",
       "logo": SITE + "/assets/img/apple-touch-icon.png",
-      "description": "Marketing consulting for startups and small businesses — strategy, lead generation, ad campaigns, automations, and content.",
+      "description": "Pittsburgh marketing consulting that connects websites, local SEO, Google Business, email, ads, photography, and video for startups and small businesses.",
       "email": "colonnamedia@gmail.com",
       "priceRange": "$$",
       "founder": {"@type": "Person", "name": "Anthony Colonna"},
@@ -204,8 +205,8 @@ FINAL_CTA = '''<section class="final">
   <div class="wrap">
     <div class="final-card reveal">
       <div class="colb"><i style="height:40%;background:var(--blue)"></i><i style="height:70%;background:var(--yellow)"></i><i style="height:100%;background:var(--green)"></i><i style="height:60%;background:var(--blue)"></i><i style="height:80%;background:var(--yellow)"></i></div>
-      <h2>Ready to grow your business?</h2>
-      <p>Book your free 30-minute session and let's map the fastest path to more customers.</p>
+      <h2>Ready to connect the pieces?</h2>
+      <p>Book your free 30-minute session and let’s find the gaps, set priorities, and map a clearer path from attention to customers.</p>
       <a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-green btn-lg">Start my free session →</a>
     </div>
   </div>
@@ -244,17 +245,18 @@ home_body = '''<section class="hero" id="top">
   <div class="wrap">
     <div class="hero-grid">
       <div>
-        <span class="eyebrow"><span class="dot"></span>Marketing consulting &middot; Startups &amp; small business</span>
+        <span class="eyebrow"><span class="dot"></span>Pittsburgh marketing, photography &amp; video for small businesses</span>
         <h1>
           Start strong.<br>
           Grow <span class="squiggle u-blue">smart<svg viewBox="0 0 120 12" preserveAspectRatio="none"><path d="M2 8 C 30 2, 60 12, 118 4" stroke="#2E9BEE" stroke-width="4" fill="none" stroke-linecap="round"/></svg></span>.<br>
           <span class="u-pink">Revamp</span> everything.
         </h1>
-        <p class="lead">We're the marketing partner for startups and small businesses that want more customers — strategy, leads, and content that actually move the needle. First step is a free 30-minute session.</p>
+        <p class="lead">Colonna Media connects your entire customer journey — from social media and Google to your website or physical location, email follow-up, and the sale — so every part of your marketing works toward the same goal.</p>
         <div class="hero-cta">
           <a href="#start" class="btn btn-green btn-lg">Start my free session →</a>
           <a href="#paths" class="btn btn-outline btn-lg">How it works</a>
         </div>
+        <p class="hero-email">Prefer email? <a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a></p>
         <div class="trust"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span>Trusted by 50+ local businesses</span></div>
       </div>
       <div class="hero-visual">
@@ -272,13 +274,13 @@ home_body = '''<section class="hero" id="top">
   <div class="wrap">
     <div class="head reveal">
       <span class="colonnade"><i></i><i></i><i></i><i></i><i></i></span>
-      <h2>Wherever your business is at</h2>
-      <p>Just getting started, ready to grow, or stuck and needing a reset — we meet you there and build the plan from the ground up.</p>
+      <h2>Make every part of your marketing work together.</h2>
+      <p>You can be active on social media and still lose customers on a website that does not convert. You can have an email platform without a sign-up form, or great content without the right places and systems to use it. We find those gaps and connect the pieces.</p>
     </div>
     <div class="paths">
-      <div class="path p1 reveal"><span class="cap"></span><div class="ic">🚀</div><h3>Start it up</h3><p>Launching something new? We help you nail your offer, brand, and first customers so you start with momentum instead of guessing.</p><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="go">Start here →</a></div>
-      <div class="path p2 reveal"><span class="cap"></span><div class="ic">📈</div><h3>Grow it bigger</h3><p>Already running? We build the campaigns, lead systems, and automations that turn steady into scaling — without the chaos.</p><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="go">Let's grow →</a></div>
-      <div class="path p3 reveal"><span class="cap"></span><div class="ic">🔄</div><h3>Revamp &amp; reset</h3><p>Feeling stuck? We diagnose what's holding you back and rebuild the strategy to pull the business out of the hole.</p><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="go">Get unstuck →</a></div>
+      <div class="path p1 reveal"><span class="cap"></span><div class="ic">🔎</div><h3>Find the gaps</h3><p>We look across your website, social media, Google presence, email, ads, content, and in-store experience to see what is missing or disconnected.</p><a href="#start" class="go">See what needs attention →</a></div>
+      <div class="path p2 reveal"><span class="cap"></span><div class="ic">🔗</div><h3>Connect the pieces</h3><p>We create a practical plan that moves people from discovery to trust, action, follow-up, and a sale — without wasted effort between steps.</p><a href="#services" class="go">See the full journey →</a></div>
+      <div class="path p3 reveal"><span class="cap"></span><div class="ic">⚡</div><h3>Put it to work</h3><p>We can guide your team, set up the systems, and create the photography, video, campaigns, and assets needed to make the plan happen.</p><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="go">Build a connected plan →</a></div>
     </div>
   </div>
 </section>
@@ -351,17 +353,17 @@ home_body = '''<section class="hero" id="top">
 <section class="block services" id="services">
   <div class="wrap">
     <div class="head reveal">
-      <span class="eyebrow"><span class="dot"></span>What we do</span>
-      <h2>Everything to make your business grow</h2>
-      <p>Consulting-led, results-focused, and built around your goals — pick a piece or let us handle the whole picture.</p>
+      <span class="eyebrow"><span class="dot"></span>One connected customer journey</span>
+      <h2>From getting found to becoming a customer</h2>
+      <p>Good marketing is not a collection of separate tasks. Each piece should lead naturally to the next, and every piece should support the same business goal.</p>
     </div>
     <div class="pillars">
-      <div class="pillar reveal"><span class="cap"></span><div class="pb"><div class="pi">🧭</div><h3>Marketing Strategy</h3><p>A clear plan for your offer, message, and customer journey — so every dollar you spend has a job to do.</p></div></div>
-      <div class="pillar reveal"><span class="cap"></span><div class="pb"><div class="pi">🎯</div><h3>Lead Generation</h3><p>Dependable systems and funnels that bring in qualified leads ready to become paying customers.</p></div></div>
-      <div class="pillar reveal"><span class="cap"></span><div class="pb"><div class="pi">📣</div><h3>Brand Awareness</h3><p>Get seen by the right people, locally or nationally, and become the obvious choice in your market.</p></div></div>
-      <div class="pillar reveal"><span class="cap"></span><div class="pb"><div class="pi">🚀</div><h3>Ad Campaigns</h3><p>Meta &amp; Google campaigns — creative, setup, and strategy — engineered to bring in real inquiries.</p></div></div>
-      <div class="pillar reveal"><span class="cap"></span><div class="pb"><div class="pi">⚙️</div><h3>Automations &amp; Systems</h3><p>Put follow-ups, booking, and busywork on autopilot so the business runs smoother on its own.</p></div></div>
-      <div class="pillar reveal"><span class="cap"></span><div class="pb"><div class="pi">📸</div><h3>Content &amp; Photography</h3><p>Scroll-stopping photo, video, and content that makes a small business look like the big player.</p></div></div>
+      <div class="pillar reveal"><span class="cap"></span><div class="pb"><div class="pi">📍</div><h3>Get Found</h3><p>Local SEO, Google Business Profiles, social channels, and search visibility help the right people discover you.</p></div></div>
+      <div class="pillar reveal"><span class="cap"></span><div class="pb"><div class="pi">📸</div><h3>Build Trust</h3><p>Professional photography, video, messaging, and social content show customers why your business is worth choosing.</p></div></div>
+      <div class="pillar reveal"><span class="cap"></span><div class="pb"><div class="pi">🖥️</div><h3>Turn Interest Into Action</h3><p>Websites, landing pages, offers, email sign-up forms, and clear calls to action turn attention into leads.</p></div></div>
+      <div class="pillar reveal"><span class="cap"></span><div class="pb"><div class="pi">🎯</div><h3>Reach More People</h3><p>Google Ads and Meta ads extend your reach with the right setup, targeting, creative, and destination.</p></div></div>
+      <div class="pillar reveal"><span class="cap"></span><div class="pb"><div class="pi">✉️</div><h3>Follow Up</h3><p>Email, booking, customer management, and automations keep good leads from slipping through the cracks.</p></div></div>
+      <div class="pillar reveal"><span class="cap"></span><div class="pb"><div class="pi">📈</div><h3>Measure What Works</h3><p>Analytics and ongoing improvements show what is producing results and where your marketing should go next.</p></div></div>
     </div>
     <div style="text-align:center;margin-top:40px" class="reveal"><a href="#start" class="btn btn-outline btn-lg">Book a free session →</a></div>
   </div>
@@ -373,8 +375,8 @@ home_body = '''<section class="hero" id="top">
       <div class="guide-photo reveal"><img src="assets/img/anthony.jpg" alt="Anthony Colonna, Pittsburgh marketing strategist, holding a camera" loading="lazy" decoding="async" /><span class="guide-tag">📷 Anthony Colonna</span></div>
       <div class="reveal">
         <span class="eyebrow green"><span class="dot"></span>Meet your guide</span>
-        <h2>We don't just hand you a plan — we walk it with you.</h2>
-        <p>Colonna Media is led by Anthony Colonna, a photographer and marketing strategist who helps small businesses look bigger and grow faster. From the first idea to the finished campaign, we guide you through every step and create the content that brings it to life.</p>
+        <h2>We don't just hand you a plan — we help put it to work.</h2>
+        <p>Colonna Media is led by Anthony Colonna, a Pittsburgh marketing strategist and creative partner who helps startups and small businesses connect the pieces between visibility and sales. We can audit the full picture, guide your team, set up the missing systems, and create the photography, video, and content that brings the strategy to life.</p>
         <p>The name Colonna is Italian for <b>column</b> — and that's how we think about marketing: strong pillars, built to hold real growth.</p>
         <a href="#contact" class="btn btn-ink btn-lg" style="margin-top:12px">Get in touch →</a>
       </div>
