@@ -23,7 +23,7 @@ export default defineConfig({
       input: {
         main: resolve(rootDir, 'index.html'),
         services: resolve(rootDir, 'services.html'),
-        work: resolve(rootDir, 'built.html'),
+        work: resolve(rootDir, 'work.html'),
         about: resolve(rootDir, 'about.html'),
         contact: resolve(rootDir, 'contact.html'),
         clients: resolve(rootDir, 'clients.html'),
