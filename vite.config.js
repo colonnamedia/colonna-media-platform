@@ -30,7 +30,11 @@ export default defineConfig({
         'startup-marketing-pittsburgh': resolve(rootDir, 'startup-marketing-pittsburgh.html'),
         'small-business-marketing-pittsburgh': resolve(rootDir, 'small-business-marketing-pittsburgh.html'),
         'business-photography-pittsburgh': resolve(rootDir, 'business-photography-pittsburgh.html'),
-        'business-videography-pittsburgh': resolve(rootDir, 'business-videography-pittsburgh.html')
+        'business-videography-pittsburgh': resolve(rootDir, 'business-videography-pittsburgh.html'),
+        'website-design-pittsburgh': resolve(rootDir, 'website-design-pittsburgh.html'),
+        'social-media-management-pittsburgh': resolve(rootDir, 'social-media-management-pittsburgh.html'),
+        'google-meta-ads-pittsburgh': resolve(rootDir, 'google-meta-ads-pittsburgh.html'),
+        'marketing-systems-pittsburgh': resolve(rootDir, 'marketing-systems-pittsburgh.html')
       }
     }
   }

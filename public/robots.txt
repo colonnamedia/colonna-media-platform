@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /dashboard
 
-Sitemap: https://colonnamedia.com/sitemap.xml
+Sitemap: https://www.colonnamedia.com/sitemap.xml

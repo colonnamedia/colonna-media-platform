@@ -7,6 +7,11 @@ assert(fs.readFileSync('vite.config.js','utf8').includes("work: resolve(rootDir,
 const routeConfig=JSON.parse(fs.readFileSync('vercel.json','utf8'));
 assert(!routeConfig.rewrites?.some(r=>r.source==='/work'),'Work should resolve directly');
 const pages=fs.readdirSync('.').filter(p=>p.endsWith('.html'));
+const published=pages.filter(p=>!['404.html','built.html'].includes(p));
+const sitemap=fs.readFileSync('public/sitemap.xml','utf8');
+assert.equal(sitemap,fs.readFileSync('sitemap.xml','utf8'),'sitemap copies must match');
+assert(fs.readFileSync('public/robots.txt','utf8').includes('Sitemap: https://www.colonnamedia.com/sitemap.xml'));
+for(const p of published){const path=p==='index.html'?'/':'/'+p.replace(/\.html$/,'');const url='https://www.colonnamedia.com'+path;const html=fs.readFileSync(p,'utf8');assert(html.includes(`rel="canonical" href="${url}"`),p+' canonical mismatch');assert(sitemap.includes(`<loc>${url}</loc>`),p+' absent from sitemap');}
 for(const p of pages){const h=fs.readFileSync(p,'utf8');assert(!/calendly/i.test(h),p+' retains Calendly');const ids=[...h.matchAll(/\sid="([^"]+)"/g)].map(m=>m[1]);assert.equal(ids.length,new Set(ids).size,p+' duplicate IDs');for(const m of h.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)){if(m[1].includes('application/ld+json'))JSON.parse(m[2]);else if(!m[1].includes('src='))new vm.Script(m[2]);}for(const m of h.matchAll(/href="#([^"]+)"/g))assert(ids.includes(m[1]),p+' missing anchor '+m[1]);}
 const contact=fs.readFileSync('contact.html','utf8');assert.equal((contact.match(/type="checkbox"/g)||[]).length,8);assert(contact.includes('name="website_url"'));assert(contact.includes('name="website"'));
 process.env.RESEND_API_KEY='mock-test-key';let sent;
