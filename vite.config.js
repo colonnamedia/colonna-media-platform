@@ -26,6 +26,7 @@ export default defineConfig({
         work: resolve(rootDir, 'built.html'),
         about: resolve(rootDir, 'about.html'),
         contact: resolve(rootDir, 'contact.html'),
+        clients: resolve(rootDir, 'clients.html'),
         'startup-marketing-pittsburgh': resolve(rootDir, 'startup-marketing-pittsburgh.html'),
         'small-business-marketing-pittsburgh': resolve(rootDir, 'small-business-marketing-pittsburgh.html'),
         'business-photography-pittsburgh': resolve(rootDir, 'business-photography-pittsburgh.html'),

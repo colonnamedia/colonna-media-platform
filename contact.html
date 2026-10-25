@@ -15,8 +15,8 @@
     var link = event.target.closest('a');
     if (!link) return;
     var href = link.getAttribute('href') || '';
-    if (href.indexOf('calendly.com/') !== -1) {
-      gtag('event', 'book_consultation_click', { link_url: href });
+    if (href.indexOf('/contact') === 0) {
+      gtag('event', 'contact_anthony_click', { link_url: href });
     } else if (href.indexOf('mailto:') === 0) {
       gtag('event', 'email_click', { link_url: 'mailto' });
     } else if (href.indexOf('tel:') === 0) {
@@ -27,8 +27,8 @@
 </script>
 
 <script>document.documentElement.className += ' js';</script>
-<title>Contact &amp; Book a Free Session | Colonna Media, Pittsburgh</title>
-<meta name="description" content="Book a free 30-minute marketing consultation with Colonna Media in Pittsburgh, or send a message. Serving clients locally and nationwide." />
+<title>Contact Anthony | Pittsburgh Creative &amp; Marketing Services</title>
+<meta name="description" content="Contact Anthony Colonna for photography, video, social media management, websites, ad setup, consulting, and automations in the Pittsburgh area." />
 <meta name="robots" content="index, follow" />
 <meta name="author" content="Colonna Media" />
 <meta name="google-site-verification" content="Kg5jyZcAGl9bcMo_rSJbHcH_5CoXPPchFYriwT2xkIA" />
@@ -46,9 +46,9 @@
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Colonna Media" />
 <meta property="og:locale" content="en_US" />
-<meta property="og:title" content="Contact &amp; Book a Free Session | Colonna Media, Pittsburgh" />
-<meta property="og:description" content="Book a free 30-minute marketing consultation with Colonna Media in Pittsburgh, or send a message. Serving clients locally and nationwide." />
-<meta property="og:url" content="https://colonnamedia.com/contact.html" />
+<meta property="og:title" content="Contact Anthony | Pittsburgh Creative &amp; Marketing Services" />
+<meta property="og:description" content="Contact Anthony Colonna for photography, video, social media management, websites, ad setup, consulting, and automations in the Pittsburgh area." />
+<meta property="og:url" content="https://colonnamedia.com/contact" />
 <meta property="og:image" content="https://colonnamedia.com/assets/img/og-image.jpg" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
@@ -56,8 +56,8 @@
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Contact &amp; Book a Free Session | Colonna Media, Pittsburgh" />
-<meta name="twitter:description" content="Book a free 30-minute marketing consultation with Colonna Media in Pittsburgh, or send a message. Serving clients locally and nationwide." />
+<meta name="twitter:title" content="Contact Anthony | Pittsburgh Creative &amp; Marketing Services" />
+<meta name="twitter:description" content="Contact Anthony Colonna for photography, video, social media management, websites, ad setup, consulting, and automations in the Pittsburgh area." />
 <meta name="twitter:image" content="https://colonnamedia.com/assets/img/og-image.jpg" />
 
 <!-- Icons / manifest -->
@@ -67,88 +67,45 @@
 <link rel="manifest" href="site.webmanifest" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
-<link rel="stylesheet" href="assets/styles.css" />
+
+<link rel="stylesheet" href="/assets/styles.css?v=20261025" />
 </head>
 <body>
 <header>
   <div class="wrap">
     <div class="bar">
       <a class="brand" href="/"><span class="colonnade"><i></i><i></i><i></i><i></i><i></i></span><b>Colonna <span>Media</span></b></a>
-      <nav class="nav-links"><a href="/">Home</a><a href="/services">Services</a><a href="/work">Work</a><a href="/about">About</a><a href="/contact" class="active">Contact</a></nav>
-      <a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-green nav-cta">Book free session</a>
+      <nav class="nav-links"><a href="/">Home</a><a href="/services">Services</a><a href="/work">Work</a><a href="/clients">Clients</a><a href="/about">About</a><a href="/contact" class="active">Contact</a></nav>
+      <a href="/contact" class="btn btn-green nav-cta">Contact Anthony →</a>
       <button class="menu-toggle" aria-label="Menu" aria-expanded="false"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
     </div>
-    <div class="mobile-menu" id="mobileMenu"><a href="/">Home</a><a href="/services">Services</a><a href="/work">Work</a><a href="/about">About</a><a href="/contact">Contact</a><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" class="btn btn-green">Book free session</a></div>
+    <div class="mobile-menu" id="mobileMenu"><a href="/">Home</a><a href="/services">Services</a><a href="/work">Work</a><a href="/clients">Clients</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/contact" class="btn btn-green">Contact Anthony →</a></div>
   </div>
 </header>
-<section class="page-header" style="padding-bottom:40px">
-  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
-  <div class="wrap"><div class="inner">
-    <span class="eyebrow green"><span class="dot"></span>Free 30-minute session</span>
-    <h1>Let's <span class="u-green">talk</span></h1>
-    <p>Pick a time that works for you and we'll talk through your business, your goals, and the fastest path to more customers. No pressure, no obligation.</p>
-  </div></div>
-</section>
-
-<section class="block" style="padding-top:20px" id="book">
-  <div class="wrap">
-    <div class="contact-grid">
-      <div class="contact-info reveal">
-        <h3>Get in touch</h3>
-        <div class="contact-item"><div class="ci">✉️</div><div><b>Email</b><a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a></div></div>
-        <div class="contact-item"><div class="ci">📍</div><div><b>Based in</b><span>Pittsburgh, PA — serving clients nationwide</span></div></div>
-        <div class="contact-item"><div class="ci">💻</div><div><b>Consulting</b><span>On-site locally &amp; virtual anywhere in the US</span></div></div>
-        <form class="cform" id="cform">
-          <div class="hp-field" aria-hidden="true"><label for="cf-website">Website</label><input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
-          <div class="field"><input id="cf-name" type="text" placeholder="Your name" required></div>
-          <div class="field"><input id="cf-email" type="email" placeholder="Your email" required></div>
-          <div class="field"><textarea id="cf-msg" placeholder="Tell us a bit about your business..."></textarea></div>
-          <button type="submit" class="btn btn-green btn-lg">Send message →</button>
-          <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
-        </form>
-      </div>
-      <div class="reveal">
-        <div class="cal-embed">
-          <div class="calendly-inline-widget" data-url="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&hide_gdpr_banner=1" style="min-width:320px;height:680px;"></div>
-        </div>
-        <p style="text-align:center;color:var(--muted);font-size:13px;margin-top:14px">Trouble seeing the calendar? <a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener" style="color:var(--blue);font-weight:600">Open the scheduler →</a></p>
-      </div>
-    </div>
-  </div>
-</section>
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":["ProfessionalService","LocalBusiness"],"@id":"https://colonnamedia.com/#business","name":"Colonna Media","url":"https://colonnamedia.com/","image":"https://colonnamedia.com/assets/img/og-image.jpg","logo":"https://colonnamedia.com/assets/img/apple-touch-icon.png","description":"Marketing consulting for startups and small businesses \u2014 strategy, lead generation, ad campaigns, automations, and content.","email":"colonnamedia@gmail.com","priceRange":"$$","founder":{"@type":"Person","name":"Anthony Colonna"},"address":{"@type":"PostalAddress","addressLocality":"Pittsburgh","addressRegion":"PA","addressCountry":"US"},"geo":{"@type":"GeoCoordinates","latitude":40.4406,"longitude":-79.9959},"areaServed":[{"@type":"City","name":"Pittsburgh"},{"@type":"Country","name":"United States"}],"knowsAbout":["Marketing Strategy","Lead Generation","Brand Awareness","Ad Campaigns","Automations & Systems","Content & Photography"],"hasOfferCatalog":{"@type":"OfferCatalog","name":"Marketing Services","itemListElement":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"Marketing Strategy"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Lead Generation"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Brand Awareness"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Ad Campaigns"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Automations & Systems"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Content & Photography"}}]}},{"@type":"WebSite","@id":"https://colonnamedia.com/#website","name":"Colonna Media","url":"https://colonnamedia.com/","inLanguage":"en-US","publisher":{"@id":"https://colonnamedia.com/#business"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://colonnamedia.com/"},{"@type":"ListItem","position":2,"name":"Contact","item":"https://colonnamedia.com/contact.html"}]}]}</script>
+<section class="page-header" style="padding-bottom:40px"><div class="blob b1"></div><div class="blob b2"></div><div class="wrap"><div class="inner"><span class="eyebrow green">Connect with Anthony</span><h1>Let's make it <span class="u-green">happen.</span></h1><p>Tell me what your business needs—from one photo shoot to ongoing marketing support. Choose one service or several.</p></div></div></section>
+<section class="block" style="padding-top:20px"><div class="wrap"><div class="contact-service-grid"><aside class="contact-info reveal"><h3>Get in touch</h3><div class="contact-item"><div class="ci">✉️</div><div><b>Email</b><a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a></div></div><div class="contact-item"><div class="ci">📍</div><div><b>Based in Pittsburgh, PA</b><span>On-site work within approximately 50 miles, including the South Hills and surrounding communities.</span></div></div><div class="contact-item"><div class="ci">🤝</div><div><b>Project or ongoing support</b><span>Photography, video, social media, websites, ad setup, consulting, and automations.</span></div></div><p class="contact-note">Not sure where to start? Select consulting or describe what you need. No calendar booking required.</p></aside>
+<div class="inquiry-panel reveal"><form class="cform" id="cform"><div class="hp-field" aria-hidden="true"><label for="cf-website">Leave this field empty</label><input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off"></div><div class="inquiry-fields"><div class="field"><label for="cf-name">Your name *</label><input id="cf-name" name="name" autocomplete="name" maxlength="120" required></div><div class="field"><label for="cf-email">Email *</label><input id="cf-email" name="email" type="email" autocomplete="email" maxlength="254" required></div><div class="field"><label for="cf-business">Business name</label><input id="cf-business" name="business_name" autocomplete="organization" maxlength="160"></div><div class="field"><label for="cf-phone">Phone (optional)</label><input id="cf-phone" name="phone" type="tel" autocomplete="tel" maxlength="40"></div><div class="field"><label for="cf-location">City / project location</label><input id="cf-location" name="location" autocomplete="address-level2" maxlength="160"></div><div class="field"><label for="cf-site">Business website (optional)</label><input id="cf-site" name="website_url" placeholder="Your website or social profile" maxlength="300"></div></div>
+<fieldset class="service-options"><legend>What are you interested in?</legend><p>Select as many as you'd like. You can also leave these blank and tell me below.</p><div class="service-check-grid"><label class="service-check"><input type="checkbox" name="services" value="photography"><span>Photography</span></label><label class="service-check"><input type="checkbox" name="services" value="videography"><span>Videography</span></label><label class="service-check"><input type="checkbox" name="services" value="social-media"><span>Social Media Management</span></label><label class="service-check"><input type="checkbox" name="services" value="consulting"><span>Marketing Consulting</span></label><label class="service-check"><input type="checkbox" name="services" value="automations"><span>Automations & Systems</span></label><label class="service-check"><input type="checkbox" name="services" value="google-ads"><span>Google Ads Setup</span></label><label class="service-check"><input type="checkbox" name="services" value="meta-ads"><span>Meta Ads Setup</span></label><label class="service-check"><input type="checkbox" name="services" value="website"><span>Website Design</span></label></div></fieldset><div class="field"><label for="cf-timing">When are you looking to get started?</label><select id="cf-timing" name="timing"><option value="">Select a timeframe (optional)</option><option>As soon as possible</option><option>Within 1–2 months</option><option>Planning ahead</option><option>Just exploring</option></select></div><div class="field"><label for="cf-msg">Tell Anthony about your project *</label><textarea id="cf-msg" name="message" rows="5" maxlength="5000" required placeholder="What do you need help with? Include goals, dates, or anything useful."></textarea></div><button type="submit" class="btn btn-green btn-lg">Send inquiry to Anthony →</button><p class="contact-note">Your details are used to respond to this inquiry.</p><div id="form-status" class="form-status" role="status" aria-live="polite"></div></form></div></div></div></section>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":["ProfessionalService","LocalBusiness"],"@id":"https://colonnamedia.com/#business","name":"Colonna Media","url":"https://colonnamedia.com/","image":"https://colonnamedia.com/assets/img/og-image.jpg","logo":"https://colonnamedia.com/assets/img/apple-touch-icon.png","description":"Photography, videography, social media management, websites, ad setup, marketing consulting, and automations in Pittsburgh and surrounding communities.","email":"colonnamedia@gmail.com","priceRange":"$$","founder":{"@type":"Person","name":"Anthony Colonna"},"address":{"@type":"PostalAddress","addressLocality":"Pittsburgh","addressRegion":"PA","addressCountry":"US"},"geo":{"@type":"GeoCoordinates","latitude":40.4406,"longitude":-79.9959},"areaServed":[{"@type":"City","name":"Pittsburgh"},{"@type":"GeoCircle","geoMidpoint":{"@type":"GeoCoordinates","latitude":40.4406,"longitude":-79.9959},"geoRadius":80467}],"knowsAbout":["Marketing Strategy","Lead Generation","Brand Awareness","Ad Campaigns","Automations & Systems","Content & Photography"],"hasOfferCatalog":{"@type":"OfferCatalog","name":"Colonna Media Services","itemListElement":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"Photography"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Videography"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Social Media Management"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Marketing Consulting"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Automations & Systems"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Google Ads Setup"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Meta Ads Setup"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Website Design"}}]}},{"@type":"WebSite","@id":"https://colonnamedia.com/#website","name":"Colonna Media","url":"https://colonnamedia.com/","inLanguage":"en-US","publisher":{"@id":"https://colonnamedia.com/#business"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://colonnamedia.com/"},{"@type":"ListItem","position":2,"name":"Contact","item":"https://colonnamedia.com/contact.html"}]}]}</script>
 <footer>
   <div class="wrap">
     <div class="foot-grid">
       <div class="foot-brand">
         <a class="brand" href="/"><span class="colonnade"><i></i><i></i><i></i><i></i><i></i></span><b>Colonna <span>Media</span></b></a>
-        <p>Marketing consulting for startups and small businesses. Strategy, leads, and content that make your business grow — in Pittsburgh and nationwide.</p>
+        <p>Photography, video, social media, websites, ad setup, and marketing support for startups and small businesses in Pittsburgh and the surrounding area.</p>
       </div>
       <div class="foot-cols">
-        <div class="foot-col"><h4>Company</h4><a href="/">Home</a><a href="/services">Services</a><a href="/work">Work</a><a href="/about">About</a></div>
+        <div class="foot-col"><h4>Company</h4><a href="/">Home</a><a href="/services">Services</a><a href="/work">Work</a><a href="/clients">Clients</a><a href="/about">About</a></div>
         <div class="foot-col"><h4>Services</h4><a href="/services">Strategy</a><a href="/services">Lead Gen</a><a href="/services">Campaigns</a><a href="/services">Content</a></div>
-        <div class="foot-col"><h4>Get started</h4><a href="https://calendly.com/colonnamedia/marketing-strategy?hide_event_type_details=1&amp;hide_gdpr_banner=1" data-calendly target="_blank" rel="noopener">Book free session</a><a href="/contact">Contact</a><a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a></div>
+        <div class="foot-col"><h4>Get started</h4><a href="/contact">Contact Anthony →</a><a href="/contact">Contact</a><a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a></div>
       </div>
     </div>
-    <div class="foot-bottom"><span>&copy; 2026 Colonna Media</span><span>Pittsburgh, PA &middot; Nationwide</span></div>
+    <div class="foot-bottom"><span>&copy; 2026 Colonna Media</span><span>Pittsburgh, PA &middot; Serving the surrounding area</span></div>
   </div>
 </footer>
-<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
-<script>
-(function(){var d=document;
-  var h=d.querySelector('header');
-  if(h){var f=function(){h.classList.toggle('scrolled',window.scrollY>30);};addEventListener('scroll',f,{passive:true});f();}
-  var t=d.querySelector('.menu-toggle'),m=d.getElementById('mobileMenu');
-  if(t&&m){t.addEventListener('click',function(){var o=m.classList.toggle('open');t.setAttribute('aria-expanded',o?'true':'false');});
-    m.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){m.classList.remove('open');});});}
-  var els=d.querySelectorAll('.reveal');
-  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});return;}
-  var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.12});
-  els.forEach(function(e){io.observe(e);});
-  addEventListener('load',function(){setTimeout(function(){els.forEach(function(e){if(e.getBoundingClientRect().top<innerHeight)e.classList.add('in');});},250);});
-})();
-</script>
-<script src="assets/app.js"></script>
+
+
+
+<script type="module" src="/assets/app.js"></script>
 </body>
 </html>

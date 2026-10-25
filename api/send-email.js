@@ -18,8 +18,14 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Email service is not configured" });
   }
 
-  const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {});
-  const { name, email, business_name, service_needed, message, website } = body;
+  let body;
+  try { body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {}); } catch { return res.status(400).json({error:"Invalid request"}); }
+  if (!body || typeof body !== "object" || Array.isArray(body)) return res.status(400).json({error:"Invalid request"});
+  const { name, email, business_name, service_needed, message, website, phone, location, website_url, timing, services } = body;
+  const serviceLabels = {"photography":"Photography","videography":"Videography","social-media":"Social Media Management","consulting":"Marketing Consulting","automations":"Automations & Systems","google-ads":"Google Ads Setup","meta-ads":"Meta Ads Setup","website":"Website Design"};
+  if (services !== undefined && (!Array.isArray(services) || services.length > 8 || services.some(id=>!Object.hasOwn(serviceLabels,id)))) return res.status(400).json({error:'Invalid service selection'});
+  const selectedServices = [...new Set(services || [])].map(id=>serviceLabels[id]).join(', ') || String(service_needed || 'Not specified');
+  if ([business_name,phone,location,website_url,timing,selectedServices].some(v=>String(v||'').length>500)) return res.status(400).json({error:'Submission is too long'});
 
   // Honeypot: accept bot submissions without sending email.
   if (website) return res.status(200).json({ success: true });
@@ -54,7 +60,11 @@ export default async function handler(req, res) {
           <p><strong>Name:</strong> ${escapeHtml(cleanName)}</p>
           <p><strong>Email:</strong> ${escapeHtml(cleanEmail)}</p>
           <p><strong>Business:</strong> ${escapeHtml(business_name || "Not provided")}</p>
-          <p><strong>Service:</strong> ${escapeHtml(service_needed || "Not specified")}</p>
+          <p><strong>Service:</strong> ${escapeHtml(selectedServices)}</p>
+          <p><strong>Phone:</strong> ${escapeHtml(phone || "Not provided")}</p>
+          <p><strong>Location:</strong> ${escapeHtml(location || "Not provided")}</p>
+          <p><strong>Business website:</strong> ${escapeHtml(website_url || "Not provided")}</p>
+          <p><strong>Timing:</strong> ${escapeHtml(timing || "Not provided")}</p>
           <hr>
           <p><strong>Message:</strong></p>
           <p>${escapeHtml(cleanMessage || "No message provided.").replaceAll("\n", "<br>")}</p>

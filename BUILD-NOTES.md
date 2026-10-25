@@ -1,135 +1,24 @@
-# Build & SEO Notes — Colonna Media
+# Current site maintenance — October 25, 2026
 
-Everything here is a plain static site (HTML/CSS/JS). No build step is required to run or deploy it.
-This file explains what's included, what to set before launch, and how to deploy.
+The root static HTML pages, assets/styles.css, and assets/app.js are the active website. The src/ React pages and build.py are legacy material; do not run build.py to regenerate the active pages.
 
----
+## Build
+Run npm run build. The first step regenerates the client collection from assets/clients.json; Vite then builds all public pages, including /clients and /contact.
 
-## 1. Before you go live — set your domain (one change)
+## Services and inquiries
+- Homepage and /services: app-style service icons link to /contact?service=ID.
+- /contact supports multiple services. IDs and labels are defined in assets/app.js form markup and api/send-email.js.
+- Contact form submits to /api/send-email, which uses the existing RESEND_API_KEY configuration.
+- Keep website as the hidden honeypot; website_url is the visitor's real website.
+- Never put visitor names, email addresses, or messages in analytics events.
+- Calendly has been removed from the active HTML and scripts.
 
-Open **`build.py`** and set the real domain at the top:
+## Clients
+Edit assets/clients.json. Each record has name, image, and optional logo (null until an approved logo is provided).
+Use HTTPS images or local assets/ paths. Do not invent logos, testimonials, or results.
+Run npm run build (or node scripts/render-clients.mjs) to update the crawlable client page.
+The eight initial entries come from the pre-existing client list. Add new client entries and approved logos as supplied by Anthony.
 
-```python
-SITE = "https://www.colonnamedia.com"   # <-- change if your domain is different
-```
-
-Then regenerate the pages + sitemap:
-
-```bash
-python3 build.py
-```
-
-`SITE` is used for canonical URLs, Open Graph/Twitter URLs, the sitemap, and structured data.
-If you don't run Python, you can instead find-and-replace `https://www.colonnamedia.com`
-across `*.html`, `sitemap.xml`, and `robots.txt`.
-
----
-
-## 2. What's included for SEO (every page)
-
-- **Unique `<title>` + meta description**, written for local search (Pittsburgh + service keywords).
-- **Canonical URL** — prevents duplicate-content issues.
-- **Open Graph + Twitter Card** tags — nice link previews on Facebook, LinkedIn, iMessage, X, etc.,
-  using `assets/img/og-image.jpg` (1200×630).
-- **Local geo meta** (`geo.region`, `geo.placename`, `geo.position`, `ICBM`) pointing at Pittsburgh.
-- **JSON-LD structured data** (`schema.org`) on every page:
-  - `ProfessionalService` + `LocalBusiness` (name, description, email, Pittsburgh address, geo,
-    area served, service catalog) — this is what helps Google understand you as a local business.
-  - `WebSite`
-  - `BreadcrumbList` on interior pages
-  - `Person` (Anthony Colonna) on the About page
-- **`robots.txt`** — allows crawling, points to the sitemap.
-- **`sitemap.xml`** — lists all indexable pages.
-- **`site.webmanifest`** + favicons/app icons — installable, correct icon in tabs and on phones.
-- **`404.html`** — friendly not-found page (marked `noindex`).
-- Semantic headings (one `<h1>` per page), descriptive `alt` text, lazy-loaded gallery images.
-
-### Fill these in when you can (marked TODO in `build.py`)
-- **Phone number** — add `"telephone"` to the business JSON-LD (in `build.py`, `jsonld()`).
-- **Social profiles** — add a `"sameAs": ["https://instagram.com/...", ...]` list to the business JSON-LD.
-- **Street address** — only city/state are set now; add a street if you want a Google Business tie-in.
-- **Real testimonial** — Maura's quote on Home/About is placeholder text.
-- **Real stats** — the "50+ businesses" / 5-star line are placeholders.
-
----
-
-## 3. After launch — recommended (free)
-
-1. **Google Search Console** (search.google.com/search-console): add the domain, then submit
-   `https://YOURDOMAIN/sitemap.xml`.
-2. **Google Business Profile** (google.com/business): create/claim your Pittsburgh listing — this is the
-   single biggest lever for local map results. Use the same name, email, and (once added) phone as the site.
-3. **Rich Results Test** (search.google.com/test/rich-results): paste your live URL to confirm the
-   LocalBusiness data is detected.
-4. **Bing Webmaster Tools** — optional, submit the same sitemap.
-
----
-
-## 4. Deploy to Vercel
-
-Your domain is already on Vercel, so:
-
-1. Put this folder in a **new GitHub repo** (keep it separate from the old React app).
-   - GitHub → New repository → "uploading an existing file" → drag in the **unzipped** files so
-     `index.html` sits at the repo root (not inside an extra folder).
-2. In Vercel → **Add New → Project** → import that repo.
-   - Framework preset: **Other**
-   - Build command: **(leave empty)**
-   - Output directory: **(leave as the root / default)**
-3. Deploy, then point your domain at the new project under **Settings → Domains**.
-
-`vercel.json` sets long cache headers for `/assets/*` (fast repeat visits) and no-cache for HTML
-(so content updates show immediately). `404.html` is served automatically for unknown URLs.
-
----
-
-## 5. File map
-
-```
-index.html          Home
-services.html       Services + process
-built.html          Work gallery + tools
-about.html          About / founder
-contact.html        Contact form + Calendly embed
-404.html            Not found
-sitemap.xml         Generated by build.py
-robots.txt          Generated by build.py
-site.webmanifest    Generated by build.py
-vercel.json         Cache headers + static config
-.gitignore          Ignore OS/editor/vercel cruft
-build.py            Regenerates all pages + SEO from shared header/footer/meta
-assets/
-  styles.css        All styling; brand colors are variables at the very top
-  app.js            Nav, mobile menu, animations, consultation journey, Calendly, contact form
-  img/              Photos (anthony/maura/nyc), favicons, app icons, og-image
-```
-
-## 6. Editing tips
-- **Colors:** edit the variables at the top of `assets/styles.css` (`--blue/--yellow/--pink/--green`, etc.).
-- **Nav or footer:** change once in `build.py` and run `python3 build.py` — it updates every page.
-- **Page content or SEO text:** edit the page body in `build.py` (or the `.html` directly) and the
-  `META` block in `build.py` for titles/descriptions, then rebuild.
-- **Calendly link:** it's in `assets/app.js` and `contact.html` (`calendly.com/colonnamedia/...`).
-
----
-
-## 7. Troubleshooting a deploy (blank page / 404s)
-
-If, after deploying, sections are blank or links 404, the cause is almost always that **not all files
-reached the server at the site root.** Check the following:
-
-- The deployed root must contain `index.html`, `contact.html`, `services.html`, `built.html`,
-  `about.html`, `404.html`, and the `assets/` folder — all at the **top level**, not inside an extra
-  `colonna-media-site/` subfolder. In your GitHub repo, `index.html` should be the first file you see.
-- Confirm `assets/app.js`, `assets/styles.css`, and `assets/img/` all uploaded.
-- Hard-refresh after redeploy (Vercel + browsers cache aggressively): on iPhone, close the tab and reopen.
-
-This version is also built to **degrade gracefully**: even if a script fails to load, all content stays
-visible, and every "Book" button opens the Calendly scheduler on its own — so the page is never blank
-and booking always works.
-
-### Quick redeploy (drag-and-drop)
-1. Unzip this package.
-2. In your GitHub repo → **Add file → Upload files** → drag in **everything inside** the unzipped folder
-   (so `index.html` lands at the repo root) → Commit.
-3. Vercel auto-redeploys. Hard-refresh the site.
+## SEO
+Keep page-specific titles, descriptions, canonical URLs, visible local copy, and sitemap.xml/public/sitemap.xml aligned.
+On-site service is approximately 50 miles around Pittsburgh. No rankings or indexing are guaranteed.
