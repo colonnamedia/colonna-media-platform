@@ -405,12 +405,12 @@
 .home-refresh .eyebrow.green{background:var(--yellow);color:var(--ink)}
 .home-refresh header .bar{background:rgba(255,255,255,.95);border-color:#e2e5ed}
 .home-refresh .hero{padding:142px 0 40px;background:#fff}
-.hero-intro{display:flex;justify-content:space-between;gap:35px;align-items:flex-end;margin-bottom:44px}
-.hero-copy{max-width:920px}
-.home-refresh .hero h1{font-size:clamp(3.2rem,6.7vw,6.4rem);line-height:.99;letter-spacing:-.055em;margin:22px 0 0}
+.hero-intro{margin-bottom:34px}
+.hero-copy{max-width:1120px}
+.home-refresh .hero h1{font-size:clamp(3.2rem,5.35vw,5rem);line-height:1.01;letter-spacing:-.055em;margin:20px 0 0}
 .home-refresh .hero h1 span{color:var(--blue)}
 .home-refresh .hero p.lead{max-width:68ch;font-size:clamp(1.05rem,1.7vw,1.25rem);margin:26px 0 29px;color:#383f57}
-.hero-side-note{flex:none;width:170px;background:var(--yellow);border:2px solid var(--ink);box-shadow:7px 7px 0 var(--blue);padding:17px 14px;transform:rotate(3deg);line-height:1.3;margin-bottom:50px}
+.hero-side-note{display:none}
 .hero-side-note strong{display:block;font-size:11px;letter-spacing:.12em;margin-bottom:13px}
 .hero-side-note span{display:block;font-family:var(--disp);font-weight:800;font-size:18px}
 .hero-side-note b{color:var(--pink)}
