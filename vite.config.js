@@ -34,7 +34,8 @@ export default defineConfig({
         'website-design-pittsburgh': resolve(rootDir, 'website-design-pittsburgh.html'),
         'social-media-management-pittsburgh': resolve(rootDir, 'social-media-management-pittsburgh.html'),
         'google-meta-ads-pittsburgh': resolve(rootDir, 'google-meta-ads-pittsburgh.html'),
-        'marketing-systems-pittsburgh': resolve(rootDir, 'marketing-systems-pittsburgh.html')
+        'marketing-systems-pittsburgh': resolve(rootDir, 'marketing-systems-pittsburgh.html'),
+        start: resolve(rootDir, 'start.html')
       }
     }
   }

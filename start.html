@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5WDDHWSBT7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5WDDHWSBT7');
+
+  document.addEventListener('click', function(event) {
+    var link = event.target.closest('a');
+    if (!link) return;
+    var href = link.getAttribute('href') || '';
+    if (href.indexOf('tel:') === 0) {
+      gtag('event', 'phone_click', { link_url: 'tel', page: 'start' });
+    } else if (href.indexOf('#quote') === 0) {
+      gtag('event', 'quote_cta_click', { page: 'start' });
+    }
+  });
+</script>
+<script>document.documentElement.className += ' js';</script>
+<title>Pittsburgh Websites, Photo, Video &amp; Marketing | Colonna Media</title>
+<meta name="description" content="Websites, photography, video, social media, and marketing plans for Pittsburgh small businesses. Tell Anthony what you need and get a quote." />
+<!-- Paid-traffic landing page: keep out of search results so it doesn't compete with the main service pages. -->
+<meta name="robots" content="noindex, follow" />
+<meta name="theme-color" content="#171C38" />
+<link rel="canonical" href="https://www.colonnamedia.com/start" />
+
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="assets/img/favicon.png" sizes="32x32" type="image/png" />
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/styles.css?v=20261025" />
+<style>
+/* /start — Google Ads landing page. Scoped with .lp so nothing else on the site changes. */
+.lp header .bar{padding-right:10px}
+.lp .lp-head-cta{display:flex;gap:10px;align-items:center}
+.lp .lp-call{font-weight:800;font-size:15px;color:var(--ink);display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--pill)}
+.lp .lp-call:hover{background:var(--cream)}
+.lp .lp-call svg{width:18px;height:18px}
+
+.lp-hero{position:relative;padding:132px 0 64px;background:linear-gradient(180deg,#fff 0%,var(--cream) 100%);overflow:hidden}
+.lp-hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:start}
+.lp-hero h1{font-size:clamp(2.5rem,5vw,4.3rem);line-height:1.02;letter-spacing:-.05em;margin:18px 0 0}
+.lp-hero h1 span{color:var(--blue)}
+.lp-hero .lead{font-size:clamp(1.05rem,1.6vw,1.22rem);color:#383f57;max-width:52ch;margin:22px 0 24px}
+.lp-checks{list-style:none;display:grid;gap:12px;margin:0 0 28px}
+.lp-checks li{display:flex;gap:12px;align-items:flex-start;font-weight:600}
+.lp-checks li b{flex:none;width:26px;height:26px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:14px;margin-top:1px}
+.lp-hero-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.lp-trustline{margin-top:26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.lp-avatars{display:flex}
+.lp-avatars img{width:42px;height:42px;border-radius:50%;object-fit:cover;border:3px solid #fff;margin-left:-10px;box-shadow:var(--shadow-sm)}
+.lp-avatars img:first-child{margin-left:0}
+.lp-trustline p{font-size:14px;color:var(--muted);font-weight:600;line-height:1.4}
+.lp-trustline p b{color:var(--ink)}
+
+/* form card */
+.lp-form-card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:12px 12px 0 var(--blue);padding:30px 28px;position:relative;scroll-margin-top:110px}
+.lp-form-card h2{font-size:clamp(1.5rem,2.4vw,1.9rem);line-height:1.1;margin-bottom:6px}
+.lp-form-card .sub{color:var(--muted);font-size:14px;margin-bottom:18px}
+.lp-form .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lp-form .field{margin-bottom:12px}
+.lp-form label{font-size:12px;font-weight:700;display:block;margin-bottom:6px}
+.lp-form input,.lp-form textarea{width:100%;border:2px solid var(--line);border-radius:var(--r-sm);padding:13px 14px;font:inherit;font-size:16px;background:#fff;color:var(--ink)}
+.lp-form textarea{min-height:84px;resize:vertical}
+.lp-form input:focus,.lp-form textarea:focus{outline:none;border-color:var(--blue)}
+.lp-form fieldset{border:0;padding:0;margin:4px 0 14px}
+.lp-form legend{font-size:12px;font-weight:700;margin-bottom:8px}
+.lp-chips{display:flex;flex-wrap:wrap;gap:8px}
+.lp-chip{position:relative;cursor:pointer}
+.lp-chip input{position:absolute;opacity:0;width:1px;height:1px}
+.lp-chip span{display:inline-block;border:2px solid var(--line);border-radius:var(--pill);padding:8px 14px;font-weight:700;font-size:13px;background:#fff;transition:.15s}
+.lp-chip:hover span{border-color:var(--blue)}
+.lp-chip input:checked+span{border-color:var(--blue);background:var(--blue-soft);color:var(--blue)}
+.lp-chip input:focus-visible+span{outline:3px solid var(--blue);outline-offset:2px}
+.lp-form .btn{width:100%;justify-content:center;font-size:17px;padding:18px 24px}
+.lp-form .fine{font-size:12px;color:var(--muted);text-align:center;margin-top:10px}
+.lp-form .or-call{display:block;text-align:center;margin-top:12px;font-weight:800;color:var(--ink)}
+.lp-form .or-call a{color:var(--blue);text-decoration:underline;text-underline-offset:3px}
+.lp-form .form-status{margin-top:10px}
+
+/* client proof strip */
+.lp-proof{background:var(--ink);color:#fff;padding:26px 0;overflow:hidden}
+.lp-proof .label{text-align:center;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow);margin-bottom:14px}
+.lp-proof .track{display:flex;width:max-content;animation:lpslide 38s linear infinite}
+.lp-proof .track span{font-family:var(--disp);font-weight:800;font-size:clamp(1.1rem,2vw,1.45rem);white-space:nowrap;padding:0 26px;display:inline-flex;align-items:center;gap:26px}
+.lp-proof .track span::after{content:"✦";color:var(--yellow);font-size:.8em}
+@keyframes lpslide{to{transform:translateX(-50%)}}
+
+/* sections */
+.lp-section{padding:clamp(64px,8vw,104px) 0}
+.lp-section .head{margin-bottom:44px}
+.lp-svc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.lp-svc{border-radius:20px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 14px 28px -19px #17214f70}
+.lp-svc img{width:100%;height:220px;object-fit:cover}
+.lp-svc .b{padding:26px 28px 28px;flex:1;display:flex;flex-direction:column}
+.lp-svc .k{font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;margin-bottom:10px}
+.lp-svc h3{font-size:clamp(1.45rem,2.4vw,1.9rem);line-height:1.1;margin-bottom:10px}
+.lp-svc p{font-size:.97rem;line-height:1.6;margin-bottom:16px}
+.lp-svc ul{list-style:none;display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px}
+.lp-svc li{font-size:12px;font-weight:700;border-radius:var(--pill);padding:6px 12px;background:rgba(255,255,255,.18)}
+.lp-svc .go{margin-top:auto;align-self:flex-start;font-weight:800;font-size:15px;border-bottom:2px solid currentColor;padding-bottom:3px}
+.lp-svc.web{background:#1659dc;color:#fff}
+.lp-svc.content{background:#f3415c;color:#fff}
+.lp-svc.social{background:#ffd33d;color:var(--ink)} .lp-svc.social li{background:rgba(23,28,56,.08)}
+.lp-svc.plan{background:#28bb90;color:var(--ink)} .lp-svc.plan li{background:rgba(23,28,56,.08)}
+
+.lp-work{background:var(--cream)}
+.lp-work-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.lp-work-grid figure{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:4/5;box-shadow:var(--shadow-sm);background:#ddd}
+.lp-work-grid img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.lp-work-grid figure:hover img{transform:scale(1.05)}
+.lp-work-grid figcaption{position:absolute;left:0;right:0;bottom:0;padding:34px 14px 12px;background:linear-gradient(transparent,rgba(0,0,0,.72));color:#fff;font-weight:800;font-size:14px}
+.lp-work .more{text-align:center;margin-top:26px;font-weight:700}
+.lp-work .more a{color:var(--blue);text-decoration:underline;text-underline-offset:3px}
+
+.lp-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.lp-step{background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px 26px;box-shadow:var(--shadow-sm)}
+.lp-step .n{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:var(--disp);font-weight:800;color:#fff;margin-bottom:14px}
+.lp-step:nth-child(1) .n{background:var(--blue)} .lp-step:nth-child(2) .n{background:var(--pink)} .lp-step:nth-child(3) .n{background:var(--green)}
+.lp-step h3{font-size:1.25rem;margin-bottom:8px}
+.lp-step p{color:var(--muted);font-size:.95rem}
+
+.lp-anthony{background:var(--yellow-soft)}
+.lp-anthony-grid{display:grid;grid-template-columns:300px 1fr;gap:60px;align-items:center}
+.lp-anthony-photo{border-radius:18px;border:7px solid #fff;box-shadow:10px 10px 0 var(--blue);overflow:hidden}
+.lp-anthony-photo img{width:100%;aspect-ratio:1/1;object-fit:cover;object-position:center 12%}
+.lp-anthony h2{font-size:clamp(1.9rem,3.6vw,2.8rem);margin:16px 0}
+.lp-anthony p{color:#383f57;font-size:1.06rem;margin-bottom:14px;max-width:58ch}
+.lp-facts{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0 26px}
+.lp-facts span{background:#fff;border:1px solid var(--line);border-radius:var(--pill);padding:9px 15px;font-weight:700;font-size:13px}
+
+.lp-final{padding:clamp(64px,8vw,100px) 0}
+.lp-final .final-card{background:var(--blue)}
+.lp-final .final-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2}
+.lp-final .btn-outline{background:transparent;color:#fff;border-color:#fff}
+.lp-final .btn-outline:hover{background:#fff;color:var(--blue)}
+
+.lp-foot{padding:30px 0 110px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.lp-foot .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.lp-foot a{text-decoration:underline}
+
+/* sticky mobile CTA bar */
+.lp-sticky{position:fixed;left:0;right:0;bottom:0;z-index:70;display:none;gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);box-shadow:0 -10px 30px -18px rgba(23,28,56,.5)}
+.lp-sticky .btn{flex:1;justify-content:center;padding:15px 12px;font-size:16px}
+
+@media (max-width:940px){
+  .lp-hero{padding-top:118px}
+  .lp-hero-grid{grid-template-columns:1fr;gap:36px}
+  .lp-work-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lp-anthony-grid{grid-template-columns:1fr;gap:32px}
+  .lp-anthony-photo{width:240px}
+  .lp .lp-call .num{display:none}
+}
+@media (max-width:700px){
+  .lp-svc-grid,.lp-steps{grid-template-columns:1fr}
+  .lp-svc img{height:200px}
+  .lp-form .row{grid-template-columns:1fr;gap:0}
+  .lp-form-card{padding:24px 18px;box-shadow:6px 6px 0 var(--blue)}
+  .lp-sticky{display:flex}
+  .lp .nav-cta{display:none}
+}
+@media (prefers-reduced-motion:reduce){.lp-proof .track{animation:none;flex-wrap:wrap;justify-content:center;width:auto}}
+</style>
+</head>
+<body class="home-refresh lp">
+<header>
+<div class="wrap">
+<div class="bar">
+<a class="brand" href="/"><span class="colonnade"><i></i><i></i><i></i><i></i><i></i></span><b>Colonna <span>Media</span></b></a>
+<div class="lp-head-cta">
+<a class="lp-call" href="tel:+14124395452" aria-label="Call Colonna Media at 412-439-5452"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg><span class="num">(412) 439-5452</span></a>
+<a href="#quote" class="btn btn-green nav-cta">Get a quote →</a>
+</div>
+</div>
+</div>
+</header>
+
+<main>
+<!-- HERO + FORM -->
+<section class="lp-hero">
+<div class="wrap lp-hero-grid">
+<div>
+<span class="eyebrow">Pittsburgh small business marketing</span>
+<h1>More customers from <span>one local partner.</span></h1>
+<p class="lead">Websites, photography, video, social media, and marketing plans for Pittsburgh startups and small businesses. Anthony plans it with you, makes the work, and connects every piece.</p>
+<ul class="lp-checks">
+<li><b>✓</b>Websites built to turn visitors into calls and inquiries</li>
+<li><b>✓</b>Photo &amp; video that shows your people, products, and place</li>
+<li><b>✓</b>Social media, ads, and follow-up that point somewhere useful</li>
+<li><b>✓</b>One point of contact — scope and pricing agreed before work starts</li>
+</ul>
+<div class="lp-hero-actions">
+<a href="#quote" class="btn btn-green btn-lg">Get my quote →</a>
+<a href="tel:+14124395452" class="btn btn-outline btn-lg">Call (412) 439-5452</a>
+</div>
+<div class="lp-trustline">
+<div class="lp-avatars" aria-hidden="true">
+<img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/0c8d64c6c_IMG_3672.png" alt="" loading="lazy" />
+<img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/56733b31f_IMG_3671.png" alt="" loading="lazy" />
+<img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/535ff1389_IMG_3667.png" alt="" loading="lazy" />
+<img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/1878d50f9_IMG_3673.png" alt="" loading="lazy" />
+</div>
+<p>Trusted by <b>Cardello Lighting, Nemacolin, Jenni G Jewelry</b><br />and other local businesses &amp; brands</p>
+</div>
+</div>
+
+<div class="lp-form-card" id="quote">
+<h2>Tell Anthony what you need</h2>
+<p class="sub">Takes about 30 seconds. Anthony reviews every inquiry personally.</p>
+<form class="lp-form" id="lpform" novalidate>
+<div class="hp-field" aria-hidden="true"><label for="lp-website">Leave this field empty</label><input id="lp-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+<div class="row">
+<div class="field"><label for="lp-name">Your name *</label><input id="lp-name" name="name" autocomplete="name" maxlength="120" required></div>
+<div class="field"><label for="lp-business">Business name</label><input id="lp-business" name="business_name" autocomplete="organization" maxlength="160"></div>
+</div>
+<div class="row">
+<div class="field"><label for="lp-email">Email *</label><input id="lp-email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
+<div class="field"><label for="lp-phone">Phone</label><input id="lp-phone" name="phone" type="tel" autocomplete="tel" maxlength="40"></div>
+</div>
+<fieldset>
+<legend>What do you need help with?</legend>
+<div class="lp-chips">
+<label class="lp-chip"><input type="checkbox" name="services" value="website"><span>Website</span></label>
+<label class="lp-chip"><input type="checkbox" name="services" value="photography"><span>Photography</span></label>
+<label class="lp-chip"><input type="checkbox" name="services" value="videography"><span>Video</span></label>
+<label class="lp-chip"><input type="checkbox" name="services" value="social-media"><span>Social media</span></label>
+<label class="lp-chip"><input type="checkbox" name="services" value="consulting"><span>Marketing plan</span></label>
+<label class="lp-chip"><input type="checkbox" name="services" value="automations"><span>Automations</span></label>
+<label class="lp-chip"><input type="checkbox" name="services" value="google-ads"><span>Google Ads</span></label>
+<label class="lp-chip"><input type="checkbox" name="services" value="meta-ads"><span>Meta Ads</span></label>
+</div>
+</fieldset>
+<div class="field"><label for="lp-msg">Anything else? (optional)</label><textarea id="lp-msg" name="message" rows="3" maxlength="5000" placeholder="Goals, dates, or what's not working right now."></textarea></div>
+<button type="submit" class="btn btn-green">Get my quote →</button>
+<p class="fine">No obligation. Your details are only used to respond to this inquiry.</p>
+<span class="or-call">Prefer to talk? <a href="tel:+14124395452">Call (412) 439-5452</a></span>
+<div id="lp-status" class="form-status" role="status" aria-live="polite"></div>
+</form>
+</div>
+</div>
+</section>
+
+<!-- CLIENT PROOF -->
+<section class="lp-proof" aria-label="Clients and collaborators">
+<p class="label">Businesses &amp; brands Anthony has worked with</p>
+<div class="track" aria-hidden="false">
+<span>Cardello Lighting &amp; Electric Supply</span><span>Nemacolin</span><span>Jenni G Jewelry</span><span>Justin Fabus</span><span>Overthrow New York</span><span>Lucid Juice</span><span>Burgh Book Buddies</span><span>Revitalize, or Die.</span>
+<span aria-hidden="true">Cardello Lighting &amp; Electric Supply</span><span aria-hidden="true">Nemacolin</span><span aria-hidden="true">Jenni G Jewelry</span><span aria-hidden="true">Justin Fabus</span><span aria-hidden="true">Overthrow New York</span><span aria-hidden="true">Lucid Juice</span><span aria-hidden="true">Burgh Book Buddies</span><span aria-hidden="true">Revitalize, or Die.</span>
+</div>
+</section>
+
+<!-- SERVICES -->
+<section class="lp-section">
+<div class="wrap">
+<div class="head reveal"><span class="eyebrow">What we do</span><h2>Pick one piece or bring the whole puzzle.</h2><p>Everything is built around your business and connected to the next step a customer takes.</p></div>
+<div class="lp-svc-grid">
+<article class="lp-svc web reveal">
+<img src="/assets/img/marketing-website.webp" alt="Business owner and designer reviewing a website" loading="lazy" />
+<div class="b"><span class="k">Websites</span><h3>A website that gets people to call.</h3><p>New site or a refresh. A clear offer, fast mobile pages, and an easy inquiry path.</p><ul><li>Web design</li><li>Redesigns</li><li>Landing pages</li></ul><a class="go" href="#quote" data-service="website">Get a website quote →</a></div>
+</article>
+<article class="lp-svc content reveal">
+<img src="/assets/img/marketing-content-production.webp" alt="Business creating on-site video content" loading="lazy" />
+<div class="b"><span class="k">Photo &amp; Video</span><h3>Show your people, products, and place.</h3><p>Commercial photography and video for your website, social media, and ads.</p><ul><li>Product &amp; brand photos</li><li>Headshots</li><li>Promo video</li></ul><a class="go" href="#quote" data-service="photography,videography">Get a photo/video quote →</a></div>
+</article>
+<article class="lp-svc social reveal">
+<img src="/assets/img/marketing-social-ads.webp" alt="Business owner reviewing social media and ad concepts" loading="lazy" />
+<div class="b"><span class="k">Social &amp; Content</span><h3>Consistent posts in your real voice.</h3><p>Social media management and content creation, connected to your site, ads, and follow-up.</p><ul><li>Social management</li><li>Content creation</li><li>Google &amp; Meta ads</li></ul><a class="go" href="#quote" data-service="social-media">Get a social media quote →</a></div>
+</article>
+<article class="lp-svc plan reveal">
+<img src="/assets/img/marketing-store-planning.webp" alt="Business owner working through a marketing plan" loading="lazy" />
+<div class="b"><span class="k">Plans &amp; Systems</span><h3>A marketing map that connects it all.</h3><p>Starting up or rebranding? Find the gaps, pick the next steps, and automate the follow-up.</p><ul><li>Marketing plans</li><li>Startups &amp; rebrands</li><li>Automations</li></ul><a class="go" href="#quote" data-service="consulting,automations">Get a planning quote →</a></div>
+</article>
+</div>
+</div>
+</section>
+
+<!-- WORK / SOCIAL PROOF -->
+<section class="lp-section lp-work">
+<div class="wrap">
+<div class="head reveal"><span class="eyebrow">Real client work</span><h2>The people behind the projects.</h2><p>A few of the local businesses and brands Anthony has created for.</p></div>
+<div class="lp-work-grid reveal">
+<figure><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/0c8d64c6c_IMG_3672.png" alt="Cardello Lighting project by Colonna Media" loading="lazy" /><figcaption>Cardello Lighting</figcaption></figure>
+<figure><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/56733b31f_IMG_3671.png" alt="Nemacolin project by Colonna Media" loading="lazy" /><figcaption>Nemacolin</figcaption></figure>
+<figure><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/535ff1389_IMG_3667.png" alt="Jenni G Jewelry project by Colonna Media" loading="lazy" /><figcaption>Jenni G Jewelry</figcaption></figure>
+<figure><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/86e44a60c_IMG_3678.png" alt="Overthrow New York project by Colonna Media" loading="lazy" /><figcaption>Overthrow New York</figcaption></figure>
+<figure><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/1878d50f9_IMG_3673.png" alt="Lucid Juice project by Colonna Media" loading="lazy" /><figcaption>Lucid Juice</figcaption></figure>
+<figure><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/26d2d043d_IMG_3675.png" alt="Justin Fabus project by Colonna Media" loading="lazy" /><figcaption>Justin Fabus</figcaption></figure>
+<figure><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/aa9b81bbd_IMG_3674.png" alt="Burgh Book Buddies project by Colonna Media" loading="lazy" /><figcaption>Burgh Book Buddies</figcaption></figure>
+<figure><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/b702f5e94_IMG_3680.png" alt="Revitalize, or Die. project by Colonna Media" loading="lazy" /><figcaption>Revitalize, or Die.</figcaption></figure>
+</div>
+<p class="more"><a href="#quote">Want work like this? Get a quote →</a></p>
+</div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="lp-section">
+<div class="wrap">
+<div class="head reveal"><span class="eyebrow">How it works</span><h2>Simple from the first message.</h2></div>
+<div class="lp-steps">
+<div class="lp-step reveal"><div class="n">1</div><h3>Tell Anthony what you need</h3><p>Pick your services and share your business, location, and goals. One minute, no calendar booking.</p></div>
+<div class="lp-step reveal"><div class="n">2</div><h3>Agree on the scope</h3><p>You'll talk through the work, timing, and pricing before anything moves forward.</p></div>
+<div class="lp-step reveal"><div class="n">3</div><h3>Bring it to life</h3><p>Websites, content, social media, ad setup, or systems — built and connected around your business.</p></div>
+</div>
+<div style="text-align:center;margin-top:34px"><a href="#quote" class="btn btn-green btn-lg">Start with step 1 →</a></div>
+</div>
+</section>
+
+<!-- ABOUT ANTHONY -->
+<section class="lp-section lp-anthony">
+<div class="wrap lp-anthony-grid">
+<div class="lp-anthony-photo reveal"><img src="assets/img/anthony.jpg" alt="Anthony Colonna, Pittsburgh marketing and creative partner" loading="lazy" /></div>
+<div class="reveal">
+<span class="eyebrow">Your point person</span>
+<h2>A real partner behind the plan.</h2>
+<p>Colonna Media is led by Anthony Colonna, a Pittsburgh marketing strategist and creative partner. Anthony helps startups and small businesses see the whole picture, set up what's missing, and create the photo, video, and content that brings the strategy to life.</p>
+<p>You work with Anthony directly — not an account manager or a software you have to figure out on your own.</p>
+<div class="lp-facts"><span>📍 Based in Pittsburgh</span><span>🚗 On-site within ~50 miles</span><span>🤝 One project or ongoing</span></div>
+<a href="#quote" class="btn btn-green btn-lg">Talk to Anthony →</a>
+</div>
+</div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="lp-final">
+<div class="wrap">
+<div class="final-card reveal">
+<h2>Ready to get it moving?</h2>
+<p>Tell Anthony what you need and get a clear plan and quote for your business.</p>
+<div class="final-actions">
+<a href="#quote" class="btn btn-yellow btn-lg">Get my quote →</a>
+<a href="tel:+14124395452" class="btn btn-outline btn-lg">Call (412) 439-5452</a>
+</div>
+<div class="colb"><i style="height:30%;background:#ffd33d"></i><i style="height:55%;background:#f3415c"></i><i style="height:100%;background:#28bb90"></i><i style="height:70%;background:#ffd33d"></i><i style="height:42%;background:#f3415c"></i></div>
+</div>
+</div>
+</section>
+</main>
+
+<footer class="lp-foot">
+<div class="wrap"><span>&copy; 2026 Colonna Media · Pittsburgh, PA · <a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a></span><span><a href="/">Visit the full site</a></span></div>
+</footer>
+
+<div class="lp-sticky">
+<a href="tel:+14124395452" class="btn btn-outline">Call</a>
+<a href="#quote" class="btn btn-green">Get a quote →</a>
+</div>
+
+<script>
+(function(){
+  var form=document.getElementById('lpform');
+  if(!form)return;
+  var boxes=form.querySelectorAll('input[name="services"]');
+  var setServices=function(list){boxes.forEach(function(b){if(list.indexOf(b.value)>-1)b.checked=true;});};
+
+  // Preselect from ?service=website or from an ad group link
+  var params=new URLSearchParams(window.location.search);
+  setServices(params.getAll('service').join(',').split(','));
+
+  // Service cards preselect their chips when clicked
+  document.querySelectorAll('[data-service]').forEach(function(a){
+    a.addEventListener('click',function(){setServices(a.getAttribute('data-service').split(','));});
+  });
+
+  // Focus the first field when a CTA jumps to the form
+  document.querySelectorAll('a[href="#quote"]').forEach(function(a){
+    a.addEventListener('click',function(){setTimeout(function(){var n=document.getElementById('lp-name');if(n)n.focus({preventScroll:true});},450);});
+  });
+
+  form.addEventListener('submit',async function(e){
+    e.preventDefault();
+    if(!form.reportValidity())return;
+    var btn=form.querySelector('button[type="submit"]'),status=document.getElementById('lp-status'),original=btn.textContent;
+    var v=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};
+    var services=Array.from(form.querySelectorAll('input[name="services"]:checked'),function(b){return b.value;});
+    var source='Source: /start landing page'+(params.get('utm_campaign')?' ('+params.get('utm_campaign')+')':'')+(params.get('gclid')?' — Google Ads click':'');
+    var msg=v('lp-msg');
+    btn.disabled=true;btn.textContent='Sending…';status.className='form-status';status.textContent='';
+    try{
+      var res=await fetch('/api/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        name:v('lp-name'),email:v('lp-email'),business_name:v('lp-business'),phone:v('lp-phone'),
+        services:services,message:(msg?msg+'\n\n':'')+source,website:v('lp-website')
+      })});
+      var data=await res.json().catch(function(){return {};});
+      if(!res.ok||!data.success)throw Error('failed');
+      status.className='form-status success';
+      status.textContent='Thanks! Your request was sent to Anthony. He will follow up with you directly.';
+      form.reset();btn.textContent='Request sent ✓';
+      if(typeof window.gtag==='function')window.gtag('event','generate_lead',{form_id:'start_landing',service_count:services.length});
+    }catch(err){
+      status.className='form-status error';
+      status.innerHTML='Your request could not be sent. Please call <a href="tel:+14124395452">(412) 439-5452</a> or email <a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a>.';
+      btn.textContent=original;btn.disabled=false;
+    }
+  });
+})();
+</script>
+<script type="module" src="/assets/app.js"></script>
+</body>
+</html>
