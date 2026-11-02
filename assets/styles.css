@@ -471,18 +471,3 @@
 @media(max-width:900px){.hero-side-note{display:none}.home-refresh .guide-grid{grid-template-columns:220px 1fr;gap:35px}.home-refresh .guide-photo img{height:220px}}
 @media(max-width:700px){.home-refresh .hero{padding:122px 0 30px}.home-refresh .hero h1{font-size:clamp(2.75rem,10vw,4.2rem)}.hero-intro{margin-bottom:30px}.hero-scene{border-width:5px;border-radius:15px;box-shadow:5px 5px 0 var(--yellow)}.hero-scene img{height:315px}.hero-scene figcaption{font-size:10px;display:block}.hero-scene figcaption span{display:block}.hero-scene figcaption span+span{margin-top:4px}.category-grid{grid-template-columns:1fr}.category-card>img{height:240px}.category-body{padding:25px}.home-refresh .guide-grid{grid-template-columns:1fr;gap:35px}.home-refresh .guide-photo{width:230px}.home-refresh .guide-photo img{height:230px}.home-refresh .power-inner{grid-template-columns:1fr}.home-refresh .power-copy{padding:35px 28px 0}.power-graphic{padding:0 28px 35px}.power-graphic span{font-size:1.5rem}.home-refresh .service-launcher{grid-template-columns:repeat(2,minmax(0,1fr))}.home-refresh .service-app{padding:18px 12px}.home-refresh .service-app h3{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.category-card{transition:none}}
-
-/* Full-width sections on desktop (mobile unchanged) — November 2026. */
-@media (min-width:701px){
-.home-refresh .hero-scene{margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);border:0;border-radius:0;box-shadow:none}
-.home-refresh .hero-scene img{height:clamp(360px,42vw,620px)}
-.home-refresh .hero-scene figcaption{padding:15px max(24px,calc((100vw - var(--maxw))/2 + 24px))}
-.category-grid{grid-template-columns:1fr;gap:0;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)}
-.category-card{flex-direction:row;border-radius:0;box-shadow:none;min-height:420px}
-.category-card:hover{transform:none}
-.category-card:nth-child(even){flex-direction:row-reverse}
-.category-card>img{width:50%;height:auto;min-height:420px;flex:none}
-.category-body{justify-content:center;padding:clamp(40px,5vw,80px) clamp(32px,6vw,96px)}
-.category-body>*{max-width:560px}
-.category-body a{margin-top:6px}
-}
