@@ -146,17 +146,6 @@
 .lp-foot .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
 .lp-foot a{text-decoration:underline}
 
-/* full-width service stripes on desktop (mobile keeps the stacked cards) */
-@media (min-width:701px){
-  .lp-svc-grid{grid-template-columns:1fr;gap:0;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)}
-  .lp-svc{flex-direction:row;border-radius:0;box-shadow:none;min-height:400px}
-  .lp-svc:nth-child(even){flex-direction:row-reverse}
-  .lp-svc img{width:50%;height:auto;min-height:400px;flex:none}
-  .lp-svc .b{justify-content:center;padding:clamp(40px,5vw,80px) clamp(32px,6vw,96px)}
-  .lp-svc .b>*{max-width:560px}
-  .lp-svc .go{margin-top:6px}
-}
-
 /* sticky mobile CTA bar */
 .lp-sticky{position:fixed;left:0;right:0;bottom:0;z-index:70;display:none;gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);box-shadow:0 -10px 30px -18px rgba(23,28,56,.5)}
 .lp-sticky .btn{flex:1;justify-content:center;padding:15px 12px;font-size:16px}
