@@ -23,8 +23,8 @@
   });
 </script>
 <script>document.documentElement.className += ' js';</script>
-<title>Pittsburgh Websites, Photo, Video &amp; Marketing | Colonna Media</title>
-<meta name="description" content="Websites, photography, video, social media, and marketing plans for Pittsburgh small businesses. Tell Anthony what you need and get a quote." />
+<title>Pittsburgh Web Design, Photography &amp; Video | Colonna Media</title>
+<meta name="description" content="Website design, business photography, and video for Pittsburgh small businesses. One project, quoted up front. Tell Anthony what you need." />
 <!-- Paid-traffic landing page: keep out of search results so it doesn't compete with the main service pages. -->
 <meta name="robots" content="noindex, follow" />
 <meta name="theme-color" content="#171C38" />
@@ -146,6 +146,37 @@
 .lp-foot .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
 .lp-foot a{text-decoration:underline}
 
+/* featured services */
+.lp-feature{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;margin-bottom:72px}
+.lp-feature:last-child{margin-bottom:0}
+.lp-feature.flip .lp-feature-img{order:2}
+.lp-feature-img{border-radius:20px;overflow:hidden;box-shadow:10px 10px 0 var(--blue)}
+.lp-feature.flip .lp-feature-img{box-shadow:-10px 10px 0 var(--pink)}
+.lp-feature-img img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.lp-feature-copy h3{font-size:clamp(1.8rem,3.2vw,2.6rem);line-height:1.05;margin:14px 0 14px}
+.lp-feature-copy>p{color:#383f57;font-size:1.05rem;margin-bottom:18px}
+.lp-tag{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:7px 13px;border-radius:var(--pill)}
+.lp-tag.blue{background:var(--blue-soft);color:var(--blue)} .lp-tag.pink{background:var(--pink-soft);color:#c4213d} .lp-tag.yellow{background:var(--yellow);color:var(--ink)}
+.lp-list{list-style:none;display:grid;gap:10px;margin:0 0 18px}
+.lp-list li{position:relative;padding-left:30px;color:#383f57}
+.lp-list li::before{content:"✓";position:absolute;left:0;top:1px;width:20px;height:20px;border-radius:50%;background:var(--green);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center}
+.lp-list b{color:var(--ink)}
+.lp-good{font-size:.95rem;color:var(--muted);background:var(--cream);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:22px}
+.lp-good b{color:var(--ink)}
+.lp-bundle{background:var(--ink);color:#fff;padding:56px 0}
+.lp-bundle-inner{display:flex;justify-content:space-between;align-items:center;gap:30px}
+.lp-bundle h2{font-size:clamp(2rem,3.8vw,3rem);margin:14px 0 10px}
+.lp-bundle p{color:rgba(255,255,255,.8);max-width:58ch}
+.lp-also{background:var(--cream)}
+.lp-also-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.lp-also-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column}
+.lp-also-card .ic{font-size:26px;margin-bottom:12px}
+.lp-also-card h3{font-size:1.15rem;margin-bottom:8px}
+.lp-also-card p{color:var(--muted);font-size:.92rem;margin-bottom:14px}
+.lp-also-card a{margin-top:auto;font-weight:800;color:var(--blue);font-size:14px}
+@media (max-width:940px){.lp-feature{grid-template-columns:1fr;gap:28px;margin-bottom:56px}.lp-feature.flip .lp-feature-img{order:0}.lp-also-grid{grid-template-columns:1fr 1fr}.lp-bundle-inner{flex-direction:column;align-items:flex-start}}
+@media (max-width:560px){.lp-also-grid{grid-template-columns:1fr}.lp-feature-img{box-shadow:6px 6px 0 var(--blue)}.lp-feature.flip .lp-feature-img{box-shadow:6px 6px 0 var(--pink)}}
+
 /* sticky mobile CTA bar */
 .lp-sticky{position:fixed;left:0;right:0;bottom:0;z-index:70;display:none;gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);box-shadow:0 -10px 30px -18px rgba(23,28,56,.5)}
 .lp-sticky .btn{flex:1;justify-content:center;padding:15px 12px;font-size:16px}
@@ -187,13 +218,13 @@
 <section class="lp-hero">
 <div class="wrap lp-hero-grid">
 <div>
-<span class="eyebrow">Pittsburgh small business marketing</span>
-<h1>More customers from <span>one local partner.</span></h1>
-<p class="lead">Websites, photography, video, social media, and marketing plans for Pittsburgh startups and small businesses. Anthony plans it with you, makes the work, and connects every piece.</p>
+<span class="eyebrow">Pittsburgh web design · photo · video</span>
+<h1>A website and photos that <span>bring in customers.</span></h1>
+<p class="lead">New websites, business photography, and video for Pittsburgh startups and small businesses. One clear project, quoted up front, built by Anthony from start to finish.</p>
 <ul class="lp-checks">
 <li><b>✓</b>Websites built to turn visitors into calls and inquiries</li>
 <li><b>✓</b>Photo &amp; video that shows your people, products, and place</li>
-<li><b>✓</b>Social media, ads, and follow-up that point somewhere useful</li>
+<li><b>✓</b>Single projects, no ongoing contract required to get started</li>
 <li><b>✓</b>One point of contact — scope and pricing agreed before work starts</li>
 </ul>
 <div class="lp-hero-actions">
@@ -230,11 +261,11 @@
 <label class="lp-chip"><input type="checkbox" name="services" value="website"><span>Website</span></label>
 <label class="lp-chip"><input type="checkbox" name="services" value="photography"><span>Photography</span></label>
 <label class="lp-chip"><input type="checkbox" name="services" value="videography"><span>Video</span></label>
+<label class="lp-chip"><input type="checkbox" name="services" value="google-ads"><span>Google Ads setup</span></label>
+<label class="lp-chip"><input type="checkbox" name="services" value="meta-ads"><span>Meta Ads setup</span></label>
 <label class="lp-chip"><input type="checkbox" name="services" value="social-media"><span>Social media</span></label>
 <label class="lp-chip"><input type="checkbox" name="services" value="consulting"><span>Marketing plan</span></label>
 <label class="lp-chip"><input type="checkbox" name="services" value="automations"><span>Automations</span></label>
-<label class="lp-chip"><input type="checkbox" name="services" value="google-ads"><span>Google Ads</span></label>
-<label class="lp-chip"><input type="checkbox" name="services" value="meta-ads"><span>Meta Ads</span></label>
 </div>
 </fieldset>
 <div class="field"><label for="lp-msg">Anything else? (optional)</label><textarea id="lp-msg" name="message" rows="3" maxlength="5000" placeholder="Goals, dates, or what's not working right now."></textarea></div>
@@ -256,27 +287,68 @@
 </div>
 </section>
 
-<!-- SERVICES -->
-<section class="lp-section">
+<!-- FEATURED: WEBSITES + PHOTO/VIDEO -->
+<section class="lp-section" id="services">
 <div class="wrap">
-<div class="head reveal"><span class="eyebrow">What we do</span><h2>Pick one piece or bring the whole puzzle.</h2><p>Everything is built around your business and connected to the next step a customer takes.</p></div>
-<div class="lp-svc-grid">
-<article class="lp-svc web reveal">
-<img src="/assets/img/marketing-website.webp" alt="Business owner and designer reviewing a website" loading="lazy" />
-<div class="b"><span class="k">Websites</span><h3>A website that gets people to call.</h3><p>New site or a refresh. A clear offer, fast mobile pages, and an easy inquiry path.</p><ul><li>Web design</li><li>Redesigns</li><li>Landing pages</li></ul><a class="go" href="#quote" data-service="website">Get a website quote →</a></div>
-</article>
-<article class="lp-svc content reveal">
-<img src="/assets/img/marketing-content-production.webp" alt="Business creating on-site video content" loading="lazy" />
-<div class="b"><span class="k">Photo &amp; Video</span><h3>Show your people, products, and place.</h3><p>Commercial photography and video for your website, social media, and ads.</p><ul><li>Product &amp; brand photos</li><li>Headshots</li><li>Promo video</li></ul><a class="go" href="#quote" data-service="photography,videography">Get a photo/video quote →</a></div>
-</article>
-<article class="lp-svc social reveal">
-<img src="/assets/img/marketing-social-ads.webp" alt="Business owner reviewing social media and ad concepts" loading="lazy" />
-<div class="b"><span class="k">Social &amp; Content</span><h3>Consistent posts in your real voice.</h3><p>Social media management and content creation, connected to your site, ads, and follow-up.</p><ul><li>Social management</li><li>Content creation</li><li>Google &amp; Meta ads</li></ul><a class="go" href="#quote" data-service="social-media">Get a social media quote →</a></div>
-</article>
-<article class="lp-svc plan reveal">
-<img src="/assets/img/marketing-store-planning.webp" alt="Business owner working through a marketing plan" loading="lazy" />
-<div class="b"><span class="k">Plans &amp; Systems</span><h3>A marketing map that connects it all.</h3><p>Starting up or rebranding? Find the gaps, pick the next steps, and automate the follow-up.</p><ul><li>Marketing plans</li><li>Startups &amp; rebrands</li><li>Automations</li></ul><a class="go" href="#quote" data-service="consulting,automations">Get a planning quote →</a></div>
-</article>
+<div class="head reveal"><span class="eyebrow">What we do</span><h2>Two projects that move the needle first.</h2><p>Most businesses start with a better website, better photos, or both. Each one is a single project with a clear scope and price before work starts.</p></div>
+
+<div class="lp-feature reveal">
+<div class="lp-feature-img"><img src="/assets/img/marketing-website.webp" alt="Business owner and designer reviewing a new website" loading="lazy" /></div>
+<div class="lp-feature-copy">
+<span class="lp-tag blue">Website design</span>
+<h3>A website that gets people to call.</h3>
+<p>Whether you need your first site or a refresh of one that isn't working, Anthony designs and builds it around one goal: making it easy for the right customer to reach you.</p>
+<ul class="lp-list">
+<li><b>Custom design</b> that fits your brand — not a template</li>
+<li><b>Mobile-first pages</b> that load fast on phones</li>
+<li><b>Clear offer &amp; page structure</b> with help on the words</li>
+<li><b>Quote and contact forms</b> that email you directly</li>
+<li><b>Local search basics</b> — page titles, descriptions, and Google Analytics</li>
+<li><b>Your own photos</b> — pair it with a shoot so the site shows the real you</li>
+</ul>
+<p class="lp-good"><b>Good for:</b> new businesses, outdated sites, DIY sites that aren't bringing in leads, and rebrands.</p>
+<a href="#quote" class="btn btn-green" data-service="website">Get a website quote →</a>
+</div>
+</div>
+
+<div class="lp-feature flip reveal">
+<div class="lp-feature-img"><img src="/assets/img/marketing-content-production.webp" alt="Business photo and video shoot on location" loading="lazy" /></div>
+<div class="lp-feature-copy">
+<span class="lp-tag pink">Photography &amp; video</span>
+<h3>Show your people, products, and place.</h3>
+<p>Real photos and video of your business do more than stock images ever will. Anthony shoots on location and delivers files ready for your website, social media, and ads.</p>
+<ul class="lp-list">
+<li><b>Brand &amp; lifestyle photos</b> of your team and space</li>
+<li><b>Product photography</b> for websites and online stores</li>
+<li><b>Headshots</b> for owners and staff</li>
+<li><b>Short promo &amp; brand videos</b> for your site and social</li>
+<li><b>Event and behind-the-scenes coverage</b></li>
+<li><b>On-site</b> anywhere within about 50 miles of Pittsburgh</li>
+</ul>
+<p class="lp-good"><b>Good for:</b> new websites, product launches, menus and catalogs, team pages, and ads that need real images.</p>
+<a href="#quote" class="btn btn-green" data-service="photography,videography">Get a photo/video quote →</a>
+</div>
+</div>
+</div>
+</section>
+
+<!-- BUNDLE BAND -->
+<section class="lp-bundle">
+<div class="wrap lp-bundle-inner reveal">
+<div><span class="lp-tag yellow">Website + photo shoot</span><h2>Better together.</h2><p>Booking your website and photography together means your new site launches with real images of your business instead of placeholders — one plan, one point of contact.</p></div>
+<a href="#quote" class="btn btn-yellow btn-lg" data-service="website,photography">Quote both →</a>
+</div>
+</section>
+
+<!-- ALSO AVAILABLE -->
+<section class="lp-section lp-also">
+<div class="wrap">
+<div class="head reveal"><span class="eyebrow">Also available</span><h2>Ready for more after launch?</h2><p>Once your site and content are in place, these help put them to work. Add them to a project or come back to them later.</p></div>
+<div class="lp-also-grid">
+<div class="lp-also-card reveal"><span class="ic">📣</span><h3>Google &amp; Meta ad setup</h3><p>Campaigns built around a clear customer journey and pointed at a page that converts.</p><a href="#quote" data-service="google-ads,meta-ads">Ask about ads →</a></div>
+<div class="lp-also-card reveal"><span class="ic">📱</span><h3>Social media &amp; content</h3><p>Planned posts and content in a consistent voice, built from your own photos and video.</p><a href="#quote" data-service="social-media">Ask about social →</a></div>
+<div class="lp-also-card reveal"><span class="ic">🗺️</span><h3>Marketing plans &amp; rebrands</h3><p>Starting up or rebranding? Find the gaps and choose the smartest next steps.</p><a href="#quote" data-service="consulting">Ask about planning →</a></div>
+<div class="lp-also-card reveal"><span class="ic">⚙️</span><h3>Automations &amp; follow-up</h3><p>Connect forms, email, and follow-up so new leads don't slip through the cracks.</p><a href="#quote" data-service="automations">Ask about automations →</a></div>
 </div>
 </div>
 </section>
@@ -306,7 +378,7 @@
 <div class="lp-steps">
 <div class="lp-step reveal"><div class="n">1</div><h3>Tell Anthony what you need</h3><p>Pick your services and share your business, location, and goals. One minute, no calendar booking.</p></div>
 <div class="lp-step reveal"><div class="n">2</div><h3>Agree on the scope</h3><p>You'll talk through the work, timing, and pricing before anything moves forward.</p></div>
-<div class="lp-step reveal"><div class="n">3</div><h3>Bring it to life</h3><p>Websites, content, social media, ad setup, or systems — built and connected around your business.</p></div>
+<div class="lp-step reveal"><div class="n">3</div><h3>Bring it to life</h3><p>Anthony designs, shoots, and builds — then hands over a finished website, photos, or video ready to use.</p></div>
 </div>
 <div style="text-align:center;margin-top:34px"><a href="#quote" class="btn btn-green btn-lg">Start with step 1 →</a></div>
 </div>
@@ -327,12 +399,26 @@
 </div>
 </section>
 
+<!-- FAQ -->
+<section class="lp-section">
+<div class="wrap">
+<div class="head reveal"><span class="eyebrow">Questions</span><h2>Good to know.</h2></div>
+<div class="faq-wrap">
+<details class="faq reveal"><summary>Can I hire you for just one project?</summary><p>Yes. Most clients start with a single project — a new website, a photo shoot, or a video. Everything is scoped and priced before work begins, and ongoing support is there later only if you want it.</p></details>
+<details class="faq reveal"><summary>How much does a website or photo shoot cost?</summary><p>It depends on what you need. Tell Anthony about your business and goals and you'll get a clear quote with the scope spelled out before anything starts.</p></details>
+<details class="faq reveal"><summary>What area do you serve?</summary><p>Colonna Media is based in Pittsburgh and does on-site work within about 50 miles, including the South Hills and surrounding communities.</p></details>
+<details class="faq reveal"><summary>Can you use the photos on my new website?</summary><p>That's the idea. Pairing a shoot with your website means the site launches with real images of your business, and you can use the same photos on social media and in ads.</p></details>
+<details class="faq reveal"><summary>Who will I be working with?</summary><p>Anthony, directly — from the first conversation through delivery. No account managers or hand-offs.</p></details>
+</div>
+</div>
+</section>
+
 <!-- FINAL CTA -->
 <section class="lp-final">
 <div class="wrap">
 <div class="final-card reveal">
-<h2>Ready to get it moving?</h2>
-<p>Tell Anthony what you need and get a clear plan and quote for your business.</p>
+<h2>Ready for a better website or new photos?</h2>
+<p>Tell Anthony what you need and get a clear, up-front quote for your project.</p>
 <div class="final-actions">
 <a href="#quote" class="btn btn-yellow btn-lg">Get my quote →</a>
 <a href="tel:+14124395452" class="btn btn-outline btn-lg">Call (412) 439-5452</a>
