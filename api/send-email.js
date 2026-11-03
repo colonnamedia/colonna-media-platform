@@ -44,7 +44,12 @@ const SERVICE_NEXT = {
   "automations": ["Automations & follow-up", "We'll map how leads reach you and where follow-up is falling through the cracks."],
 };
 
-function thankYouEmail({ firstName, serviceIds, message, business }) {
+function thankYouEmail({ firstName, serviceIds, message, business, followup }) {
+  const nextLine = followup === "call"
+    ? "I'll reach out shortly to set up your quick 15-minute call."
+    : followup === "email"
+      ? "I'll follow up by email with some ideas and next steps shortly."
+      : "I'll personally follow up with you about it shortly.";
   const items = serviceIds.filter((id) => SERVICE_NEXT[id]);
   const rows = items.length
     ? items.map((id) => `
@@ -90,7 +95,7 @@ function thankYouEmail({ firstName, serviceIds, message, business }) {
     <tr><td style="height:6px;line-height:6px;font-size:0;background:#ffd33d;">&nbsp;</td></tr>
     <tr><td style="padding:36px 32px 8px 32px;font-family:Arial,Helvetica,sans-serif;">
       <div style="font-size:30px;line-height:36px;font-weight:bold;color:#171c38;">Thanks${firstName ? ", " + escapeHtml(firstName) : ""}!<br><span style="color:#1659dc;">Your request is in.</span></div>
-      <p style="font-size:16px;line-height:25px;color:#434961;margin:16px 0 0 0;">I got your request${forLine} and I'll personally follow up with you about it shortly. No sales team, no hand-offs — you'll hear from me directly.</p>
+      <p style="font-size:16px;line-height:25px;color:#434961;margin:16px 0 0 0;">I got your request${forLine}. ${nextLine} No sales team, no hand-offs — you'll hear from me directly.</p>
     </td></tr>
     <tr><td style="padding:24px 32px 4px 32px;font-family:Arial,Helvetica,sans-serif;">
       <div style="font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#1659dc;padding-bottom:12px;">What we'll talk about</div>
@@ -131,7 +136,7 @@ function thankYouEmail({ firstName, serviceIds, message, business }) {
 // Sends the thank-you email. Until colonnamedia.com is verified in Resend, this only
 // sends to the Colonna Media inbox (test mode). Set LEAD_AUTOREPLY_FROM after verifying,
 // e.g. "Anthony at Colonna Media <hello@colonnamedia.com>".
-async function sendThankYou(resendKey, { to, firstName, serviceIds, message, business }) {
+async function sendThankYou(resendKey, { to, firstName, serviceIds, message, business, followup }) {
   const from = process.env.LEAD_AUTOREPLY_FROM;
   const testMode = !from;
   if (testMode && to.toLowerCase() !== "colonnamedia@gmail.com") return;
@@ -144,7 +149,7 @@ async function sendThankYou(resendKey, { to, firstName, serviceIds, message, bus
         to: [to],
         reply_to: "colonnamedia@gmail.com",
         subject: `Thanks${firstName ? ", " + firstName : ""} — I got your request`,
-        html: thankYouEmail({ firstName, serviceIds, message, business }),
+        html: thankYouEmail({ firstName, serviceIds, message, business, followup }),
       }),
     });
     if (!response.ok) console.error("Thank-you email error", await response.json().catch(() => ({})));
@@ -164,7 +169,8 @@ export default async function handler(req, res) {
   let body;
   try { body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {}); } catch { return res.status(400).json({error:"Invalid request"}); }
   if (!body || typeof body !== "object" || Array.isArray(body)) return res.status(400).json({error:"Invalid request"});
-  const { name, email, business_name, service_needed, message, website, phone, location, website_url, timing, services } = body;
+  const { name, email, business_name, service_needed, message, website, phone, location, website_url, timing, services, followup } = body;
+  const followupLabel = followup === "call" ? "Quick 15-minute call" : followup === "email" ? "Email me info" : "";
   const serviceLabels = {"photography":"Photography","videography":"Videography","social-media":"Social Media Management","consulting":"Marketing Consulting","automations":"Automations & Systems","google-ads":"Google Ads Setup","meta-ads":"Meta Ads Setup","website":"Website Design"};
   if (services !== undefined && (!Array.isArray(services) || services.length > 8 || services.some(id=>!Object.hasOwn(serviceLabels,id)))) return res.status(400).json({error:'Invalid service selection'});
   const selectedServices = [...new Set(services || [])].map(id=>serviceLabels[id]).join(', ') || String(service_needed || 'Not specified');
@@ -199,6 +205,7 @@ export default async function handler(req, res) {
     location: String(location || ""),
     website_url: String(website_url || ""),
     timing: String(timing || ""),
+    followup: followupLabel,
     message: cleanMessage,
     page,
   });
@@ -233,6 +240,7 @@ export default async function handler(req, res) {
           <p><strong>Location:</strong> ${escapeHtml(location || "Not provided")}</p>
           <p><strong>Business website:</strong> ${escapeHtml(website_url || "Not provided")}</p>
           <p><strong>Timing:</strong> ${escapeHtml(timing || "Not provided")}</p>
+          <p><strong>Follow-up:</strong> ${escapeHtml(followupLabel || "No preference")}</p>
           <p><strong>Page:</strong> ${escapeHtml(page || "Unknown")}</p>
           <hr>
           <p><strong>Message:</strong></p>
@@ -256,6 +264,7 @@ export default async function handler(req, res) {
       serviceIds: [...new Set(services || [])],
       message: cleanMessage.replace(/\n*Source: .*$/s, "").trim(),
       business: String(business_name || "").trim(),
+      followup: followup === "call" || followup === "email" ? followup : "",
     });
 
     return res.status(200).json({ success: true });
