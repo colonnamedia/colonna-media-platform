@@ -19,7 +19,7 @@ try{
  const response=await fetch('/api/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:value('cf-name'),email:value('cf-email'),business_name:value('cf-business'),phone:value('cf-phone'),location:value('cf-location'),website_url:value('cf-site'),timing:value('cf-timing'),services,message:value('cf-msg'),website:value('cf-website')})});
  const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw Error('Submission failed');
  status.className='form-status success';status.textContent='Thanks—your inquiry was sent to Anthony. He will follow up with you directly.';form.reset();button.textContent='Inquiry sent ✓';
- if(typeof window.gtag==='function')window.gtag('event','generate_lead',{form_id:'service_inquiry',service_count:services.length});
+ if(typeof window.gtag==='function'){window.gtag('event','generate_lead',{form_id:'service_inquiry',service_count:services.length});window.gtag('config','AW-18441272783');window.gtag('event','conversion',{send_to:'AW-18441272783/LF1DCJqMnbEdEM_7vdlE'});}
 }catch(error){status.className='form-status error';status.innerHTML='Your inquiry could not be sent. Please try again or email <a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a>.';button.textContent=original;button.disabled=false;}
 });
 })();
