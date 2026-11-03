@@ -181,6 +181,35 @@
 @media (max-width:940px){.lp-feature{grid-template-columns:1fr;gap:28px;margin-bottom:56px}.lp-feature.flip .lp-feature-img{order:0}.lp-also-grid{grid-template-columns:1fr 1fr}.lp-bundle-inner{flex-direction:column;align-items:flex-start}}
 @media (max-width:560px){.lp-also-grid{grid-template-columns:1fr}.lp-feature-img{box-shadow:6px 6px 0 var(--blue)}.lp-feature.flip .lp-feature-img{box-shadow:6px 6px 0 var(--pink)}}
 
+/* main services (4) */
+.lp-main-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.lp-main{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:var(--shadow-sm);display:flex;flex-direction:column}
+.lp-main-img img{width:100%;aspect-ratio:16/10;object-fit:cover}
+.lp-main.blue{border-top:8px solid #1659dc}.lp-main.pink{border-top:8px solid #f3415c}.lp-main.green{border-top:8px solid #13a977}.lp-main.yellow{border-top:8px solid #ffd33d}
+.lp-main-body{padding:26px 26px 28px;display:flex;flex-direction:column;flex:1}
+.lp-main-body h3{font-size:clamp(1.5rem,2.4vw,1.95rem);line-height:1.08;margin:12px 0 10px}
+.lp-main-body>p{color:#383f57;margin-bottom:16px}
+.lp-main-body .lp-good{margin-top:auto}
+.lp-main-body .btn{align-self:flex-start}
+.lp-tag.green{background:var(--green-soft);color:#0d805a}.lp-tag.yellow{background:var(--yellow-soft);color:#7a5a00}
+/* growth services (bold) */
+.lp-growth{background:var(--ink);color:#fff}
+.lp-growth .head h2{color:#fff}.lp-growth .head p{color:rgba(255,255,255,.75)}
+.lp-sec-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.lp-sec{background:#fff;color:var(--ink);border-radius:20px;padding:24px 22px 24px;display:flex;flex-direction:column;border-top:8px solid var(--c)}
+.lp-sec.pink{--c:#f3415c}.lp-sec.blue{--c:#1659dc}.lp-sec.purple{--c:#7c3aed}.lp-sec.green{--c:#13a977}
+.lp-sec-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.lp-sec-ic{width:52px;height:52px;border-radius:14px;background:var(--c);color:#fff;display:grid;place-items:center}
+.lp-sec-ic svg{width:28px;height:28px}
+.lp-sec-badge{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--c);background:color-mix(in srgb,var(--c) 12%,#fff);padding:6px 10px;border-radius:999px}
+.lp-sec h3{font-size:1.35rem;line-height:1.1;margin-bottom:8px}
+.lp-sec>p{color:#434961;font-size:.95rem;margin-bottom:14px}
+.lp-sec .lp-list{margin-bottom:20px;font-size:.93rem}
+.lp-sec .btn{margin-top:auto;justify-content:center;font-size:14px;padding:12px 16px;white-space:normal;text-align:center}
+.lp-follow{border:0;padding:0;margin:0 0 14px}
+@media (max-width:1040px){.lp-sec-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:760px){.lp-main-grid,.lp-sec-grid{grid-template-columns:1fr}}
+
 /* sticky mobile CTA bar */
 .lp-sticky{position:fixed;left:0;right:0;bottom:0;z-index:70;display:none;gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);box-shadow:0 -10px 30px -18px rgba(23,28,56,.5)}
 .lp-sticky .btn{flex:1;justify-content:center;padding:15px 12px;font-size:16px}
@@ -261,7 +290,7 @@
 </div>
 <div class="row">
 <div class="field"><label for="lp-location">City / area <span class="opt">(optional)</span></label><input id="lp-location" name="location" autocomplete="address-level2" maxlength="160" placeholder="e.g. Mt. Lebanon"></div>
-<div class="field"><label for="lp-site">Current website <span class="opt">(optional)</span></label><input id="lp-site" name="website_url" maxlength="300" placeholder="Website or Instagram"></div>
+<div class="field"><label for="lp-site">Website or Instagram <span class="opt">(optional)</span></label><input id="lp-site" name="website_url" maxlength="300" placeholder="yoursite.com or @handle"></div>
 </div>
 <div class="field"><label for="lp-timing">When do you want to start? <span class="opt">(optional)</span></label><select id="lp-timing" name="timing"><option value="">Select a timeframe</option><option>As soon as possible</option><option>Within 1–2 months</option><option>Planning ahead</option><option>Just exploring</option></select></div>
 <fieldset>
@@ -275,6 +304,13 @@
 <label class="lp-chip"><input type="checkbox" name="services" value="social-media"><span>Social media</span></label>
 <label class="lp-chip"><input type="checkbox" name="services" value="consulting"><span>Marketing plan</span></label>
 <label class="lp-chip"><input type="checkbox" name="services" value="automations"><span>Automations</span></label>
+</div>
+</fieldset>
+<fieldset class="lp-follow">
+<legend>How should Anthony follow up? <span class="opt">(optional)</span></legend>
+<div class="lp-chips">
+<label class="lp-chip"><input type="radio" name="followup" value="call"><span>&#128222; Quick 15-minute call</span></label>
+<label class="lp-chip"><input type="radio" name="followup" value="email"><span>&#9993;&#65039; Just email me info</span></label>
 </div>
 </fieldset>
 <div class="field"><label for="lp-msg">Anything else? (optional)</label><textarea id="lp-msg" name="message" rows="3" maxlength="5000" placeholder="Goals, dates, or what's not working right now."></textarea></div>
@@ -296,47 +332,55 @@
 </div>
 </section>
 
-<!-- FEATURED: WEBSITES + PHOTO/VIDEO -->
+<!-- MAIN SERVICES -->
 <section class="lp-section" id="services">
 <div class="wrap">
-<div class="head reveal"><span class="eyebrow">What we do</span><h2>Start with a strong foundation.</h2><p>Most businesses start with a better website, better photos, or both — then keep the momentum going with monthly social media and ads.</p></div>
-
-<div class="lp-feature reveal">
-<div class="lp-feature-img"><img src="/assets/img/marketing-website.webp" alt="Business owner and designer reviewing a new website" loading="lazy" /></div>
-<div class="lp-feature-copy">
+<div class="head reveal"><span class="eyebrow">What we do</span><h2>Four ways to get your business seen.</h2><p>Start with the one you need most. Each one is planned with you and priced up front before work starts.</p></div>
+<div class="lp-main-grid">
+<article class="lp-main blue reveal">
+<div class="lp-main-img"><img src="/assets/img/marketing-website.webp" alt="Business owner and designer reviewing a new website" loading="lazy" /></div>
+<div class="lp-main-body">
 <span class="lp-tag blue">Website design</span>
 <h3>A website that gets people to call.</h3>
-<p>Whether you need your first site or a refresh of one that isn't working, Anthony designs and builds it around one goal: making it easy for the right customer to reach you.</p>
-<ul class="lp-list">
-<li><b>Custom design</b> that fits your brand — not a template</li>
-<li><b>Mobile-first pages</b> that load fast on phones</li>
-<li><b>Clear offer &amp; page structure</b> with help on the words</li>
-<li><b>Quote and contact forms</b> that email you directly</li>
-<li><b>Local search basics</b> — page titles, descriptions, and Google Analytics</li>
-<li><b>Your own photos</b> — pair it with a shoot so the site shows the real you</li>
-</ul>
-<p class="lp-good"><b>Good for:</b> new businesses, outdated sites, DIY sites that aren't bringing in leads, and rebrands.</p>
+<p>Your first site or a refresh of one that isn't working — designed around making it easy for the right customer to reach you.</p>
+<ul class="lp-list"><li><b>Custom design</b> that fits your brand</li><li><b>Mobile-first pages</b> that load fast</li><li><b>Quote &amp; contact forms</b> that email you</li><li><b>Local search basics</b> and Google Analytics</li></ul>
+<p class="lp-good"><b>Good for:</b> new businesses, outdated or DIY sites, and rebrands.</p>
 <a href="#quote" class="btn btn-green" data-service="website">Get a website quote →</a>
 </div>
-</div>
-
-<div class="lp-feature flip reveal">
-<div class="lp-feature-img"><img src="/assets/img/marketing-content-production.webp" alt="Business photo and video shoot on location" loading="lazy" /></div>
-<div class="lp-feature-copy">
-<span class="lp-tag pink">Photography &amp; video</span>
+</article>
+<article class="lp-main pink reveal">
+<div class="lp-main-img"><img src="https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/535ff1389_IMG_3667.png" alt="Brand photography for Jenni G Jewelry by Colonna Media" loading="lazy" /></div>
+<div class="lp-main-body">
+<span class="lp-tag pink">Photography</span>
 <h3>Show your people, products, and place.</h3>
-<p>Real photos and video of your business do more than stock images ever will. Anthony shoots on location and delivers files ready for your website, social media, and ads.</p>
-<ul class="lp-list">
-<li><b>Brand &amp; lifestyle photos</b> of your team and space</li>
-<li><b>Product photography</b> for websites and online stores</li>
-<li><b>Headshots</b> for owners and staff</li>
-<li><b>Short promo &amp; brand videos</b> for your site and social</li>
-<li><b>Event and behind-the-scenes coverage</b></li>
-<li><b>On-site</b> anywhere within about 50 miles of Pittsburgh</li>
-</ul>
-<p class="lp-good"><b>Good for:</b> new websites, product launches, menus and catalogs, team pages, and ads that need real images.</p>
-<a href="#quote" class="btn btn-green" data-service="photography,videography">Get a photo/video quote →</a>
+<p>Real photos of your business beat stock images every time. Shot on location and delivered ready for your site, social, and ads.</p>
+<ul class="lp-list"><li><b>Brand &amp; lifestyle</b> photos of your team and space</li><li><b>Product photography</b> for sites and stores</li><li><b>Headshots</b> for owners and staff</li><li><b>On-site</b> within about 50 miles of Pittsburgh</li></ul>
+<p class="lp-good"><b>Good for:</b> new websites, product launches, menus, and team pages.</p>
+<a href="#quote" class="btn btn-green" data-service="photography">Get a photo quote →</a>
 </div>
+</article>
+<article class="lp-main green reveal">
+<div class="lp-main-img"><img src="/assets/img/marketing-content-production.webp" alt="On-location business video shoot" loading="lazy" /></div>
+<div class="lp-main-body">
+<span class="lp-tag green">Video</span>
+<h3>Videos people actually watch.</h3>
+<p>Short, story-driven video for your website, social media, and ads — planned, shot, and edited for you.</p>
+<ul class="lp-list"><li><b>Promo &amp; brand videos</b> for your site</li><li><b>Short-form clips</b> for Reels and TikTok</li><li><b>Event &amp; behind-the-scenes</b> coverage</li><li><b>Edited and ready</b> to post</li></ul>
+<p class="lp-good"><b>Good for:</b> launches, openings, ads, and social media content.</p>
+<a href="#quote" class="btn btn-green" data-service="videography">Get a video quote →</a>
+</div>
+</article>
+<article class="lp-main yellow reveal">
+<div class="lp-main-img"><img src="/assets/img/marketing-store-planning.webp" alt="Business owner working through a marketing plan" loading="lazy" /></div>
+<div class="lp-main-body">
+<span class="lp-tag yellow">Marketing plans &amp; branding</span>
+<h3>A plan that connects every piece.</h3>
+<p>Starting up or rebranding? Find the gaps, choose the smartest next steps, and get a clear map for your marketing.</p>
+<ul class="lp-list"><li><b>Marketing plan</b> built around your goals</li><li><b>Startup &amp; rebrand</b> guidance</li><li><b>Customer journey</b> from first look to follow-up</li><li><b>Clear next steps</b> you can act on</li></ul>
+<p class="lp-good"><b>Good for:</b> new businesses, rebrands, and owners who feel stuck.</p>
+<a href="#quote" class="btn btn-green" data-service="consulting">Get a planning quote →</a>
+</div>
+</article>
 </div>
 </div>
 </section>
@@ -349,15 +393,39 @@
 </div>
 </section>
 
-<!-- ALSO AVAILABLE -->
-<section class="lp-section lp-also">
+<!-- GROWTH SERVICES -->
+<section class="lp-section lp-growth">
 <div class="wrap">
-<div class="head reveal"><span class="eyebrow">Monthly support</span><h2>Keep it working every month.</h2><p>Once your site and content are in place, Anthony can run your social media, ads, and follow-up on a monthly plan — so your marketing keeps bringing people in without you juggling it.</p></div>
-<div class="lp-also-grid">
-<div class="lp-also-card reveal"><span class="ic">📣</span><h3>Google &amp; Meta ads</h3><p>Campaigns set up, watched, and adjusted every month — pointed at a page that converts.</p><a href="#quote" data-service="google-ads,meta-ads">Ask about ad management →</a></div>
-<div class="lp-also-card reveal"><span class="ic">📱</span><h3>Social media management</h3><p>Monthly posts and content in a consistent voice, built from your own photos and video.</p><a href="#quote" data-service="social-media">Ask about social media →</a></div>
-<div class="lp-also-card reveal"><span class="ic">🗺️</span><h3>Marketing plans &amp; rebrands</h3><p>Starting up or rebranding? Find the gaps and choose the smartest next steps.</p><a href="#quote" data-service="consulting">Ask about planning →</a></div>
-<div class="lp-also-card reveal"><span class="ic">⚙️</span><h3>Automations &amp; follow-up</h3><p>Connect forms, email, and follow-up so new leads don't slip through the cracks.</p><a href="#quote" data-service="automations">Ask about automations →</a></div>
+<div class="head reveal"><span class="eyebrow">Keep it growing</span><h2>Social media &amp; ads, handled every month.</h2><p>Once your site and content are ready, put them to work. Set up once, or let Anthony manage it month to month.</p></div>
+<div class="lp-sec-grid">
+<article class="lp-sec pink reveal">
+<div class="lp-sec-top"><span class="lp-sec-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></span><span class="lp-sec-badge">Setup + monthly</span></div>
+<h3>Social media management</h3>
+<p>Set up your profiles right, then post consistently in your real voice.</p>
+<ul class="lp-list"><li>Profile setup &amp; branding</li><li>Monthly content calendar</li><li>Posts built from your own photos &amp; video</li></ul>
+<a href="#quote" class="btn btn-outline" data-service="social-media">Ask about social media →</a>
+</article>
+<article class="lp-sec blue reveal">
+<div class="lp-sec-top"><span class="lp-sec-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><span class="lp-sec-badge">Setup + monthly</span></div>
+<h3>Google Ads</h3>
+<p>Show up when people near you search for what you do.</p>
+<ul class="lp-list"><li>Campaign &amp; keyword setup</li><li>Ads pointed at a page that converts</li><li>Monthly tuning &amp; reporting</li></ul>
+<a href="#quote" class="btn btn-outline" data-service="google-ads">Ask about Google Ads →</a>
+</article>
+<article class="lp-sec purple reveal">
+<div class="lp-sec-top"><span class="lp-sec-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M19 6a8 8 0 0 1 0 12"/></svg></span><span class="lp-sec-badge">Setup + monthly</span></div>
+<h3>Facebook &amp; Instagram ads</h3>
+<p>Reach the right local audience on Meta with ads built from real content.</p>
+<ul class="lp-list"><li>Audience &amp; campaign setup</li><li>Creative from your photos &amp; video</li><li>Monthly tuning &amp; reporting</li></ul>
+<a href="#quote" class="btn btn-outline" data-service="meta-ads">Ask about Meta ads →</a>
+</article>
+<article class="lp-sec green reveal">
+<div class="lp-sec-top"><span class="lp-sec-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H5.2L4 17.2z"/><path d="m8 9 3 3 5-5"/></svg></span><span class="lp-sec-badge">One-time setup</span></div>
+<h3>Automations &amp; follow-up</h3>
+<p>Make sure every new lead gets a fast reply and nobody slips through.</p>
+<ul class="lp-list"><li>Forms connected to email &amp; sheets</li><li>Automatic thank-you replies</li><li>Simple lead tracking</li></ul>
+<a href="#quote" class="btn btn-outline" data-service="automations">Ask about automations →</a>
+</article>
 </div>
 </div>
 </section>
@@ -481,7 +549,7 @@
     btn.disabled=true;btn.textContent='Sending…';status.className='form-status';status.textContent='';
     try{
       var res=await fetch('/api/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-        name:v('lp-name'),email:v('lp-email'),business_name:v('lp-business'),phone:v('lp-phone'),location:v('lp-location'),website_url:v('lp-site'),timing:v('lp-timing'),
+        name:v('lp-name'),email:v('lp-email'),business_name:v('lp-business'),phone:v('lp-phone'),location:v('lp-location'),website_url:v('lp-site'),timing:v('lp-timing'),followup:((form.querySelector('input[name="followup"]:checked')||{}).value||''),
         services:services,message:(msg?msg+'\n\n':'')+source,website:v('lp-website')
       })});
       var data=await res.json().catch(function(){return {};});
