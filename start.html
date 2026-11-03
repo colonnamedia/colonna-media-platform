@@ -10,6 +10,7 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-5WDDHWSBT7');
+  gtag('config', 'AW-18441272783');
 
   document.addEventListener('click', function(event) {
     var link = event.target.closest('a');
@@ -479,7 +480,7 @@
       status.className='form-status success';
       status.textContent='Thanks! Your request was sent to Anthony. He will follow up with you directly.';
       form.reset();btn.textContent='Request sent ✓';
-      if(typeof window.gtag==='function')window.gtag('event','generate_lead',{form_id:'start_landing',service_count:services.length});
+      if(typeof window.gtag==='function'){window.gtag('event','generate_lead',{form_id:'start_landing',service_count:services.length});window.gtag('event','conversion',{send_to:'AW-18441272783/LF1DCJqMnbEdEM_7vdlE'});}
     }catch(err){
       status.className='form-status error';
       status.innerHTML='Your request could not be sent. Please call <a href="tel:+14124395452">(412) 439-5452</a> or email <a href="mailto:colonnamedia@gmail.com">colonnamedia@gmail.com</a>.';
