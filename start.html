@@ -70,6 +70,9 @@
 .lp-form label{font-size:12px;font-weight:700;display:block;margin-bottom:6px}
 .lp-form input,.lp-form textarea{width:100%;border:2px solid var(--line);border-radius:var(--r-sm);padding:13px 14px;font:inherit;font-size:16px;background:#fff;color:var(--ink)}
 .lp-form textarea{min-height:84px;resize:vertical}
+.lp-form select{width:100%;border:2px solid var(--line);border-radius:var(--r-sm);padding:13px 14px;font:inherit;font-size:16px;background:#fff;color:var(--ink)}
+.lp-form select:focus{outline:none;border-color:var(--blue)}
+.lp-form .opt{font-weight:500;color:var(--muted)}
 .lp-form input:focus,.lp-form textarea:focus{outline:none;border-color:var(--blue)}
 .lp-form fieldset{border:0;padding:0;margin:4px 0 14px}
 .lp-form legend{font-size:12px;font-weight:700;margin-bottom:8px}
@@ -245,7 +248,7 @@
 
 <div class="lp-form-card" id="quote">
 <h2>Tell Anthony what you need</h2>
-<p class="sub">Takes about 30 seconds. Anthony reviews every inquiry personally.</p>
+<p class="sub">Takes about a minute. Anthony reviews every inquiry personally.</p>
 <form class="lp-form" id="lpform" novalidate>
 <div class="hp-field" aria-hidden="true"><label for="lp-website">Leave this field empty</label><input id="lp-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
 <div class="row">
@@ -256,6 +259,11 @@
 <div class="field"><label for="lp-email">Email *</label><input id="lp-email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
 <div class="field"><label for="lp-phone">Phone</label><input id="lp-phone" name="phone" type="tel" autocomplete="tel" maxlength="40"></div>
 </div>
+<div class="row">
+<div class="field"><label for="lp-location">City / area <span class="opt">(optional)</span></label><input id="lp-location" name="location" autocomplete="address-level2" maxlength="160" placeholder="e.g. Mt. Lebanon"></div>
+<div class="field"><label for="lp-site">Current website <span class="opt">(optional)</span></label><input id="lp-site" name="website_url" maxlength="300" placeholder="Website or Instagram"></div>
+</div>
+<div class="field"><label for="lp-timing">When do you want to start? <span class="opt">(optional)</span></label><select id="lp-timing" name="timing"><option value="">Select a timeframe</option><option>As soon as possible</option><option>Within 1–2 months</option><option>Planning ahead</option><option>Just exploring</option></select></div>
 <fieldset>
 <legend>What do you need help with?</legend>
 <div class="lp-chips">
@@ -472,7 +480,7 @@
     btn.disabled=true;btn.textContent='Sending…';status.className='form-status';status.textContent='';
     try{
       var res=await fetch('/api/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-        name:v('lp-name'),email:v('lp-email'),business_name:v('lp-business'),phone:v('lp-phone'),
+        name:v('lp-name'),email:v('lp-email'),business_name:v('lp-business'),phone:v('lp-phone'),location:v('lp-location'),website_url:v('lp-site'),timing:v('lp-timing'),
         services:services,message:(msg?msg+'\n\n':'')+source,website:v('lp-website')
       })});
       var data=await res.json().catch(function(){return {};});
