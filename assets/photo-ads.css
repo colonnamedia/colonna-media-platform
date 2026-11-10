@@ -149,8 +149,12 @@
   background: #e7e3e1;
 }
 
-.photo-more-grid .photo-frame-top {
+.photo-gallery .photo-frame-top {
   object-position: center top;
+}
+
+.photo-gallery .photo-frame-upper {
+  object-position: center 3%;
 }
 
 .photo-contact {
