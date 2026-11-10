@@ -22,6 +22,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(rootDir, 'index.html'),
+        admin: resolve(rootDir, 'admin.html'),
+        sign: resolve(rootDir, 'sign.html'),
         services: resolve(rootDir, 'services.html'),
         work: resolve(rootDir, 'work.html'),
         about: resolve(rootDir, 'about.html'),
