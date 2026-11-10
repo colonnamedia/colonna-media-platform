@@ -149,6 +149,10 @@
   background: #e7e3e1;
 }
 
+.photo-more-grid .photo-frame-top {
+  object-position: center top;
+}
+
 .photo-contact {
   scroll-margin-top: 128px;
 }
