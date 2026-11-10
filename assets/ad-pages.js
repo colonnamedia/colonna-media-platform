@@ -8,7 +8,8 @@ document.querySelectorAll('.ad-form').forEach(form=>{
     const value=name=>form.elements[name]?.value?.trim()||'';
     button.disabled=true;button.textContent='Sending…';status.textContent='';status.className='ad-form-status';
     try{
-      const response=await fetch('/api/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:value('name'),email:value('email'),business_name:value('business_name'),phone:value('phone'),website_url:value('website_url'),message:value('message')+'\n\nSource: '+window.location.pathname+(new URLSearchParams(location.search).get('utm_campaign')?' | Campaign: '+new URLSearchParams(location.search).get('utm_campaign'):'')+(new URLSearchParams(location.search).get('gclid')?' | Google Ads click':''),services:[value('service')],website:value('website')})});
+      const projectType=value('project_type');
+      const response=await fetch('/api/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:value('name'),email:value('email'),business_name:value('business_name'),phone:value('phone'),website_url:value('website_url'),location:value('location'),timing:value('timing'),message:(projectType?'Project type: '+projectType+'\n\n':'')+value('message')+'\n\nSource: '+window.location.pathname+(new URLSearchParams(location.search).get('utm_campaign')?' | Campaign: '+new URLSearchParams(location.search).get('utm_campaign'):'')+(new URLSearchParams(location.search).get('gclid')?' | Google Ads click':''),services:[value('service')],website:value('website')})});
       const data=await response.json().catch(()=>({}));
       if(!response.ok||!data.success)throw new Error('Send failed');
       const service=value('service');

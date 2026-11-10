@@ -37,6 +37,7 @@ export default defineConfig({
         'google-ads-launch-offer': resolve(rootDir, 'google-ads-launch-offer.html'),
         'web-design-ads': resolve(rootDir, 'web-design-ads.html'),
         'google-ads-management': resolve(rootDir, 'google-ads-management.html'),
+        'photography-ads': resolve(rootDir, 'photography-ads.html'),
         'marketing-systems-pittsburgh': resolve(rootDir, 'marketing-systems-pittsburgh.html'),
         start: resolve(rootDir, 'start.html')
       }
