@@ -3,7 +3,7 @@
 .photo-page .photo-head-nav a{text-decoration:none;white-space:nowrap}
 .photo-page .photo-head-nav a:hover,.photo-page .photo-head-nav [aria-current=page]{color:#1659dc}
 .photo-page .ad-hero-grid{grid-template-columns:1.02fr .98fr;gap:42px}
-.photo-page .ad-hero h1{font-size:clamp(2.75rem,5.3vw,5.3rem);max-width:11ch}
+.photo-page .ad-hero h1{font-size:clamp(2.75rem,4.3vw,4.6rem);max-width:16ch;line-height:1.06}
 .photo-page .ad-lead{max-width:52ch}
 .photo-page .ad-btn{background:#f3415c;box-shadow:0 8px 18px #f3415c35}
 .photo-page .ad-btn:hover{background:#d22947}
