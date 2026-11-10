@@ -1,4 +1,7 @@
 .photo-page .ad-hero{padding:clamp(46px,6vw,88px) 0 94px;background:linear-gradient(125deg,#fff 45%,#fff3b8)}
+.photo-page .photo-head-nav{display:flex;align-items:center;gap:clamp(10px,1.8vw,24px);font-size:14px;font-weight:800}
+.photo-page .photo-head-nav a{text-decoration:none;white-space:nowrap}
+.photo-page .photo-head-nav a:hover,.photo-page .photo-head-nav [aria-current=page]{color:#1659dc}
 .photo-page .ad-hero-grid{grid-template-columns:1.02fr .98fr;gap:42px}
 .photo-page .ad-hero h1{font-size:clamp(2.75rem,5.3vw,5.3rem);max-width:11ch}
 .photo-page .ad-lead{max-width:52ch}
@@ -24,3 +27,4 @@
 .photo-page .photo-form-note{font-size:.9rem;color:#5f667b;margin:6px 0 0}
 @media(max-width:820px){.photo-page .ad-hero-grid{grid-template-columns:1fr}.photo-page .photo-hero-art{grid-template-rows:180px 180px;max-width:610px}.photo-page .photo-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:580px){.photo-page .photo-gallery{grid-template-columns:1fr 1fr;gap:8px}.photo-page .photo-tile{min-height:0}.photo-page .photo-tile img{aspect-ratio:3/4}.photo-page .photo-tile figcaption{padding:32px 9px 9px}.photo-page .photo-tile figcaption strong{font-size:13px}.photo-page .photo-tile figcaption span{font-size:10px}.photo-page .photo-hero-art{grid-template-rows:130px 130px;gap:8px}.photo-page .photo-hero-art img{border-radius:10px}}
+@media(max-width:900px){.photo-page .ad-head .ad-wrap{flex-wrap:wrap;padding:10px 0}.photo-page .photo-head-nav{order:3;width:100%;justify-content:space-between;gap:8px;padding-bottom:10px;font-size:13px}.photo-page .ad-nav{font-size:13px}}
