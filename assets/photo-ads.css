@@ -26,7 +26,7 @@
   width: 57%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 21%;
+  object-position: center top;
 }
 
 .photo-feature::after {
@@ -38,7 +38,7 @@
 }
 
 .photo-hero-copy {
-  padding: clamp(28px, 5vw, 66px);
+  padding: clamp(28px, 4.4vw, 54px);
   padding-right: 0;
 }
 
@@ -51,9 +51,9 @@
 }
 
 .photo-page .photo-hero h1 {
-  max-width: 14ch;
+  max-width: 19ch;
   margin: 14px 0 16px;
-  font-size: clamp(2.7rem, 5.3vw, 4.9rem);
+  font-size: clamp(2.55rem, 4.4vw, 4rem);
   line-height: .99;
   text-wrap: balance;
 }
@@ -206,7 +206,6 @@
     position: static;
     width: 100%;
     height: clamp(230px, 53vw, 365px);
-    object-position: 50% 23%;
   }
 
   .photo-feature::after {
