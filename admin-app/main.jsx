@@ -17,6 +17,8 @@ import {
   Download,
   ClipboardList,
   Settings2,
+  Archive,
+  RotateCcw,
 } from "lucide-react";
 import {
   SERVICES,
@@ -464,7 +466,7 @@ function ContactForm({ initial, onSave }) {
         />
         <Select
           label="Lead stage"
-          options={["new", "contacted", "qualified", "proposal", "won", "lost"]}
+          options={["new", "contacted", "qualified", "proposal", "won"]}
           value={v.stage}
           onChange={(e) => update("stage", e.target.value)}
         />
@@ -899,6 +901,7 @@ function App() {
     [kind, setKind] = useState(""),
     [activity, setActivity] = useState(""),
     [due, setDue] = useState(false),
+    [showArchived, setShowArchived] = useState(false),
     [modal, setModal] = useState(null),
     [message, setMessage] = useState(""),
     [error, setError] = useState(""),
@@ -958,8 +961,22 @@ function App() {
       setModal(null);
       setMessage("Saved successfully.");
     });
+  const setArchive = (entity, id, archived) =>
+    act(async () => {
+      await request("archive", { entity, id, archived });
+      await refresh();
+      setMessage(archived ? "Archived. You can restore it from the archived view." : "Restored to your working view.");
+    });
+  const visibleContacts = data.contacts.filter((c) => !c.archived_at);
+  const visibleInquiries = data.inquiries.filter((i) => !i.archived_at);
+  const activeJobs = data.jobs.filter((j) => isActiveJob(j));
+  const recentSince = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  const serviceMix = Object.entries(SERVICES).map(([key, label]) => ({
+    key, label, count: activeJobs.filter((j) => j.services.includes(key)).length,
+  })).filter((item) => item.count).sort((a, b) => b.count - a.count);
   const contacts = data.contacts.filter(
     (c) =>
+      Boolean(c.archived_at) === showArchived &&
       (!q ||
         [c.name, c.business, c.email, c.notes].some((v) =>
           v?.toLowerCase().includes(q.toLowerCase()),
@@ -1007,13 +1024,33 @@ function App() {
   const stats = [
     [
       "Active clients",
-      data.contacts.filter((c) => activeClient(c.id)).length,
+      visibleContacts.filter((c) => activeClient(c.id)).length,
       "Clients with work in progress",
     ],
     [
       "Active jobs",
-      data.jobs.filter((j) => isActiveJob(j)).length,
-      "One-time & recurring services",
+      activeJobs.length,
+      "Work happening now",
+    ],
+    [
+      "One-time jobs",
+      activeJobs.filter((j) => j.mode === "one-time").length,
+      "Currently active projects",
+    ],
+    [
+      "Recurring jobs",
+      activeJobs.filter((j) => j.mode === "recurring").length,
+      "Ongoing client services",
+    ],
+    [
+      "New leads",
+      visibleContacts.filter((c) => c.kind === "lead" && c.stage === "new").length,
+      "Ready for first follow-up",
+    ],
+    [
+      "Inquiries · 30 days",
+      visibleInquiries.filter((i) => new Date(i.created_at).getTime() >= recentSince).length,
+      "Website form submissions",
     ],
     [
       "Awaiting signature",
@@ -1024,7 +1061,7 @@ function App() {
     ],
     [
       "Follow-ups due",
-      data.contacts.filter((c) => c.follow_up && c.follow_up <= today).length,
+      visibleContacts.filter((c) => c.follow_up && c.follow_up <= today).length,
       "Keep the conversation moving",
     ],
   ];
@@ -1122,12 +1159,13 @@ function App() {
                 </td>
                 <td>{c.follow_up || "—"}</td>
                 <td>
-                  <button
-                    className="text-button"
-                    onClick={() => setModal({ type: "contact", value: c })}
-                  >
-                    Edit
-                  </button>
+                  <div className="actions">
+                    <button className="text-button" onClick={() => setModal({ type: "contact", value: c })}>Edit</button>
+                    <button className="text-button" disabled={busy} onClick={() => setArchive("contact", c.id, !c.archived_at)}>
+                      {c.archived_at ? <RotateCcw size={15} /> : <Archive size={15} />}
+                      {c.archived_at ? "Restore" : "Archive"}
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -1155,12 +1193,13 @@ function App() {
               onClick={() => {
                 setTab(name);
                 setQ("");
+                setShowArchived(false);
               }}
             >
               <Icon size={19} />
               {name}
-              {name === "Inquiries" && data.inquiries.length > 0 && (
-                <span className="nav-count">{data.inquiries.length}</span>
+              {name === "Inquiries" && visibleInquiries.length > 0 && (
+                <span className="nav-count">{visibleInquiries.length}</span>
               )}
             </button>
           ))}
@@ -1263,9 +1302,9 @@ function App() {
                     <span className={"stat-icon s" + i}>
                       {i === 0 ? (
                         <Users />
-                      ) : i === 1 ? (
+                      ) : i <= 3 ? (
                         <BriefcaseBusiness />
-                      ) : i === 2 ? (
+                      ) : i === 6 ? (
                         <FileSignature />
                       ) : (
                         <ClipboardList />
@@ -1277,6 +1316,16 @@ function App() {
                   </article>
                 ))}
               </div>
+              <section className="panel analytics-panel">
+                <div className="panel-head"><h2>Active work by service</h2><span className="muted">One job can include multiple services</span></div>
+                {serviceMix.length ? serviceMix.map(({ key, label, count }) => (
+                  <div className="service-metric" key={key}>
+                    <span>{label}</span>
+                    <div className="metric-track"><div style={{ width: `${Math.round(count / activeJobs.length * 100)}%` }} /></div>
+                    <strong>{count}</strong>
+                  </div>
+                )) : <p className="muted">Services will appear here when jobs become active.</p>}
+              </section>
               <div className="overview-grid">
                 <section className="panel">
                   <div className="panel-head">
@@ -1342,7 +1391,7 @@ function App() {
                     View all <ArrowUpRight size={16} />
                   </button>
                 </div>
-                {contactTable(data.contacts.slice(0, 5))}
+                {contactTable(visibleContacts.slice(0, 5))}
               </section>
             </>
           )}
@@ -1396,14 +1445,7 @@ function App() {
                       onChange={(e) => setStage(e.target.value)}
                     >
                       <option value="">All stages</option>
-                      {[
-                        "new",
-                        "contacted",
-                        "qualified",
-                        "proposal",
-                        "won",
-                        "lost",
-                      ].map((s) => (
+                      {["new", "contacted", "qualified", "proposal", "won"].map((s) => (
                         <option key={s}>{s}</option>
                       ))}
                     </select>
@@ -1419,7 +1461,15 @@ function App() {
                 )}
               </div>
               {tab === "Contacts" ? (
-                <section className="panel">{contactTable(contacts)}</section>
+                <section className="panel">
+                  <div className="archive-toolbar">
+                    <span>{showArchived ? "Archived contacts" : "Current contacts"}</span>
+                    <button className="text-button" onClick={() => setShowArchived(!showArchived)}>
+                      {showArchived ? "Show current" : `Show archived (${data.contacts.length - visibleContacts.length})`}
+                    </button>
+                  </div>
+                  {contactTable(contacts)}
+                </section>
               ) : (
                 <div className="jobs-grid">
                   {jobs.map((j) => (
@@ -1578,11 +1628,12 @@ function App() {
             <section className="panel">
               <div className="panel-head">
                 <h2>Website inquiries</h2>
-                <span className="muted">
-                  Original submissions are preserved
-                </span>
+                <button className="text-button" onClick={() => setShowArchived(!showArchived)}>
+                  {showArchived ? "Show current" : `Show archived (${data.inquiries.length - visibleInquiries.length})`}
+                </button>
               </div>
-              {data.inquiries.map((i) => (
+              <p className="archive-note">{showArchived ? "Archived submissions can be restored at any time." : "Original submissions are preserved. Archive test entries to clear this view."}</p>
+              {data.inquiries.filter((i) => Boolean(i.archived_at) === showArchived).map((i) => (
                 <div className="inquiry" key={i.id}>
                   <div>
                     <strong>
@@ -1597,7 +1648,7 @@ function App() {
                     <p>{i.services}</p>
                     <p className="terms">{i.message}</p>
                   </div>
-                  <button
+                  <div className="inquiry-actions"><button
                     onClick={() => {
                       const existing = data.contacts.find(
                         (c) => c.email.toLowerCase() === i.email.toLowerCase(),
@@ -1629,9 +1680,13 @@ function App() {
                       ? "View contact"
                       : "Add to CRM"}
                   </button>
+                  <button className="text-button" disabled={busy} onClick={() => setArchive("inquiry", i.id, !i.archived_at)}>
+                    {i.archived_at ? <RotateCcw size={15} /> : <Archive size={15} />}
+                    {i.archived_at ? "Restore" : "Archive"}
+                  </button></div>
                 </div>
               ))}
-              {!data.inquiries.length && (
+              {!data.inquiries.some((i) => Boolean(i.archived_at) === showArchived) && (
                 <Empty
                   title="Ready for your next inquiry."
                   text="New website submissions will appear here after the database is connected. Existing Google Sheet leads can be imported separately."
