@@ -36,7 +36,7 @@ async function saveLeadToSheet(lead) {
 
 // The customer acknowledgment is staged behind an explicit delivery switch.
 // A verified sender and the owner's per-recipient approval rule are required first.
-async function sendConfirmation(resendKey, to) {
+async function sendConfirmation(resendKey, { to, firstName, serviceIds, message, business }) {
   if (process.env.LEAD_AUTOREPLY_ENABLED !== "true" || !process.env.LEAD_AUTOREPLY_FROM) return;
   try {
     const response = await fetch("https://api.resend.com/emails", {
@@ -46,9 +46,9 @@ async function sendConfirmation(resendKey, to) {
         from: process.env.LEAD_AUTOREPLY_FROM,
         to: [to],
         reply_to: "colonnamedia@gmail.com",
-        subject: confirmationSubject,
-        text: confirmationText,
-        html: confirmationHtml,
+        subject: confirmationSubject(firstName),
+        text: confirmationText({ firstName, business }),
+        html: confirmationHtml({ firstName, serviceIds, message, business }),
       }),
     });
     if (!response.ok) console.error("Confirmation email error", response.status);
@@ -124,7 +124,13 @@ export default async function handler(req, res) {
   }
 
   // Customer confirmation is independent of the internal notification.
-  await sendConfirmation(resendKey, cleanEmail);
+  await sendConfirmation(resendKey, {
+    to: cleanEmail,
+    firstName: cleanName.split(/\s+/)[0].slice(0, 40),
+    serviceIds: [...new Set(services || [])],
+    message: cleanMessage.replace(/\n*Source: .*$/s, "").trim(),
+    business: String(business_name || "").trim(),
+  });
 
   try {
     const response = await fetch("https://api.resend.com/emails", {
