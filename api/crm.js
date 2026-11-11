@@ -3,6 +3,7 @@ import {
   jobSchema,
   agreementSchema,
   SERVICES,
+  isActiveJob,
 } from "../lib/crm/domain.js";
 import {
   db,
@@ -120,6 +121,24 @@ export default async function handler(req, res) {
     if (req.method !== "POST")
       return res.status(405).json({ error: "Method not allowed" });
     const input = body(req);
+    if (action === "archive") {
+      const { entity, id, archived } = z.object({
+        entity: z.enum(["contact", "inquiry"]),
+        id: z.string().uuid(),
+        archived: z.boolean(),
+      }).parse(input);
+      const table = entity === "contact" ? "crm_contacts" : "crm_inquiries";
+      if (entity === "contact" && archived) {
+        const jobs = check(await client.from("crm_jobs").select("status,mode,start_date,end_date,auto_close").eq("contact_id", id));
+        if (jobs.some((job) => isActiveJob(job)))
+          throw Object.assign(new Error("Finish or pause active jobs before archiving this contact."), { status: 409 });
+      }
+      const result = check(await client.from(table)
+        .update({ archived_at: archived ? new Date().toISOString() : null })
+        .eq("id", id).select("id,archived_at").single());
+      await audit(client, entity, result.id, archived ? "archived" : "restored", actor.id);
+      return res.status(200).json(result);
+    }
     if (action === "template") {
       const t = z
         .object({
