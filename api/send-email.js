@@ -124,7 +124,9 @@ function thankYouEmail({ firstName, serviceIds, message, business, followup }) {
     <tr><td style="padding:16px 32px 0 32px;font-family:Arial,Helvetica,sans-serif;">
       <div style="background:#f6f7fb;border:1px solid #dfe3ed;border-radius:12px;padding:18px 20px;">
         <div style="font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#1659dc;">Stay connected</div>
-        <p style="font-size:14px;line-height:22px;color:#434961;margin:8px 0 0 0;">Follow Colonna Media on <a href="https://www.instagram.com/colonna_media" style="color:#1659dc;font-weight:bold;">Instagram</a> and Facebook for recent work, behind-the-scenes photography, and marketing ideas.</p>
+        <p style="font-size:14px;line-height:22px;color:#434961;margin:8px 0 12px 0;">Follow us for recent work, behind-the-scenes photography, and marketing ideas.</p>
+        <a href="https://www.instagram.com/colonna_media" style="display:inline-block;margin:0 8px 8px 0;padding:9px 14px;border-radius:999px;background:#171c38;color:#fff;font-size:13px;font-weight:bold;text-decoration:none;">Instagram</a>
+        <a href="https://www.facebook.com/share/1CsudL19rX/?mibextid=wwXIfr" style="display:inline-block;margin:0 0 8px 0;padding:9px 14px;border-radius:999px;background:#1659dc;color:#fff;font-size:13px;font-weight:bold;text-decoration:none;">Facebook</a>
       </div>
     </td></tr>
     <tr><td style="padding:28px 32px 32px 32px;font-family:Arial,Helvetica,sans-serif;">
