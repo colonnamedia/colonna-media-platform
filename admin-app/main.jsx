@@ -510,7 +510,7 @@ function JobForm({ initial, contacts, onSave }) {
     services: [],
     mode: "one-time",
     status: "planned",
-    start_date: nyDate(),
+    start_date: "",
     end_date: "",
     auto_close: false,
     scope: "",
@@ -557,9 +557,9 @@ function JobForm({ initial, contacts, onSave }) {
           onChange={(e) => update("status", e.target.value)}
         />
         <Input
-          label="Start date"
+          label="Start date (when confirmed)"
           type="date"
-          required
+          required={v.status === "active"}
           value={v.start_date}
           onChange={(e) => update("start_date", e.target.value)}
         />
@@ -614,13 +614,13 @@ function JobForm({ initial, contacts, onSave }) {
     </form>
   );
 }
-function AgreementForm({ jobs, contacts, templates, onSave }) {
-  const [jobId, setJob] = useState(jobs[0]?.id || ""),
+function AgreementForm({ jobs, contacts, templates, onSave, initialJobId = "" }) {
+  const [jobId, setJob] = useState(initialJobId || jobs[0]?.id || ""),
     [title, setTitle] = useState("Service agreement"),
     [date, setDate] = useState(nyDate()),
-    [total, setTotal] = useState(700),
+    [total, setTotal] = useState(0),
     [percent, setPercent] = useState(50),
-    [payments, setPayments] = useState(paymentPlan(70000)),
+    [payments, setPayments] = useState([]),
     [terms, setTerms] = useState(""),
     [reviewed, setReviewed] = useState(false),
     [preview, setPreview] = useState(false);
@@ -1760,6 +1760,7 @@ function App() {
                 jobs={data.jobs}
                 contacts={data.contacts}
                 templates={data.templates}
+                initialJobId={modal.value?.job_id}
                 onSave={(v) => save("agreement", v)}
               />
             )}{" "}
@@ -1880,6 +1881,30 @@ function App() {
               setModal({ type: "job", value: { contact_id: selected } });
               setSelected(null);
             }}
+            addAgreement={(jobId) => {
+              setModal({ type: "agreement", value: { job_id: jobId } });
+              setSelected(null);
+            }}
+            reviewAgreement={(agreement) => {
+              setModal({ type: "view", value: agreement });
+              setSelected(null);
+            }}
+            issueAgreement={(agreement) => {
+              setSelected(null);
+              act(async () => {
+                const r = await request("issue", { id: agreement.id });
+                await refresh();
+                setModal({ type: "link", value: r.url });
+              });
+            }}
+            downloadAgreement={(agreement) =>
+              act(async () =>
+                download(
+                  await request("pdf&id=" + agreement.id),
+                  `signed-agreement-${agreement.id}.pdf`,
+                ),
+              )
+            }
           />
         </Modal>
       )}
@@ -1895,7 +1920,7 @@ function Empty({ title, text }) {
     </div>
   );
 }
-function Profile({ contact: c, jobs, agreements, payments, edit, addJob }) {
+function Profile({ contact: c, jobs, agreements, payments, edit, addJob, addAgreement, reviewAgreement, issueAgreement, downloadAgreement }) {
   return (
     <>
       <h2>{c.business || c.name}</h2>
@@ -1911,6 +1936,11 @@ function Profile({ contact: c, jobs, agreements, payments, edit, addJob }) {
         <button className="primary" onClick={addJob}>
           Add job
         </button>
+        {jobs.length > 0 && (
+          <button onClick={() => addAgreement(jobs[0].id)}>
+            Create agreement
+          </button>
+        )}
       </div>
       <h3>Notes</h3>
       <p className="terms">{c.notes || "No notes yet."}</p>
@@ -1926,9 +1956,21 @@ function Profile({ contact: c, jobs, agreements, payments, edit, addJob }) {
       ))}
       <h3>Agreements</h3>
       {agreements.map((a) => (
-        <p key={a.id}>
-          {a.title} · {a.status} · {money(a.snapshot.total_cents)}
-        </p>
+        <div className="work-item" key={a.id}>
+          <div>
+            <strong>{a.title}</strong>
+            <small>{a.status} · {money(a.snapshot.total_cents)}</small>
+          </div>
+          <div className="actions">
+            <button onClick={() => reviewAgreement(a)}>Review</button>
+            {a.status === "draft" && (
+              <button onClick={() => issueAgreement(a)}>Create signing link</button>
+            )}
+            {a.status === "signed" && (
+              <button onClick={() => downloadAgreement(a)}>Signed PDF</button>
+            )}
+          </div>
+        </div>
       ))}
       <h3>Payments recorded</h3>
       {payments.map((p) => (
