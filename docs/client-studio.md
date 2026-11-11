@@ -2,9 +2,9 @@
 
 ## Implementation status
 
-Code is implemented on `feat/client-crm-agreements`; production is not connected yet. Source publication to the existing public GitHub repository was blocked by automatic approval review; no remote branch/PR was created. Owner approval is required before publishing this code publicly. Existing public website stays unchanged except an additional optional CRM write in the existing inquiry endpoint. Existing email and Sheet workflows are preserved. No client messages were sent during development.
+The CRM and signing pages are deployed at `/admin` and `/sign`. PR #6 was merged after Anthony approved publication to the existing public repository. The private production Supabase project is connected through server-only environment variables. The owner user exists; actual owner TOTP enrollment and a complete real signing flow still require verification. No client signing link or message was sent during development.
 
-The current Vercel project has only Sheet and Resend settings, with no CRM database. The connected Supabase organization (`colonnamedia's Org`, Free plan) contains CUZ Cards only. Provision a **separate Colonna Media project** after confirming organization and provisioning cost with Anthony. Do not reuse CUZ Cards.
+The dedicated Supabase project is `fkyhairzbnqiamviywis` (Colonna Media CRM), separate from CUZ Cards. Provisioning was quoted at $0/month on the organization Free plan. The seven CRM tables have RLS with no direct anonymous/authenticated policies, and agreement PDFs use a private storage bucket. The server pins the confirmed owner UUID and requires AAL2 for data operations.
 
 ## User requirements covered
 
@@ -29,23 +29,22 @@ The current Vercel project has only Sheet and Resend settings, with no CRM datab
 - Existing website inquiries are also captured in the CRM after configuration. Original inquiries remain preserved; convert to a contact with duplicate-email detection. Historical Google Sheet leads are not auto-imported.
 - Future email marketing supported by contact/consent fields and export. Sending is not enabled; Anthony must review full draft, recipients, and sending account and approve each specific message.
 
-## Connection steps remaining
+## Operations and remaining checks
 
-1. Confirm the Supabase organization with Anthony and check/confirm the new project cost. Organization Free plan is verified; a new project's quota/cost has not been confirmed. No new subscription has been purchased.
-2. Create the dedicated project. Apply `database/crm-schema.sql` once through Supabase SQL/migration tooling. It creates contacts, jobs, agreements, events, payments, inquiries, and templates, plus a private PDF bucket. RLS enabled, no anon/authenticated table grants or policies; only the server secret has data access.
-3. Disable public signup. Create the verified owner user without sending an email unless specifically approved. Anthony sets their own password through an approved secure account setup flow; don't paste credentials into chat, code, logs, or version control. Configure the pinned UUID only after verifying the account.
-4. Set these **server-side Vercel environment variables** for Production and the intended Preview environment. Do not use VITE_ for secrets:
+1. Public signup is disabled in Supabase Auth. Keep it disabled; the pinned owner ID and server checks independently deny other users CRM data.
+2. The production Vercel variables are set. Do not use `VITE_` for secrets:
    - `CRM_SUPABASE_URL`
    - `CRM_SUPABASE_PUBLISHABLE_KEY`
    - `CRM_SUPABASE_SECRET_KEY` (secret/service-role key, server only)
    - `CRM_ADMIN_USER_ID` (verified owner UUID)
    - `CRM_PUBLIC_ORIGIN` (`https://www.colonnamedia.com` for production; exact preview origin for isolated preview testing)
-5. Configure a development/preview origin explicitly; cross-origin mutations are denied. Vercel traces the bundled PDF font through `functions.api/sign.js.includeFiles`.
-6. Run Supabase security advisors. Verify anon/AAL1 cannot read any CRM table or private PDF. Verify wrong user with AAL2 is denied.
-7. Owner signs in and enrolls Google Authenticator. Verify a valid code is mandatory before any records load. Confirm authenticator backup/recovery with owner; no custom MFA bypass exists.
-8. In an isolated environment, test the complete flow with disposable records: inquiry → contact → two jobs (one recurring) → custom agreement with phases → review → issue link → draw/sign → download → compare stored PDF hash → verify re-sign is rejected → check client status and recorded payment.
-9. Review actual reusable legal wording before client use; supplied default wording contains deliberate prompts and cannot be issued as-is. Signature records do not guarantee dispute outcomes. For a dispute, retain payment authorization and service-delivery evidence as well.
-10. Merge/deploy only after database provisioning, owner setup, and end-to-end verification. Until then keep PR draft. Setup state is fail-closed; no real CRM is available yet.
+3. Supabase Auth Site URL and redirect allowlist point to `https://www.colonnamedia.com/admin`; recovery links can set a new password on the deployed admin page. The older `localhost` links are obsolete.
+4. Configure a separate preview environment before testing with production data. Cross-origin mutations are denied. Vercel bundles the PDF font for signing.
+5. Security advisors showed no warnings/errors; direct anon/authenticated table reads failed. The signature finalization RPC was checked in a rolled-back SQL transaction for replay and signed-row mutation rejection. Owner login, TOTP enrollment, and real PDF download remain to verify.
+6. Test the full flow with a clearly disposable agreement and user-approved test signature. Do not sign a binding client agreement on Anthony's behalf.
+7. Review actual legal wording before client use; defaults contain deliberate prompts and cannot be issued as-is. Retain payment and delivery evidence for disputes.
+8. The website thank-you HTML now mentions Instagram and Facebook. External auto-replies remain in test mode without `LEAD_AUTOREPLY_FROM`; do not enable sending without Anthony's review of full wording, recipients, and sending account.
+9. Emma Gladstein is a quoted photography lead with a planned job and unconfirmed shoot date/location. The profile offers agreement creation, review, and signing-link generation. Do not issue a link until particulars and legal terms are reviewed.
 
 ## Validation completed
 
@@ -53,7 +52,7 @@ The current Vercel project has only Sheet and Resend settings, with no CRM datab
 - Seven Node tests: cent-exact payment splits; phased schedules/mismatches; one-time/recurring activity; Eastern date boundary; wrong-owner, unconfirmed-email, missing-login and AAL1 denial; origin/token checks; unconfigured API fails closed.
 - API/server module syntax checks passed.
 - Generated a disposable multipage test PDF; extracted accented names, totals, installments, and acceptance record; visually inspected render. No client signature or actual agreement was used.
-- Browser verified the admin setup page renders. Authenticated CRM UI and real database/signing flow remain unverified until database/account connection.
+- Browser verified the live owner login page and password-reset control. Authenticated CRM UI and a real end-to-end signature remain unverified until owner TOTP setup.
 
 ## Known bounds
 
