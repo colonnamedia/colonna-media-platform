@@ -45,7 +45,7 @@ const SERVICE_NEXT = {
   "automations": ["Automations & follow-up", "We'll map how leads reach you and where follow-up is falling through the cracks."],
 };
 
-function thankYouEmail({ firstName, serviceIds, message, business, followup }) {
+export function thankYouEmail({ firstName, serviceIds, message, business, followup }) {
   const nextLine = followup === "call"
     ? "I'll reach out shortly to set up your quick 15-minute call."
     : followup === "email"
@@ -142,31 +142,6 @@ function thankYouEmail({ firstName, serviceIds, message, business, followup }) {
 </body></html>`;
 }
 
-// Sends the thank-you email. Until colonnamedia.com is verified in Resend, this only
-// sends to the Colonna Media inbox (test mode). Set LEAD_AUTOREPLY_FROM after verifying,
-// e.g. "Anthony at Colonna Media <hello@colonnamedia.com>".
-async function sendThankYou(resendKey, { to, firstName, serviceIds, message, business, followup }) {
-  const from = process.env.LEAD_AUTOREPLY_FROM;
-  const testMode = !from;
-  if (testMode && to.toLowerCase() !== "colonnamedia@gmail.com") return;
-  try {
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${resendKey}` },
-      body: JSON.stringify({
-        from: from || "Colonna Media <onboarding@resend.dev>",
-        to: [to],
-        reply_to: "colonnamedia@gmail.com",
-        subject: `Thanks${firstName ? ", " + firstName : ""} — I got your request`,
-        html: thankYouEmail({ firstName, serviceIds, message, business, followup }),
-      }),
-    });
-    if (!response.ok) console.error("Thank-you email error", await response.json().catch(() => ({})));
-  } catch (error) {
-    console.error("Thank-you email failed", error);
-  }
-}
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -204,9 +179,8 @@ export default async function handler(req, res) {
   let page = "";
   try { page = new URL(String(req.headers.referer || "")).pathname; } catch { page = ""; }
 
-  // Preserve new inquiries in the private CRM as well as the existing Sheet.
-  // This does not send an additional email or overwrite an existing client.
-  const savedToCrm = await captureLead({name:cleanName,email:cleanEmail,business:String(business_name||''),phone:String(phone||''),services:selectedServices,location:String(location||''),website_url:String(website_url||''),timing:String(timing||''),followup:followupLabel,message:cleanMessage,page}).catch(()=>false);
+  // Retain every valid submission and add first-time senders as CRM leads.
+  const savedToCrm = await captureLead({name:cleanName,email:cleanEmail,business:String(business_name||''),phone:String(phone||''),services:selectedServices,location:String(location||''),website_url:String(website_url||''),timing:String(timing||''),followup:followupLabel,message:cleanMessage,page}, [...new Set(services || [])]).catch((error)=>{console.error("CRM lead capture failed",error);return false;});
 
   // 1) Store the lead in the Google Sheet first, so it's kept even if email has a problem.
   const savedToSheet = await saveLeadToSheet({
@@ -222,6 +196,9 @@ export default async function handler(req, res) {
     message: cleanMessage,
     page,
   });
+
+  // Never report a successful form submission if it was not saved as a CRM lead.
+  if (!savedToCrm) return res.status(503).json({ error: "Unable to save your request. Please try again." });
 
   // 2) Email the lead to Colonna Media.
   if (!resendKey) {
@@ -270,15 +247,6 @@ export default async function handler(req, res) {
         ? res.status(200).json({ success: true })
         : res.status(502).json({ error: "Email delivery failed" });
     }
-
-    await sendThankYou(resendKey, {
-      to: cleanEmail,
-      firstName: cleanName.split(/\s+/)[0].slice(0, 40),
-      serviceIds: [...new Set(services || [])],
-      message: cleanMessage.replace(/\n*Source: .*$/s, "").trim(),
-      business: String(business_name || "").trim(),
-      followup: followup === "call" || followup === "email" ? followup : "",
-    });
 
     return res.status(200).json({ success: true });
   } catch (error) {
