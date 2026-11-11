@@ -1,3 +1,4 @@
+import { captureLead } from '../lib/crm/server.js';
 const escapeHtml = (value = "") =>
   String(value)
     .replaceAll("&", "&amp;")
@@ -195,6 +196,10 @@ export default async function handler(req, res) {
   let page = "";
   try { page = new URL(String(req.headers.referer || "")).pathname; } catch { page = ""; }
 
+  // Preserve new inquiries in the private CRM as well as the existing Sheet.
+  // This does not send an additional email or overwrite an existing client.
+  const savedToCrm = await captureLead({name:cleanName,email:cleanEmail,business:String(business_name||''),phone:String(phone||''),services:selectedServices,location:String(location||''),website_url:String(website_url||''),timing:String(timing||''),followup:followupLabel,message:cleanMessage,page}).catch(()=>false);
+
   // 1) Store the lead in the Google Sheet first, so it's kept even if email has a problem.
   const savedToSheet = await saveLeadToSheet({
     name: cleanName,
@@ -213,7 +218,7 @@ export default async function handler(req, res) {
   // 2) Email the lead to Colonna Media.
   if (!resendKey) {
     console.error("RESEND_API_KEY is not configured");
-    return savedToSheet
+    return (savedToSheet || savedToCrm)
       ? res.status(200).json({ success: true })
       : res.status(500).json({ error: "Email service is not configured" });
   }
@@ -253,7 +258,7 @@ export default async function handler(req, res) {
     if (!response.ok) {
       console.error("Resend error", data);
       // The lead is still safe in the sheet, so tell the visitor it went through.
-      return savedToSheet
+      return (savedToSheet || savedToCrm)
         ? res.status(200).json({ success: true })
         : res.status(502).json({ error: "Email delivery failed" });
     }
@@ -270,7 +275,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true });
   } catch (error) {
     console.error("Contact form error", error);
-    return savedToSheet
+    return (savedToSheet || savedToCrm)
       ? res.status(200).json({ success: true })
       : res.status(500).json({ error: "Unable to send message" });
   }

@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /
 Disallow: /dashboard
+Disallow: /admin
+Disallow: /sign
+Disallow: /api/crm
+Disallow: /api/sign
 
 Sitemap: https://www.colonnamedia.com/sitemap.xml
