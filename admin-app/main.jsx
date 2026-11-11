@@ -141,7 +141,7 @@ function Banner({ children }) {
     </div>
   ) : null;
 }
-function Login({ config, onReady }) {
+function Login({ config, onReady, initialNotice = "" }) {
   const [email, setEmail] = useState(config.email),
     [password, setPassword] = useState(""),
     [factor, setFactor] = useState(null),
@@ -149,7 +149,24 @@ function Login({ config, onReady }) {
     [qr, setQr] = useState(""),
     [secret, setSecret] = useState(""),
     [error, setError] = useState(""),
+    [notice, setNotice] = useState(initialNotice),
     [busy, setBusy] = useState(false);
+  async function resetPassword() {
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const { error } = await auth.auth.resetPasswordForEmail(config.email, {
+        redirectTo: window.location.origin + "/admin",
+      });
+      if (error) throw error;
+      setNotice("If this account exists, a password reset link has been sent. Open it on this device.");
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
   async function inspect() {
     const {
       data: { session },
@@ -309,6 +326,7 @@ function Login({ config, onReady }) {
               </>
             )}
             <Banner>{error}</Banner>
+            <Banner>{notice}</Banner>
             <button className="primary wide" disabled={busy}>
               {busy
                 ? "Verifying…"
@@ -316,6 +334,11 @@ function Login({ config, onReady }) {
                   ? "Verify & enter studio"
                   : "Continue"}
             </button>
+            {!factor && (
+              <button type="button" className="text-button" disabled={busy} onClick={resetPassword}>
+                Reset CRM password
+              </button>
+            )}
             {factor && (
               <button
                 type="button"
@@ -339,6 +362,48 @@ function Login({ config, onReady }) {
             <p>No client data is stored in this browser.</p>
           </div>
         )}
+      </div>
+    </main>
+  );
+}
+function PasswordRecovery({ onComplete }) {
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  async function submit(e) {
+    e.preventDefault();
+    setError("");
+    if (password.length < 12) return setError("Use at least 12 characters.");
+    if (password !== confirm) return setError("Passwords do not match.");
+    setBusy(true);
+    try {
+      const { data: { session }, error: sessionError } = await auth.auth.getSession();
+      if (sessionError || !session) throw Error("This reset link has expired. Request a new link.");
+      const { error } = await auth.auth.updateUser({ password });
+      if (error) throw error;
+      await auth.auth.signOut();
+      history.replaceState(null, "", "/admin");
+      onComplete();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <main className="login">
+      <div className="login-story"><Brand /><div><div className="eyebrow">PRIVATE WORKSPACE</div><h1>Secure access.<br />Your next move.</h1><p>Set a new password for your Colonna Media Client Studio.</p></div><small>COLONNA MEDIA LLC · PITTSBURGH</small></div>
+      <div className="login-form">
+        <ShieldCheck size={32} />
+        <p className="eyebrow">ACCOUNT RECOVERY</p>
+        <h2>Choose a new password</h2>
+        <form onSubmit={submit}>
+          <Input label="New password" type="password" autoComplete="new-password" minLength={12} required value={password} onChange={(e) => setPassword(e.target.value)} />
+          <Input label="Confirm new password" type="password" autoComplete="new-password" minLength={12} required value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+          <Banner>{error}</Banner>
+          <button className="primary wide" disabled={busy}>{busy ? "Saving…" : "Set new password"}</button>
+        </form>
       </div>
     </main>
   );
@@ -823,6 +888,8 @@ function AgreementView({ snapshot: s }) {
 }
 function App() {
   const [config, setConfig] = useState(null),
+    [recovery, setRecovery] = useState(new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery"),
+    [recoveryDone, setRecoveryDone] = useState(false),
     [ready, setReady] = useState(false),
     [data, setData] = useState(empty),
     [tab, setTab] = useState("Overview"),
@@ -842,14 +909,18 @@ function App() {
       .then((r) => r.json())
       .then((c) => {
         setConfig(c);
-        if (c.configured)
+        if (c.configured) {
           auth = createClient(c.url, c.key, {
             auth: {
               persistSession: false,
               autoRefreshToken: true,
-              detectSessionInUrl: false,
+              detectSessionInUrl: true,
             },
           });
+          auth.auth.onAuthStateChange((event) => {
+            if (event === "PASSWORD_RECOVERY") setRecovery(true);
+          });
+        }
       })
       .catch(() => {
         if (import.meta.env.DEV)
@@ -921,7 +992,9 @@ function App() {
         <p>{error || "Opening your studio…"}</p>
       </main>
     );
-  if (!ready) return <Login config={config} onReady={enter} />;
+  if (recovery && config.configured)
+    return <PasswordRecovery onComplete={() => { setRecovery(false); setRecoveryDone(true); }} />;
+  if (!ready) return <Login config={config} onReady={enter} initialNotice={recoveryDone ? "Password updated. Sign in with your new password to set up Google Authenticator." : ""} />;
   const nav = [
     ["Overview", LayoutDashboard],
     ["Contacts", Users],
