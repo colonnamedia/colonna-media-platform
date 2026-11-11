@@ -4,7 +4,7 @@ create extension if not exists pgcrypto with schema extensions;
 create table public.crm_contacts (
  id uuid primary key default gen_random_uuid(),created_at timestamptz not null default now(),
  name text not null,email text not null,business text not null default '',phone text not null default '',website text not null default '',
- kind text not null check(kind in ('lead','client')),stage text not null,services jsonb not null default '[]',source text not null default '',notes text not null default '',follow_up text not null default '',marketing_consent boolean not null default false
+ kind text not null check(kind in ('lead','client')),stage text not null,services jsonb not null default '[]',source text not null default '',notes text not null default '',follow_up text not null default '',marketing_consent boolean not null default false,archived_at timestamptz
 );
 create table public.crm_jobs (
  id uuid primary key default gen_random_uuid(),created_at timestamptz not null default now(),contact_id uuid not null references public.crm_contacts(id),
@@ -27,7 +27,7 @@ create table public.crm_payments (
 );
 create table public.crm_inquiries (
  id uuid primary key default gen_random_uuid(),created_at timestamptz not null default now(),name text not null,email text not null,business text not null default '',phone text not null default '',
- services text not null default '',location text not null default '',website_url text not null default '',timing text not null default '',followup text not null default '',message text not null default '',page text not null default ''
+ services text not null default '',location text not null default '',website_url text not null default '',timing text not null default '',followup text not null default '',message text not null default '',page text not null default '',archived_at timestamptz
 );
 create index crm_jobs_contact on public.crm_jobs(contact_id);
 create index crm_agreements_contact on public.crm_agreements(contact_id);
