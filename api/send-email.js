@@ -121,6 +121,12 @@ function thankYouEmail({ firstName, serviceIds, message, business, followup }) {
       </tr></table>
       <p style="font-size:14px;line-height:21px;color:#434961;margin:14px 0 0 0;">Want to talk sooner? Call <a href="tel:+14124395452" style="color:#1659dc;font-weight:bold;text-decoration:none;">(412) 439-5452</a></p>
     </td></tr>
+    <tr><td style="padding:16px 32px 0 32px;font-family:Arial,Helvetica,sans-serif;">
+      <div style="background:#f6f7fb;border:1px solid #dfe3ed;border-radius:12px;padding:18px 20px;">
+        <div style="font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#1659dc;">Stay connected</div>
+        <p style="font-size:14px;line-height:22px;color:#434961;margin:8px 0 0 0;">Follow Colonna Media on <a href="https://www.instagram.com/colonna_media" style="color:#1659dc;font-weight:bold;">Instagram</a> and Facebook for recent work, behind-the-scenes photography, and marketing ideas.</p>
+      </div>
+    </td></tr>
     <tr><td style="padding:28px 32px 32px 32px;font-family:Arial,Helvetica,sans-serif;">
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-top:1px solid #dfe3ed;"><tr><td style="padding-top:20px;">
         <div style="font-size:15px;color:#171c38;font-weight:bold;">Anthony Colonna</div>
