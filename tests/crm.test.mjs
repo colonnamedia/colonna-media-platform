@@ -73,6 +73,9 @@ test("one-time work closes after its date, recurring and paused work do not auto
 });
 test("Eastern date boundary and invalid job periods", () => {
   assert.equal(nyDate(new Date("2026-11-11T02:00:00Z")), "2026-11-10");
+  assert.equal(jobSchema.parse({ ...job, status: "planned", start_date: "", end_date: "", auto_close: false }).start_date, "");
+  assert.equal(isActiveJob({ ...job, start_date: "" }), false);
+  assert.throws(() => jobSchema.parse({ ...job, start_date: "" }));
   assert.throws(() => jobSchema.parse({ ...job, end_date: "2026-10-01" }));
   assert.throws(() => jobSchema.parse({ ...job, mode: "recurring" }));
   assert.throws(() => jobSchema.parse({ ...job, end_date: "" }));
