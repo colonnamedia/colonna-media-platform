@@ -297,6 +297,27 @@ nav button.selected:before {
   gap: 18px;
   margin-bottom: 26px;
 }
+.analytics-panel {
+  padding: 22px 26px;
+  margin-bottom: 26px;
+}
+.analytics-panel > .muted { margin-bottom: 0; }
+.service-metric {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) minmax(80px, 3fr) 28px;
+  align-items: center;
+  gap: 16px;
+  margin-top: 15px;
+  color: #434961;
+  font-size: 13px;
+}
+.service-metric strong { text-align: right; color: #171c38; }
+.metric-track { height: 9px; background: #edf1f7; border-radius: 20px; overflow: hidden; }
+.metric-track div { height: 100%; background: #3159d9; border-radius: 20px; }
+.archive-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid #e5e8f1; font-size: 13px; color: #434961; }
+.archive-note { margin: 0; padding: 0 24px 12px; font-size: 12px; color: #7c8294; }
+.inquiry-actions { display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+.inquiry-actions .text-button, .table-wrap .text-button { display: inline-flex; align-items: center; gap: 5px; }
 .stats article {
   background: #fff;
   border: 1px solid #e5e8f1;
