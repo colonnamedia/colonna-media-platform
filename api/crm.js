@@ -15,23 +15,24 @@ import {
   headers,
   fail,
   audit,
+  allRows,
   newToken,
   hashToken,
 } from "../lib/crm/server.js";
+import { linksSchema } from "../lib/site/links-schema.js";
+import { DEFAULT_LINKS } from "../lib/site/links-content.js";
 import { z } from "zod";
 export default async function handler(req, res) {
   headers(res);
   try {
     const action = String(req.query.action || "");
     if (action === "config" && req.method === "GET")
-      return res
-        .status(200)
-        .json({
-          configured: configured(),
-          url: configured() ? process.env.CRM_SUPABASE_URL : null,
-          key: configured() ? process.env.CRM_SUPABASE_PUBLISHABLE_KEY : null,
-          email: "colonnamedia@gmail.com",
-        });
+      return res.status(200).json({
+        configured: configured(),
+        url: configured() ? process.env.CRM_SUPABASE_URL : null,
+        key: configured() ? process.env.CRM_SUPABASE_PUBLISHABLE_KEY : null,
+        email: "colonnamedia@gmail.com",
+      });
     if (!["GET", "POST"].includes(req.method))
       return res.status(405).json({ error: "Method not allowed" });
     assertOrigin(req);
@@ -40,11 +41,7 @@ export default async function handler(req, res) {
     if (action === "list" && req.method === "GET") {
       const [contacts, jobs, agreements, inquiries, payments, templates] =
         await Promise.all([
-          client
-            .from("crm_contacts")
-            .select("*")
-            .order("created_at", { ascending: false })
-            .limit(5000),
+          allRows(client, "crm_contacts").then((data) => ({ data })),
           client
             .from("crm_jobs")
             .select("*")
@@ -57,11 +54,7 @@ export default async function handler(req, res) {
             )
             .order("created_at", { ascending: false })
             .limit(5000),
-          client
-            .from("crm_inquiries")
-            .select("*")
-            .order("created_at", { ascending: false })
-            .limit(5000),
+          allRows(client, "crm_inquiries").then((data) => ({ data })),
           client
             .from("crm_payments")
             .select("*")
@@ -69,16 +62,26 @@ export default async function handler(req, res) {
             .limit(5000),
           client.from("crm_templates").select("*"),
         ]);
+      return res.status(200).json({
+        contacts: check(contacts),
+        jobs: check(jobs),
+        agreements: check(agreements),
+        inquiries: check(inquiries),
+        payments: check(payments),
+        templates: check(templates),
+      });
+    }
+    if (action === "links" && req.method === "GET") {
+      const record = check(
+        await client
+          .from("crm_site_content")
+          .select("config,version")
+          .eq("key", "links")
+          .maybeSingle(),
+      );
       return res
         .status(200)
-        .json({
-          contacts: check(contacts),
-          jobs: check(jobs),
-          agreements: check(agreements),
-          inquiries: check(inquiries),
-          payments: check(payments),
-          templates: check(templates),
-        });
+        .json(record || { config: DEFAULT_LINKS, version: 0 });
     }
     if (action === "events" && req.method === "GET") {
       const id = z.string().uuid().parse(req.query.id);
@@ -121,22 +124,78 @@ export default async function handler(req, res) {
     if (req.method !== "POST")
       return res.status(405).json({ error: "Method not allowed" });
     const input = body(req);
+    if (action === "inquiry-stage") {
+      const { id, stage } = z
+        .object({
+          id: z.string().uuid(),
+          stage: z.enum(["new", "contacted", "qualified", "proposal", "won"]),
+        })
+        .parse(input);
+      return res
+        .status(200)
+        .json(
+          check(
+            await client.rpc("crm_set_inquiry_stage", {
+              inquiry_id: id,
+              next_stage: stage,
+              owner_id: actor.id,
+            }),
+          ),
+        );
+    }
+    if (action === "links-save") {
+      const config = linksSchema.parse(input.config);
+      const version = z.number().int().nonnegative().parse(input.version);
+      const result = await client.rpc("crm_save_links", {
+        content: config,
+        expected_version: version,
+        owner_id: actor.id,
+      });
+      if (result.error?.code === "40001")
+        return res
+          .status(409)
+          .json({ error: "Content changed. Reload before saving." });
+      return res.status(200).json(check(result));
+    }
     if (action === "archive") {
-      const { entity, id, archived } = z.object({
-        entity: z.enum(["contact", "inquiry"]),
-        id: z.string().uuid(),
-        archived: z.boolean(),
-      }).parse(input);
+      const { entity, id, archived } = z
+        .object({
+          entity: z.enum(["contact", "inquiry"]),
+          id: z.string().uuid(),
+          archived: z.boolean(),
+        })
+        .parse(input);
       const table = entity === "contact" ? "crm_contacts" : "crm_inquiries";
       if (entity === "contact" && archived) {
-        const jobs = check(await client.from("crm_jobs").select("status,mode,start_date,end_date,auto_close").eq("contact_id", id));
+        const jobs = check(
+          await client
+            .from("crm_jobs")
+            .select("status,mode,start_date,end_date,auto_close")
+            .eq("contact_id", id),
+        );
         if (jobs.some((job) => isActiveJob(job)))
-          throw Object.assign(new Error("Finish or pause active jobs before archiving this contact."), { status: 409 });
+          throw Object.assign(
+            new Error(
+              "Finish or pause active jobs before archiving this contact.",
+            ),
+            { status: 409 },
+          );
       }
-      const result = check(await client.from(table)
-        .update({ archived_at: archived ? new Date().toISOString() : null })
-        .eq("id", id).select("id,archived_at").single());
-      await audit(client, entity, result.id, archived ? "archived" : "restored", actor.id);
+      const result = check(
+        await client
+          .from(table)
+          .update({ archived_at: archived ? new Date().toISOString() : null })
+          .eq("id", id)
+          .select("id,archived_at")
+          .single(),
+      );
+      await audit(
+        client,
+        entity,
+        result.id,
+        archived ? "archived" : "restored",
+        actor.id,
+      );
       return res.status(200).json(result);
     }
     if (action === "template") {
@@ -262,11 +321,9 @@ export default async function handler(req, res) {
       await audit(client, "agreement", id, "link_created", actor.id, {
         expires_at: expires,
       });
-      return res
-        .status(200)
-        .json({
-          url: `${process.env.CRM_PUBLIC_ORIGIN || "https://www.colonnamedia.com"}/sign#${token}`,
-        });
+      return res.status(200).json({
+        url: `${process.env.CRM_PUBLIC_ORIGIN || "https://www.colonnamedia.com"}/sign#${token}`,
+      });
     }
     if (action === "revoke") {
       const id = z.string().uuid().parse(input.id);

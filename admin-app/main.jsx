@@ -30,6 +30,12 @@ import {
   isActiveJob,
 } from "../lib/crm/domain.js";
 import "./style.css";
+import AttributionReport, {
+  InquirySource,
+  InquiryStage,
+} from "./Attribution.jsx";
+import LinksEditor from "./LinksEditor.jsx";
+import { attributionSource } from "../lib/lead/attribution.js";
 let auth;
 const empty = {
   contacts: [],
@@ -162,7 +168,9 @@ function Login({ config, onReady, initialNotice = "" }) {
         redirectTo: window.location.origin + "/admin",
       });
       if (error) throw error;
-      setNotice("If this account exists, a password reset link has been sent. Open it on this device.");
+      setNotice(
+        "If this account exists, a password reset link has been sent. Open it on this device.",
+      );
     } catch (e) {
       setError(e.message);
     } finally {
@@ -337,7 +345,12 @@ function Login({ config, onReady, initialNotice = "" }) {
                   : "Continue"}
             </button>
             {!factor && (
-              <button type="button" className="text-button" disabled={busy} onClick={resetPassword}>
+              <button
+                type="button"
+                className="text-button"
+                disabled={busy}
+                onClick={resetPassword}
+              >
                 Reset CRM password
               </button>
             )}
@@ -380,8 +393,12 @@ function PasswordRecovery({ onComplete }) {
     if (password !== confirm) return setError("Passwords do not match.");
     setBusy(true);
     try {
-      const { data: { session }, error: sessionError } = await auth.auth.getSession();
-      if (sessionError || !session) throw Error("This reset link has expired. Request a new link.");
+      const {
+        data: { session },
+        error: sessionError,
+      } = await auth.auth.getSession();
+      if (sessionError || !session)
+        throw Error("This reset link has expired. Request a new link.");
       const { error } = await auth.auth.updateUser({ password });
       if (error) throw error;
       await auth.auth.signOut();
@@ -395,16 +412,46 @@ function PasswordRecovery({ onComplete }) {
   }
   return (
     <main className="login">
-      <div className="login-story"><Brand /><div><div className="eyebrow">PRIVATE WORKSPACE</div><h1>Secure access.<br />Your next move.</h1><p>Set a new password for your Colonna Media Client Studio.</p></div><small>COLONNA MEDIA LLC · PITTSBURGH</small></div>
+      <div className="login-story">
+        <Brand />
+        <div>
+          <div className="eyebrow">PRIVATE WORKSPACE</div>
+          <h1>
+            Secure access.
+            <br />
+            Your next move.
+          </h1>
+          <p>Set a new password for your Colonna Media Client Studio.</p>
+        </div>
+        <small>COLONNA MEDIA LLC · PITTSBURGH</small>
+      </div>
       <div className="login-form">
         <ShieldCheck size={32} />
         <p className="eyebrow">ACCOUNT RECOVERY</p>
         <h2>Choose a new password</h2>
         <form onSubmit={submit}>
-          <Input label="New password" type="password" autoComplete="new-password" minLength={12} required value={password} onChange={(e) => setPassword(e.target.value)} />
-          <Input label="Confirm new password" type="password" autoComplete="new-password" minLength={12} required value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+          <Input
+            label="New password"
+            type="password"
+            autoComplete="new-password"
+            minLength={12}
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <Input
+            label="Confirm new password"
+            type="password"
+            autoComplete="new-password"
+            minLength={12}
+            required
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+          />
           <Banner>{error}</Banner>
-          <button className="primary wide" disabled={busy}>{busy ? "Saving…" : "Set new password"}</button>
+          <button className="primary wide" disabled={busy}>
+            {busy ? "Saving…" : "Set new password"}
+          </button>
         </form>
       </div>
     </main>
@@ -616,7 +663,13 @@ function JobForm({ initial, contacts, onSave }) {
     </form>
   );
 }
-function AgreementForm({ jobs, contacts, templates, onSave, initialJobId = "" }) {
+function AgreementForm({
+  jobs,
+  contacts,
+  templates,
+  onSave,
+  initialJobId = "",
+}) {
   const [jobId, setJob] = useState(initialJobId || jobs[0]?.id || ""),
     [title, setTitle] = useState("Service agreement"),
     [date, setDate] = useState(nyDate()),
@@ -890,7 +943,10 @@ function AgreementView({ snapshot: s }) {
 }
 function App() {
   const [config, setConfig] = useState(null),
-    [recovery, setRecovery] = useState(new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery"),
+    [recovery, setRecovery] = useState(
+      new URLSearchParams(window.location.hash.slice(1)).get("type") ===
+        "recovery",
+    ),
     [recoveryDone, setRecoveryDone] = useState(false),
     [ready, setReady] = useState(false),
     [data, setData] = useState(empty),
@@ -965,15 +1021,24 @@ function App() {
     act(async () => {
       await request("archive", { entity, id, archived });
       await refresh();
-      setMessage(archived ? "Archived. You can restore it from the archived view." : "Restored to your working view.");
+      setMessage(
+        archived
+          ? "Archived. You can restore it from the archived view."
+          : "Restored to your working view.",
+      );
     });
   const visibleContacts = data.contacts.filter((c) => !c.archived_at);
   const visibleInquiries = data.inquiries.filter((i) => !i.archived_at);
   const activeJobs = data.jobs.filter((j) => isActiveJob(j));
   const recentSince = Date.now() - 30 * 24 * 60 * 60 * 1000;
-  const serviceMix = Object.entries(SERVICES).map(([key, label]) => ({
-    key, label, count: activeJobs.filter((j) => j.services.includes(key)).length,
-  })).filter((item) => item.count).sort((a, b) => b.count - a.count);
+  const serviceMix = Object.entries(SERVICES)
+    .map(([key, label]) => ({
+      key,
+      label,
+      count: activeJobs.filter((j) => j.services.includes(key)).length,
+    }))
+    .filter((item) => item.count)
+    .sort((a, b) => b.count - a.count);
   const contacts = data.contacts.filter(
     (c) =>
       Boolean(c.archived_at) === showArchived &&
@@ -1010,14 +1075,34 @@ function App() {
       </main>
     );
   if (recovery && config.configured)
-    return <PasswordRecovery onComplete={() => { setRecovery(false); setRecoveryDone(true); }} />;
-  if (!ready) return <Login config={config} onReady={enter} initialNotice={recoveryDone ? "Password updated. Sign in with your new password to set up Google Authenticator." : ""} />;
+    return (
+      <PasswordRecovery
+        onComplete={() => {
+          setRecovery(false);
+          setRecoveryDone(true);
+        }}
+      />
+    );
+  if (!ready)
+    return (
+      <Login
+        config={config}
+        onReady={enter}
+        initialNotice={
+          recoveryDone
+            ? "Password updated. Sign in with your new password to set up Google Authenticator."
+            : ""
+        }
+      />
+    );
   const nav = [
     ["Overview", LayoutDashboard],
     ["Contacts", Users],
     ["Jobs", BriefcaseBusiness],
     ["Agreements", FileSignature],
     ["Inquiries", Inbox],
+    ["Lead reporting", SlidersHorizontal],
+    ["Social links", ArrowUpRight],
     ["Templates", ClipboardList],
     ["Settings", Settings2],
   ];
@@ -1027,11 +1112,7 @@ function App() {
       visibleContacts.filter((c) => activeClient(c.id)).length,
       "Clients with work in progress",
     ],
-    [
-      "Active jobs",
-      activeJobs.length,
-      "Work happening now",
-    ],
+    ["Active jobs", activeJobs.length, "Work happening now"],
     [
       "One-time jobs",
       activeJobs.filter((j) => j.mode === "one-time").length,
@@ -1044,12 +1125,15 @@ function App() {
     ],
     [
       "New leads",
-      visibleContacts.filter((c) => c.kind === "lead" && c.stage === "new").length,
+      visibleContacts.filter((c) => c.kind === "lead" && c.stage === "new")
+        .length,
       "Ready for first follow-up",
     ],
     [
       "Inquiries · 30 days",
-      visibleInquiries.filter((i) => new Date(i.created_at).getTime() >= recentSince).length,
+      visibleInquiries.filter(
+        (i) => new Date(i.created_at).getTime() >= recentSince,
+      ).length,
       "Website form submissions",
     ],
     [
@@ -1119,6 +1203,7 @@ function App() {
               <th>Client / lead</th>
               <th>Services</th>
               <th>Stage</th>
+              <th>Source / campaign</th>
               <th>Activity</th>
               <th>Follow-up</th>
               <th />
@@ -1151,6 +1236,26 @@ function App() {
                   </span>
                 </td>
                 <td>
+                  {(() => {
+                    const inquiry = data.inquiries.find(
+                      (i) =>
+                        i.contact_id === c.id ||
+                        (!i.contact_id &&
+                          i.email.toLowerCase() === c.email.toLowerCase()),
+                    );
+                    return (
+                      <>
+                        {inquiry
+                          ? attributionSource(inquiry)
+                          : c.source || "Not recorded"}
+                        <small>
+                          {inquiry?.utm_campaign || "Campaign not recorded"}
+                        </small>
+                      </>
+                    );
+                  })()}
+                </td>
+                <td>
                   <span
                     className={"pill " + (activeClient(c.id) ? "green" : "")}
                   >
@@ -1160,9 +1265,24 @@ function App() {
                 <td>{c.follow_up || "—"}</td>
                 <td>
                   <div className="actions">
-                    <button className="text-button" onClick={() => setModal({ type: "contact", value: c })}>Edit</button>
-                    <button className="text-button" disabled={busy} onClick={() => setArchive("contact", c.id, !c.archived_at)}>
-                      {c.archived_at ? <RotateCcw size={15} /> : <Archive size={15} />}
+                    <button
+                      className="text-button"
+                      onClick={() => setModal({ type: "contact", value: c })}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="text-button"
+                      disabled={busy}
+                      onClick={() =>
+                        setArchive("contact", c.id, !c.archived_at)
+                      }
+                    >
+                      {c.archived_at ? (
+                        <RotateCcw size={15} />
+                      ) : (
+                        <Archive size={15} />
+                      )}
                       {c.archived_at ? "Restore" : "Archive"}
                     </button>
                   </div>
@@ -1263,7 +1383,12 @@ function App() {
                   Export filtered
                 </button>
               )}
-              {!["Settings", "Templates"].includes(tab) && (
+              {![
+                "Settings",
+                "Templates",
+                "Lead reporting",
+                "Social links",
+              ].includes(tab) && (
                 <button
                   className="primary"
                   onClick={() =>
@@ -1317,14 +1442,31 @@ function App() {
                 ))}
               </div>
               <section className="panel analytics-panel">
-                <div className="panel-head"><h2>Active work by service</h2><span className="muted">One job can include multiple services</span></div>
-                {serviceMix.length ? serviceMix.map(({ key, label, count }) => (
-                  <div className="service-metric" key={key}>
-                    <span>{label}</span>
-                    <div className="metric-track"><div style={{ width: `${Math.round(count / activeJobs.length * 100)}%` }} /></div>
-                    <strong>{count}</strong>
-                  </div>
-                )) : <p className="muted">Services will appear here when jobs become active.</p>}
+                <div className="panel-head">
+                  <h2>Active work by service</h2>
+                  <span className="muted">
+                    One job can include multiple services
+                  </span>
+                </div>
+                {serviceMix.length ? (
+                  serviceMix.map(({ key, label, count }) => (
+                    <div className="service-metric" key={key}>
+                      <span>{label}</span>
+                      <div className="metric-track">
+                        <div
+                          style={{
+                            width: `${Math.round((count / activeJobs.length) * 100)}%`,
+                          }}
+                        />
+                      </div>
+                      <strong>{count}</strong>
+                    </div>
+                  ))
+                ) : (
+                  <p className="muted">
+                    Services will appear here when jobs become active.
+                  </p>
+                )}
               </section>
               <div className="overview-grid">
                 <section className="panel">
@@ -1445,9 +1587,11 @@ function App() {
                       onChange={(e) => setStage(e.target.value)}
                     >
                       <option value="">All stages</option>
-                      {["new", "contacted", "qualified", "proposal", "won"].map((s) => (
-                        <option key={s}>{s}</option>
-                      ))}
+                      {["new", "contacted", "qualified", "proposal", "won"].map(
+                        (s) => (
+                          <option key={s}>{s}</option>
+                        ),
+                      )}
                     </select>
                     <label className="check">
                       <input
@@ -1463,9 +1607,16 @@ function App() {
               {tab === "Contacts" ? (
                 <section className="panel">
                   <div className="archive-toolbar">
-                    <span>{showArchived ? "Archived contacts" : "Current contacts"}</span>
-                    <button className="text-button" onClick={() => setShowArchived(!showArchived)}>
-                      {showArchived ? "Show current" : `Show archived (${data.contacts.length - visibleContacts.length})`}
+                    <span>
+                      {showArchived ? "Archived contacts" : "Current contacts"}
+                    </span>
+                    <button
+                      className="text-button"
+                      onClick={() => setShowArchived(!showArchived)}
+                    >
+                      {showArchived
+                        ? "Show current"
+                        : `Show archived (${data.contacts.length - visibleContacts.length})`}
                     </button>
                   </div>
                   {contactTable(contacts)}
@@ -1624,69 +1775,125 @@ function App() {
               </div>
             </section>
           )}
+          {tab === "Lead reporting" && (
+            <AttributionReport
+              inquiries={data.inquiries}
+              busy={busy}
+              onStage={(id, stage) =>
+                act(async () => {
+                  await request("inquiry-stage", { id, stage });
+                  await refresh();
+                })
+              }
+            />
+          )}
+          {tab === "Social links" && (
+            <LinksEditor
+              load={() => request("links")}
+              save={(value) => request("links-save", value)}
+            />
+          )}
           {tab === "Inquiries" && (
             <section className="panel">
               <div className="panel-head">
                 <h2>Website inquiries</h2>
-                <button className="text-button" onClick={() => setShowArchived(!showArchived)}>
-                  {showArchived ? "Show current" : `Show archived (${data.inquiries.length - visibleInquiries.length})`}
+                <button
+                  className="text-button"
+                  onClick={() => setShowArchived(!showArchived)}
+                >
+                  {showArchived
+                    ? "Show current"
+                    : `Show archived (${data.inquiries.length - visibleInquiries.length})`}
                 </button>
               </div>
-              <p className="archive-note">{showArchived ? "Archived submissions can be restored at any time." : "Original submissions are preserved. Archive test entries to clear this view."}</p>
-              {data.inquiries.filter((i) => Boolean(i.archived_at) === showArchived).map((i) => (
-                <div className="inquiry" key={i.id}>
-                  <div>
-                    <strong>
-                      {i.name} {i.business && " / " + i.business}
-                    </strong>
-                    <small>
-                      {i.email} ·{" "}
-                      {new Date(i.created_at).toLocaleString("en-US", {
-                        timeZone: "America/New_York",
-                      })}
-                    </small>
-                    <p>{i.services}</p>
-                    <p className="terms">{i.message}</p>
+              <p className="archive-note">
+                {showArchived
+                  ? "Archived submissions can be restored at any time."
+                  : "Original submissions are preserved. Archive test entries to clear this view."}
+              </p>
+              {data.inquiries
+                .filter((i) => Boolean(i.archived_at) === showArchived)
+                .map((i) => (
+                  <div className="inquiry" key={i.id}>
+                    <div>
+                      <strong>
+                        {i.name} {i.business && " / " + i.business}
+                      </strong>
+                      <small>
+                        {i.email} ·{" "}
+                        {new Date(i.created_at).toLocaleString("en-US", {
+                          timeZone: "America/New_York",
+                        })}
+                      </small>
+                      <p>{i.services}</p>
+                      <InquirySource inquiry={i} />
+                      <p className="terms">{i.message}</p>
+                    </div>
+                    <div className="inquiry-actions">
+                      <InquiryStage
+                        inquiry={i}
+                        disabled={busy}
+                        onChange={(id, stage) =>
+                          act(async () => {
+                            await request("inquiry-stage", { id, stage });
+                            await refresh();
+                          })
+                        }
+                      />
+                      <button
+                        onClick={() => {
+                          const existing = data.contacts.find(
+                            (c) =>
+                              c.email.toLowerCase() === i.email.toLowerCase(),
+                          );
+                          if (existing) {
+                            setSelected(existing.id);
+                            return;
+                          }
+                          setModal({
+                            type: "contact",
+                            value: {
+                              name: i.name,
+                              email: i.email,
+                              business: i.business,
+                              phone: i.phone,
+                              website: i.website_url,
+                              source: "Website " + i.page,
+                              notes: i.message,
+                              services: Object.entries(SERVICES)
+                                .filter(([, v]) => i.services.includes(v))
+                                .map(([k]) => k),
+                            },
+                          });
+                        }}
+                      >
+                        {data.contacts.some(
+                          (c) =>
+                            c.email.toLowerCase() === i.email.toLowerCase(),
+                        )
+                          ? "View contact"
+                          : "Add to CRM"}
+                      </button>
+                      <button
+                        className="text-button"
+                        disabled={busy}
+                        onClick={() =>
+                          setArchive("inquiry", i.id, !i.archived_at)
+                        }
+                      >
+                        {i.archived_at ? (
+                          <RotateCcw size={15} />
+                        ) : (
+                          <Archive size={15} />
+                        )}
+                        {i.archived_at ? "Restore" : "Archive"}
+                      </button>
+                    </div>
                   </div>
-                  <div className="inquiry-actions"><button
-                    onClick={() => {
-                      const existing = data.contacts.find(
-                        (c) => c.email.toLowerCase() === i.email.toLowerCase(),
-                      );
-                      if (existing) {
-                        setSelected(existing.id);
-                        return;
-                      }
-                      setModal({
-                        type: "contact",
-                        value: {
-                          name: i.name,
-                          email: i.email,
-                          business: i.business,
-                          phone: i.phone,
-                          website: i.website_url,
-                          source: "Website " + i.page,
-                          notes: i.message,
-                          services: Object.entries(SERVICES)
-                            .filter(([, v]) => i.services.includes(v))
-                            .map(([k]) => k),
-                        },
-                      });
-                    }}
-                  >
-                    {data.contacts.some(
-                      (c) => c.email.toLowerCase() === i.email.toLowerCase(),
-                    )
-                      ? "View contact"
-                      : "Add to CRM"}
-                  </button>
-                  <button className="text-button" disabled={busy} onClick={() => setArchive("inquiry", i.id, !i.archived_at)}>
-                    {i.archived_at ? <RotateCcw size={15} /> : <Archive size={15} />}
-                    {i.archived_at ? "Restore" : "Archive"}
-                  </button></div>
-                </div>
-              ))}
-              {!data.inquiries.some((i) => Boolean(i.archived_at) === showArchived) && (
+                ))}
+              {!data.inquiries.some(
+                (i) => Boolean(i.archived_at) === showArchived,
+              ) && (
                 <Empty
                   title="Ready for your next inquiry."
                   text="New website submissions will appear here after the database is connected. Existing Google Sheet leads can be imported separately."
@@ -1923,6 +2130,13 @@ function App() {
         <Modal title="Client profile" close={() => setSelected(null)}>
           <Profile
             contact={getContact(selected)}
+            inquiries={data.inquiries.filter(
+              (i) =>
+                i.contact_id === selected ||
+                (!i.contact_id &&
+                  i.email.toLowerCase() ===
+                    getContact(selected).email.toLowerCase()),
+            )}
             jobs={clientJobs(selected)}
             agreements={data.agreements.filter(
               (a) => a.contact_id === selected,
@@ -1975,7 +2189,19 @@ function Empty({ title, text }) {
     </div>
   );
 }
-function Profile({ contact: c, jobs, agreements, payments, edit, addJob, addAgreement, reviewAgreement, issueAgreement, downloadAgreement }) {
+function Profile({
+  contact: c,
+  inquiries = [],
+  jobs,
+  agreements,
+  payments,
+  edit,
+  addJob,
+  addAgreement,
+  reviewAgreement,
+  issueAgreement,
+  downloadAgreement,
+}) {
   return (
     <>
       <h2>{c.business || c.name}</h2>
@@ -1999,6 +2225,22 @@ function Profile({ contact: c, jobs, agreements, payments, edit, addJob, addAgre
       </div>
       <h3>Notes</h3>
       <p className="terms">{c.notes || "No notes yet."}</p>
+      <h3>Inquiry sources &amp; campaigns</h3>
+      {!inquiries.length && (
+        <p className="muted">
+          No linked website inquiries. Profile source ·{" "}
+          {c.source || "Not recorded"}
+        </p>
+      )}
+      {inquiries.map((i) => (
+        <section className="profile-inquiry" key={i.id}>
+          <small>
+            {nyDate(new Date(i.created_at))} · {i.services}
+          </small>
+          <InquirySource inquiry={i} />
+          <p className="terms">{i.message}</p>
+        </section>
+      ))}
       <h3>Jobs & services</h3>
       {jobs.map((j) => (
         <div className="work-item" key={j.id}>
@@ -2014,12 +2256,16 @@ function Profile({ contact: c, jobs, agreements, payments, edit, addJob, addAgre
         <div className="work-item" key={a.id}>
           <div>
             <strong>{a.title}</strong>
-            <small>{a.status} · {money(a.snapshot.total_cents)}</small>
+            <small>
+              {a.status} · {money(a.snapshot.total_cents)}
+            </small>
           </div>
           <div className="actions">
             <button onClick={() => reviewAgreement(a)}>Review</button>
             {a.status === "draft" && (
-              <button onClick={() => issueAgreement(a)}>Create signing link</button>
+              <button onClick={() => issueAgreement(a)}>
+                Create signing link
+              </button>
             )}
             {a.status === "signed" && (
               <button onClick={() => downloadAgreement(a)}>Signed PDF</button>

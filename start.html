@@ -525,7 +525,8 @@
 <a href="#quote" class="btn btn-green">Get a quote →</a>
 </div>
 
-<script>
+<script type="module">
+import { leadAttribution, submissionKey } from "/assets/lead-attribution.js";
 (function(){
   var form=document.getElementById('lpform');
   if(!form)return;
@@ -552,19 +553,18 @@
     var btn=form.querySelector('button[type="submit"]'),status=document.getElementById('lp-status'),original=btn.textContent;
     var v=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};
     var services=Array.from(form.querySelectorAll('input[name="services"]:checked'),function(b){return b.value;});
-    var source='Source: /start landing page'+(params.get('offer')==='google-ads-launch'?' — Google Ads launch offer':'')+(params.get('utm_campaign')?' ('+params.get('utm_campaign')+')':'')+(params.get('gclid')?' — Google Ads click':'');
     var msg=v('lp-msg');
     btn.disabled=true;btn.textContent='Sending…';status.className='form-status';status.textContent='';
     try{
       var res=await fetch('/api/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
         name:v('lp-name'),email:v('lp-email'),business_name:v('lp-business'),phone:v('lp-phone'),location:v('lp-location'),website_url:v('lp-site'),timing:v('lp-timing'),followup:((form.querySelector('input[name="followup"]:checked')||{}).value||''),
-        services:services,message:(msg?msg+'\n\n':'')+source,website:v('lp-website')
+        services:services,attribution:leadAttribution('start-inquiry',services),submission_key:submissionKey(form),message:msg,website:v('lp-website')
       })});
       var data=await res.json().catch(function(){return {};});
       if(!res.ok||!data.success)throw Error('failed');
       status.className='form-status success';
       status.textContent='Thanks! Your request was sent to Anthony. He will follow up with you directly.';
-      form.reset();btn.textContent='Request sent ✓';
+      form.reset();delete form.dataset.submissionKey;btn.textContent='Request sent ✓';
       if(typeof window.gtag==='function'){window.gtag('event','generate_lead',{form_id:'start_landing',service_count:services.length});window.gtag('event','conversion',{send_to:'AW-18441272783/LF1DCJqMnbEdEM_7vdlE'});}
     }catch(err){
       status.className='form-status error';

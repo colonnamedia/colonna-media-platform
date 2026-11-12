@@ -1,3 +1,4 @@
+import { leadAttribution } from '../../assets/lead-attribution.js';
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
@@ -39,7 +40,7 @@ export default function Contact() {
       const res = await fetch("/api/send-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({...form,attribution:leadAttribution('legacy-react-contact')}),
       });
 
       if (!res.ok) throw new Error("Failed to send");

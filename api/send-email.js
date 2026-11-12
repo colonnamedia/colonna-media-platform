@@ -1,5 +1,11 @@
-import { captureLead } from '../lib/crm/server.js';
-import { confirmationSubject, confirmationText, confirmationHtml } from '../lib/lead/confirmation.js';
+import { z } from "zod";
+import { normalizeAttribution } from "../lib/lead/validate.js";
+import { captureLead } from "../lib/crm/server.js";
+import {
+  confirmationSubject,
+  confirmationText,
+  confirmationHtml,
+} from "../lib/lead/confirmation.js";
 const escapeHtml = (value = "") =>
   String(value)
     .replaceAll("&", "&amp;")
@@ -26,7 +32,8 @@ async function saveLeadToSheet(lead) {
     });
     clearTimeout(timer);
     const data = await response.json().catch(() => ({}));
-    if (!data.ok) console.error("Lead sheet error", data.error || response.status);
+    if (!data.ok)
+      console.error("Lead sheet error", data.error || response.status);
     return Boolean(data.ok);
   } catch (error) {
     console.error("Lead sheet request failed", error);
@@ -36,12 +43,22 @@ async function saveLeadToSheet(lead) {
 
 // The customer acknowledgment is staged behind an explicit delivery switch.
 // A verified sender and the owner's per-recipient approval rule are required first.
-async function sendConfirmation(resendKey, { to, firstName, serviceIds, message, business }) {
-  if (process.env.LEAD_AUTOREPLY_ENABLED !== "true" || !process.env.LEAD_AUTOREPLY_FROM) return;
+async function sendConfirmation(
+  resendKey,
+  { to, firstName, serviceIds, message, business },
+) {
+  if (
+    process.env.LEAD_AUTOREPLY_ENABLED !== "true" ||
+    !process.env.LEAD_AUTOREPLY_FROM
+  )
+    return;
   try {
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${resendKey}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${resendKey}`,
+      },
       body: JSON.stringify({
         from: process.env.LEAD_AUTOREPLY_FROM,
         to: [to],
@@ -51,7 +68,8 @@ async function sendConfirmation(resendKey, { to, firstName, serviceIds, message,
         html: confirmationHtml({ firstName, serviceIds, message, business }),
       }),
     });
-    if (!response.ok) console.error("Confirmation email error", response.status);
+    if (!response.ok)
+      console.error("Confirmation email error", response.status);
   } catch (error) {
     console.error("Confirmation email failed", error);
   }
@@ -63,17 +81,71 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const resendKey = process.env.RESEND_API_KEY || process.env.VITE_RESEND_API_KEY;
+  const resendKey =
+    process.env.RESEND_API_KEY || process.env.VITE_RESEND_API_KEY;
 
   let body;
-  try { body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {}); } catch { return res.status(400).json({error:"Invalid request"}); }
-  if (!body || typeof body !== "object" || Array.isArray(body)) return res.status(400).json({error:"Invalid request"});
-  const { name, email, business_name, service_needed, message, website, phone, location, website_url, timing, services, followup } = body;
-  const followupLabel = followup === "call" ? "Quick 15-minute call" : followup === "email" ? "Email me info" : "";
-  const serviceLabels = {"photography":"Photography","videography":"Videography","social-media":"Social Media Management","consulting":"Marketing Consulting","automations":"Automations & Systems","google-ads":"Google Ads Setup","meta-ads":"Meta Ads Setup","website":"Website Design"};
-  if (services !== undefined && (!Array.isArray(services) || services.length > 8 || services.some(id=>!Object.hasOwn(serviceLabels,id)))) return res.status(400).json({error:'Invalid service selection'});
-  const selectedServices = [...new Set(services || [])].map(id=>serviceLabels[id]).join(', ') || String(service_needed || 'Not specified');
-  if ([business_name,phone,location,website_url,timing,selectedServices].some(v=>String(v||'').length>500)) return res.status(400).json({error:'Submission is too long'});
+  try {
+    body =
+      typeof req.body === "string"
+        ? JSON.parse(req.body || "{}")
+        : req.body || {};
+  } catch {
+    return res.status(400).json({ error: "Invalid request" });
+  }
+  if (!body || typeof body !== "object" || Array.isArray(body))
+    return res.status(400).json({ error: "Invalid request" });
+  const {
+    name,
+    email,
+    business_name,
+    service_needed,
+    message,
+    website,
+    phone,
+    location,
+    website_url,
+    timing,
+    services,
+    followup,
+  } = body;
+  const followupLabel =
+    followup === "call"
+      ? "Quick 15-minute call"
+      : followup === "email"
+        ? "Email me info"
+        : "";
+  const serviceLabels = {
+    photography: "Photography",
+    videography: "Videography",
+    "social-media": "Social Media Management",
+    consulting: "Marketing Consulting",
+    automations: "Automations & Systems",
+    "google-ads": "Google Ads Setup",
+    "meta-ads": "Meta Ads Setup",
+    website: "Website Design",
+  };
+  if (
+    services !== undefined &&
+    (!Array.isArray(services) ||
+      services.length > 8 ||
+      services.some((id) => !Object.hasOwn(serviceLabels, id)))
+  )
+    return res.status(400).json({ error: "Invalid service selection" });
+  const selectedServices =
+    [...new Set(services || [])].map((id) => serviceLabels[id]).join(", ") ||
+    String(service_needed || "Not specified");
+  if (
+    [
+      business_name,
+      phone,
+      location,
+      website_url,
+      timing,
+      selectedServices,
+    ].some((v) => String(v || "").length > 500)
+  )
+    return res.status(400).json({ error: "Submission is too long" });
 
   // Honeypot: accept bot submissions without sending email.
   if (website) return res.status(200).json({ success: true });
@@ -84,18 +156,70 @@ export default async function handler(req, res) {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (!cleanName || !emailPattern.test(cleanEmail)) {
-    return res.status(400).json({ error: "Please enter a valid name and email address" });
+    return res
+      .status(400)
+      .json({ error: "Please enter a valid name and email address" });
   }
 
-  if (cleanName.length > 120 || cleanEmail.length > 254 || cleanMessage.length > 5000) {
+  if (
+    cleanName.length > 120 ||
+    cleanEmail.length > 254 ||
+    cleanMessage.length > 5000
+  ) {
     return res.status(400).json({ error: "Submission is too long" });
   }
 
-  let page = "";
-  try { page = new URL(String(req.headers.referer || "")).pathname; } catch { page = ""; }
+  let attribution, submission_key, project_type;
+  try {
+    attribution = normalizeAttribution(body.attribution, req);
+    submission_key = body.submission_key
+      ? z.string().uuid().parse(body.submission_key)
+      : null;
+    project_type = z
+      .string()
+      .trim()
+      .max(200)
+      .parse(body.project_type || "");
+  } catch {
+    return res.status(400).json({ error: "Invalid form attribution" });
+  }
+  const page = attribution.submission_page;
 
   // Retain every valid submission and add first-time senders as CRM leads.
-  const savedToCrm = await captureLead({name:cleanName,email:cleanEmail,business:String(business_name||''),phone:String(phone||''),services:selectedServices,location:String(location||''),website_url:String(website_url||''),timing:String(timing||''),followup:followupLabel,message:cleanMessage,page}, [...new Set(services || [])]).catch((error)=>{console.error("CRM lead capture failed",error);return false;});
+  const savedToCrm = await captureLead(
+    {
+      name: cleanName,
+      email: cleanEmail,
+      business: String(business_name || ""),
+      phone: String(phone || ""),
+      services: selectedServices,
+      location: String(location || ""),
+      website_url: String(website_url || ""),
+      timing: String(timing || ""),
+      followup: followupLabel,
+      message: cleanMessage,
+      page,
+      project_type,
+      submission_key,
+      ...attribution,
+    },
+    [...new Set(services || [])],
+  ).catch((error) => {
+    console.error("CRM lead capture failed", error);
+    return false;
+  });
+
+  if (!savedToCrm)
+    return res
+      .status(503)
+      .json({ error: "Unable to save your request. Please try again." });
+  if (savedToCrm.duplicate) return res.status(200).json({ success: true });
+
+  // Preview and test deployments must opt in to outbound delivery separately.
+  const emailDisabled =
+    process.env.LEAD_DELIVERY_DISABLED === "true" ||
+    process.env.VERCEL_ENV === "preview";
+  if (emailDisabled) return res.status(200).json({ success: true });
 
   // 1) Store the lead in the Google Sheet first, so it's kept even if email has a problem.
   const savedToSheet = await saveLeadToSheet({
@@ -110,15 +234,20 @@ export default async function handler(req, res) {
     followup: followupLabel,
     message: cleanMessage,
     page,
+    project_type,
+    ...attribution,
   });
 
   // Never report a successful form submission if it was not saved as a CRM lead.
-  if (!savedToCrm) return res.status(503).json({ error: "Unable to save your request. Please try again." });
+  if (!savedToCrm)
+    return res
+      .status(503)
+      .json({ error: "Unable to save your request. Please try again." });
 
   // 2) Email the lead to Colonna Media.
   if (!resendKey) {
     console.error("RESEND_API_KEY is not configured");
-    return (savedToSheet || savedToCrm)
+    return savedToSheet || savedToCrm
       ? res.status(200).json({ success: true })
       : res.status(500).json({ error: "Email service is not configured" });
   }
@@ -128,7 +257,7 @@ export default async function handler(req, res) {
     to: cleanEmail,
     firstName: cleanName.split(/\s+/)[0].slice(0, 40),
     serviceIds: [...new Set(services || [])],
-    message: cleanMessage.replace(/\n*Source: .*$/s, "").trim(),
+    message: cleanMessage,
     business: String(business_name || "").trim(),
   });
 
@@ -167,7 +296,7 @@ export default async function handler(req, res) {
     if (!response.ok) {
       console.error("Resend error", data);
       // The lead is still safe in the sheet, so tell the visitor it went through.
-      return (savedToSheet || savedToCrm)
+      return savedToSheet || savedToCrm
         ? res.status(200).json({ success: true })
         : res.status(502).json({ error: "Email delivery failed" });
     }
@@ -175,7 +304,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true });
   } catch (error) {
     console.error("Contact form error", error);
-    return (savedToSheet || savedToCrm)
+    return savedToSheet || savedToCrm
       ? res.status(200).json({ success: true })
       : res.status(500).json({ error: "Unable to send message" });
   }

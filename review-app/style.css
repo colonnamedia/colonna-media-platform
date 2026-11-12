@@ -1,0 +1,55 @@
+.review-toolbar {
+  background: #171c38;
+  color: white;
+  padding: 20px 25px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.review-toolbar p {
+  color: #c4cbe3;
+  font-size: 12px;
+  margin: 8px 0 0;
+}
+.review-toolbar nav {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+.review-toolbar nav button {
+  font-size: 12px;
+  padding: 10px 14px;
+}
+.review-dashboard {
+  max-width: 1250px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+.review-dashboard > h1 {
+  font-size: 30px;
+}
+.review-dashboard > .muted {
+  margin: 10px 0 25px;
+}
+.review-app .panel {
+  padding: 25px;
+}
+.review-app {
+  min-height: 100vh;
+  background: #f6f7fb;
+}
+@media (max-width: 600px) {
+  .review-toolbar {
+    padding: 18px;
+  }
+  .review-dashboard {
+    padding: 0 12px;
+  }
+  .review-app .panel {
+    padding: 16px;
+  }
+}
