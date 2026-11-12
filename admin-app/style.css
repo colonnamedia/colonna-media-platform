@@ -1710,3 +1710,58 @@ dd {
     flex-wrap: wrap;
   }
 }
+/* Consistent Social links form spacing at every screen width. */
+.panel.links-editor {
+  padding: 0;
+}
+.links-editor > .panel-head {
+  padding: 24px;
+  align-items: flex-start;
+  gap: 20px;
+}
+.links-editor > form {
+  padding: 24px;
+}
+.links-editor .form-grid {
+  gap: 20px 18px;
+}
+.links-editor .form-grid > .field {
+  margin-bottom: 0;
+}
+.links-editor .link-editor-section {
+  padding: 20px;
+  margin: 0 0 24px;
+  border: 1px solid #e2e7f0;
+  border-radius: 16px;
+  background: #fafbfe;
+}
+.links-editor .link-editor-section > summary {
+  padding: 0 0 4px;
+}
+.links-editor .link-editor-section > .form-grid {
+  margin-top: 24px;
+}
+.links-editor .links-edit-card > .panel-head {
+  padding: 0 0 16px;
+  margin-bottom: 20px;
+}
+.links-editor .links-edit-card > .form-grid {
+  margin-bottom: 20px;
+}
+.links-editor .link-section-head {
+  margin-top: 28px;
+}
+@media (max-width: 650px) {
+  .links-editor > .panel-head,
+  .links-editor > form {
+    padding: 18px;
+  }
+  .links-editor .link-editor-section {
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .links-editor .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+}
