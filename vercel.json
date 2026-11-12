@@ -12,6 +12,11 @@
       "source": "/photography-ads",
       "destination": "/photography",
       "permanent": true
+    },
+    {
+      "source": "/links",
+      "destination": "/link-us",
+      "permanent": true
     }
   ],
   "headers": [

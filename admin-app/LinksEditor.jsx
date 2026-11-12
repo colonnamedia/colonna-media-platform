@@ -91,7 +91,7 @@ export default function LinksEditor({ load, save }) {
           <div>
             <h2>Your social links page</h2>
             <p className="muted">
-              Edit the content, thumbnails, and display order for /links.
+              Edit the content, thumbnails, and display order for /link-us.
             </p>
           </div>
           <button onClick={() => setPreview(!preview)}>

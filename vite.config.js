@@ -36,7 +36,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(rootDir, "index.html"),
-        links: resolve(rootDir, "links.html"),
+        "link-us": resolve(rootDir, "link-us.html"),
         ...(process.env.VITE_REVIEW_PREVIEW === "true" ||
         process.env.VERCEL_ENV === "preview"
           ? { review: resolve(rootDir, "review.html") }
