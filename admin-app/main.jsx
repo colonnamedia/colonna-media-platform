@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import { createClient } from "@supabase/supabase-js";
+import { adminAuthOptions } from "./session.js";
 import {
   Users,
   BriefcaseBusiness,
@@ -158,7 +159,8 @@ function Login({ config, onReady, initialNotice = "" }) {
     [secret, setSecret] = useState(""),
     [error, setError] = useState(""),
     [notice, setNotice] = useState(initialNotice),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),
+    [checkingSession, setCheckingSession] = useState(config.configured);
   async function resetPassword() {
     setBusy(true);
     setError("");
@@ -214,7 +216,10 @@ function Login({ config, onReady, initialNotice = "" }) {
     setSecret(data.totp.secret);
   }
   useEffect(() => {
-    if (config.configured) inspect().catch((e) => setError(e.message));
+    if (config.configured)
+      inspect()
+        .catch((e) => setError(e.message))
+        .finally(() => setCheckingSession(false));
   }, []);
   async function submit(e) {
     e.preventDefault();
@@ -243,6 +248,13 @@ function Login({ config, onReady, initialNotice = "" }) {
       setBusy(false);
     }
   }
+  if (checkingSession)
+    return (
+      <main className="loading">
+        <Brand />
+        <p>Restoring your secure session…</p>
+      </main>
+    );
   return (
     <main className="login">
       <div className="login-story">
@@ -970,14 +982,14 @@ function App() {
         setConfig(c);
         if (c.configured) {
           auth = createClient(c.url, c.key, {
-            auth: {
-              persistSession: false,
-              autoRefreshToken: true,
-              detectSessionInUrl: true,
-            },
+            auth: adminAuthOptions(),
           });
           auth.auth.onAuthStateChange((event) => {
             if (event === "PASSWORD_RECOVERY") setRecovery(true);
+            if (event === "SIGNED_OUT") {
+              setReady(false);
+              setData(empty);
+            }
           });
         }
       })
