@@ -217,10 +217,10 @@ export default function LinksEditor({ load, save, fetchPreview, uploadImage }) {
             <span className="links-admin-kicker">Your mini website</span>
             <h2>Link Us</h2>
             <p className="muted">
-              Build /links with your brand, featured content, and social
+              Build /link-us with your brand, featured content, and social
               profiles.
             </p>
-            <a href="/links" target="_blank" rel="noopener noreferrer">
+            <a href="/link-us" target="_blank" rel="noopener noreferrer">
               Open public page ↗
             </a>
           </div>

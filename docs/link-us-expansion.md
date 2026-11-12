@@ -1,6 +1,6 @@
 # Link Us: mini website for Colonna Media
 
-Built on the existing /links page and owner-protected CRM. This is a single-brand pilot, not a separate subscription platform.
+Built on the existing /link-us page and owner-protected CRM. This is a single-brand pilot, not a separate subscription platform.
 
 ## Current scope
 - Admin sidebar: **Link Us**.

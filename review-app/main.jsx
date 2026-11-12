@@ -240,7 +240,7 @@ function Review() {
                       "Attribution retained during navigation",
                     ],
                     [
-                      "/links",
+                      "/link-us",
                       "No inquiry form",
                       "Editable service and social link cards",
                     ],
