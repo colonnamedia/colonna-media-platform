@@ -525,7 +525,8 @@
 <a href="#quote" class="btn btn-green">Get a quote →</a>
 </div>
 
-<script>
+<script type="module">
+import { formAttribution } from '/assets/attribution.js';
 (function(){
   var form=document.getElementById('lpform');
   if(!form)return;
@@ -558,7 +559,7 @@
     try{
       var res=await fetch('/api/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
         name:v('lp-name'),email:v('lp-email'),business_name:v('lp-business'),phone:v('lp-phone'),location:v('lp-location'),website_url:v('lp-site'),timing:v('lp-timing'),followup:((form.querySelector('input[name="followup"]:checked')||{}).value||''),
-        services:services,message:(msg?msg+'\n\n':'')+source,website:v('lp-website')
+        services:services,message:(msg?msg+'\n\n':'')+source,website:v('lp-website'),attribution:formAttribution('start_landing')
       })});
       var data=await res.json().catch(function(){return {};});
       if(!res.ok||!data.success)throw Error('failed');

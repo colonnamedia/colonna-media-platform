@@ -1,5 +1,6 @@
 import { captureLead } from '../lib/crm/server.js';
 import { confirmationSubject, confirmationText, confirmationHtml } from '../lib/lead/confirmation.js';
+import { normalizeAttribution } from '../lib/lead/attribution.js';
 const escapeHtml = (value = "") =>
   String(value)
     .replaceAll("&", "&amp;")
@@ -93,9 +94,10 @@ export default async function handler(req, res) {
 
   let page = "";
   try { page = new URL(String(req.headers.referer || "")).pathname; } catch { page = ""; }
+  const attribution = normalizeAttribution(body.attribution, page);
 
   // Retain every valid submission and add first-time senders as CRM leads.
-  const savedToCrm = await captureLead({name:cleanName,email:cleanEmail,business:String(business_name||''),phone:String(phone||''),services:selectedServices,location:String(location||''),website_url:String(website_url||''),timing:String(timing||''),followup:followupLabel,message:cleanMessage,page}, [...new Set(services || [])]).catch((error)=>{console.error("CRM lead capture failed",error);return false;});
+  const savedToCrm = await captureLead({name:cleanName,email:cleanEmail,business:String(business_name||''),phone:String(phone||''),services:selectedServices,location:String(location||''),website_url:String(website_url||''),timing:String(timing||''),followup:followupLabel,message:cleanMessage,page,attribution}, [...new Set(services || [])]).catch((error)=>{console.error("CRM lead capture failed",error);return false;});
 
   // 1) Store the lead in the Google Sheet first, so it's kept even if email has a problem.
   const savedToSheet = await saveLeadToSheet({

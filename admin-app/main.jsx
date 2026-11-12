@@ -29,6 +29,7 @@ import {
   effectiveJobStatus,
   isActiveJob,
 } from "../lib/crm/domain.js";
+import { funnelRows, funnelCounts } from "../lib/crm/funnel.js";
 import "./style.css";
 let auth;
 const empty = {
@@ -902,6 +903,9 @@ function App() {
     [activity, setActivity] = useState(""),
     [due, setDue] = useState(false),
     [showArchived, setShowArchived] = useState(false),
+    [funnelDays, setFunnelDays] = useState("30"),
+    [funnelLanding, setFunnelLanding] = useState(""),
+    [funnelCampaign, setFunnelCampaign] = useState(""),
     [modal, setModal] = useState(null),
     [message, setMessage] = useState(""),
     [error, setError] = useState(""),
@@ -969,6 +973,14 @@ function App() {
     });
   const visibleContacts = data.contacts.filter((c) => !c.archived_at);
   const visibleInquiries = data.inquiries.filter((i) => !i.archived_at);
+  const funnel = funnelRows(data.inquiries, data.contacts, { days: funnelDays, landing: funnelLanding, campaign: funnelCampaign });
+  const funnelStages = funnelCounts(funnel);
+  const landingOptions = [...new Set(visibleInquiries.map(i => i.attribution?.landing_page || i.page || "Unknown"))].sort();
+  const campaignOptions = [...new Set(visibleInquiries.map(i => i.attribution?.utm_campaign || "").filter(Boolean))].sort();
+  const funnelByLanding = [...new Set(funnel.map(row => row.landing))].map(landing => ({ landing, rows: funnel.filter(row => row.landing === landing) }))
+    .sort((a, b) => b.rows.length - a.rows.length);
+  const funnelByCampaign = [...new Set(funnel.map(row => `${row.source} / ${row.campaign}`))].map(label => ({ label, rows: funnel.filter(row => `${row.source} / ${row.campaign}` === label) }))
+    .sort((a, b) => b.rows.length - a.rows.length);
   const activeJobs = data.jobs.filter((j) => isActiveJob(j));
   const recentSince = Date.now() - 30 * 24 * 60 * 60 * 1000;
   const serviceMix = Object.entries(SERVICES).map(([key, label]) => ({
@@ -1018,6 +1030,7 @@ function App() {
     ["Jobs", BriefcaseBusiness],
     ["Agreements", FileSignature],
     ["Inquiries", Inbox],
+    ["Lead Funnel", SlidersHorizontal],
     ["Templates", ClipboardList],
     ["Settings", Settings2],
   ];
@@ -1109,6 +1122,11 @@ function App() {
       ),
       "colonna-contacts.csv",
     );
+  }
+  function exportFunnel() {
+    const records = [["Name", "Business", "Email", "First landing page", "Form page", "Source", "Campaign", "Service", "Current stage", "Inquiry date"],
+      ...funnel.map(r => [r.name, r.business, r.email, r.landing, r.submitted, r.source, r.campaign, r.service, r.stage, r.created_at])];
+    download(new Blob([records.map(row => row.map(v => escapeCSV(/^[=+@\-\t\r]/.test(String(v ?? "")) ? "'" + v : v)).join(",")).join("\r\n")], { type: "text/csv" }), "colonna-lead-funnel.csv");
   }
   function contactTable(items) {
     return (
@@ -1316,6 +1334,11 @@ function App() {
                   </article>
                 ))}
               </div>
+              <section className="panel analytics-panel">
+                <div className="panel-head"><h2>Lead funnel · last 30 days</h2><button className="text-button" onClick={() => { setFunnelDays("30"); setTab("Lead Funnel"); }}>Explore sources →</button></div>
+                <p className="muted">Unique people who submitted a form. Stages reflect their current CRM status.</p>
+                <div className="funnel-stages">{funnelCounts(funnelRows(data.inquiries, data.contacts, { days: 30 })).map(item => <div key={item.stage}><strong>{item.count}</strong><span>{item.stage === "new" ? "Inquired" : item.stage}</span></div>)}</div>
+              </section>
               <section className="panel analytics-panel">
                 <div className="panel-head"><h2>Active work by service</h2><span className="muted">One job can include multiple services</span></div>
                 {serviceMix.length ? serviceMix.map(({ key, label, count }) => (
@@ -1624,6 +1647,25 @@ function App() {
               </div>
             </section>
           )}
+          {tab === "Lead Funnel" && (
+            <section className="panel analytics-panel">
+              <div className="panel-head"><div><h2>Lead funnel</h2><p className="muted">One person per email in the selected period. Stages show current CRM status, including later updates.</p></div><button className="text-button" onClick={exportFunnel}><Download size={16} /> Export CSV</button></div>
+              <div className="funnel-filters">
+                <Select label="Inquiries received" value={funnelDays} onChange={e => setFunnelDays(e.target.value)} options={[{value:"30",label:"Last 30 days"},{value:"90",label:"Last 90 days"},{value:"all",label:"All time"}]} />
+                <Select label="First landing page" value={funnelLanding} onChange={e => setFunnelLanding(e.target.value)} options={[{value:"",label:"All pages"},...landingOptions.map(value => ({value,label:value}))]} />
+                <Select label="Campaign" value={funnelCampaign} onChange={e => setFunnelCampaign(e.target.value)} options={[{value:"",label:"All campaigns"},...campaignOptions.map(value => ({value,label:value}))]} />
+              </div>
+              <div className="funnel-stages">{funnelStages.map(({stage,count}) => <div key={stage}><strong>{count}</strong><span>{stage === "new" ? "Inquired" : stage}</span></div>)}</div>
+              <p className="muted">These are counts of people who reached each stage or later. Visits and form starts are not included because they are not connected to this CRM.</p>
+              <h3>By first landing page</h3>
+              <div className="table-wrap"><table><thead><tr><th>Page</th><th>Inquiries</th><th>Contacted+</th><th>Qualified+</th><th>Proposals+</th><th>Won</th></tr></thead><tbody>{funnelByLanding.map(({landing,rows}) => <tr key={landing}><td>{landing}</td>{funnelCounts(rows).map(item => <td key={item.stage}>{item.count}</td>)}</tr>)}</tbody></table></div>
+              <h3>By source and campaign</h3>
+              <div className="table-wrap"><table><thead><tr><th>Source / campaign</th><th>Inquiries</th><th>Contacted+</th><th>Qualified+</th><th>Proposals+</th><th>Won</th></tr></thead><tbody>{funnelByCampaign.map(({label,rows}) => <tr key={label}><td>{label}</td>{funnelCounts(rows).map(item => <td key={item.stage}>{item.count}</td>)}</tr>)}</tbody></table></div>
+              {!funnel.length && <p className="muted">No matching inquiries in this period.</p>}
+              <h3>People and campaigns</h3>
+              <div className="table-wrap"><table><thead><tr><th>Lead</th><th>First page</th><th>Form page</th><th>Source / campaign</th><th>Service</th><th>Current stage</th></tr></thead><tbody>{funnel.map(row => <tr key={row.email}><td>{row.name}<br /><small>{row.email}</small></td><td>{row.landing}</td><td>{row.submitted}</td><td>{row.source} / {row.campaign}</td><td>{row.service}</td><td>{row.stage}</td></tr>)}</tbody></table></div>
+            </section>
+          )}
           {tab === "Inquiries" && (
             <section className="panel">
               <div className="panel-head">
@@ -1646,6 +1688,7 @@ function App() {
                       })}
                     </small>
                     <p>{i.services}</p>
+                    <p className="attribution-note">First page: {i.attribution?.landing_page || i.page || "Unknown"} · Form: {i.attribution?.form_page || i.page || "Unknown"} · Source: {i.attribution?.utm_source || "Unspecified"} · Campaign: {i.attribution?.utm_campaign || "Unspecified"}</p>
                     <p className="terms">{i.message}</p>
                   </div>
                   <div className="inquiry-actions"><button

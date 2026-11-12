@@ -1,4 +1,5 @@
 /* Colonna Media: navigation, service selection, and project inquiries. */
+import { formAttribution } from './attribution.js';
 (function(){
 const header=document.querySelector('header');
 if(header){const sync=()=>header.classList.toggle('scrolled',window.scrollY>30);window.addEventListener('scroll',sync,{passive:true});sync();}
@@ -16,7 +17,7 @@ const value=id=>document.getElementById(id)?.value.trim()||'';
 const services=Array.from(form.querySelectorAll('input[name="services"]:checked'),box=>box.value);
 button.disabled=true;button.textContent='Sending…';status.className='form-status';status.textContent='';
 try{
- const response=await fetch('/api/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:value('cf-name'),email:value('cf-email'),business_name:value('cf-business'),phone:value('cf-phone'),location:value('cf-location'),website_url:value('cf-site'),timing:value('cf-timing'),services,message:value('cf-msg'),website:value('cf-website'),followup:((form.querySelector('input[name="followup"]:checked')||{}).value||'')})});
+ const response=await fetch('/api/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:value('cf-name'),email:value('cf-email'),business_name:value('cf-business'),phone:value('cf-phone'),location:value('cf-location'),website_url:value('cf-site'),timing:value('cf-timing'),services,message:value('cf-msg'),website:value('cf-website'),followup:((form.querySelector('input[name="followup"]:checked')||{}).value||''),attribution:formAttribution('service_inquiry')})});
  const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw Error('Submission failed');
  status.className='form-status success';status.textContent='Thanks—your inquiry was sent to Anthony. He will follow up with you directly.';form.reset();button.textContent='Inquiry sent ✓';
  if(typeof window.gtag==='function'){window.gtag('event','generate_lead',{form_id:'service_inquiry',service_count:services.length});window.gtag('config','AW-18441272783');window.gtag('event','conversion',{send_to:'AW-18441272783/LF1DCJqMnbEdEM_7vdlE'});}
