@@ -6,7 +6,7 @@ Built on the existing /link-us page and owner-protected CRM. This is a single-br
 - Admin sidebar: **Link Us**.
 - Editable brand name, logo, cover image, eyebrow, headline, short description, contact button and destination.
 - Light, Colonna blue, and midnight themes.
-- Ordered compact links, image cards and full-width hero boxes. Each supports title, description, button text, destination, optional thumbnail, image shape, fit, focal point, featured badge and visibility.
+- Ordered compact links and image cards. The Featured checkbox pins any number of items to the top as full-width hero boxes. Each group preserves its configured order. Each supports title, description, button text, destination, optional thumbnail, image shape, fit, focal point, featured badge and visibility.
 - Up to 24 blocks and eight social profiles. Instagram, TikTok, YouTube, Threads, Facebook, LinkedIn, and custom labels. No fake account URLs; unused profiles remain hidden.
 - URL preview retrieval: YouTube and TikTok oEmbed; Open Graph/Twitter image metadata for other public pages, including Instagram and Threads where accessible. Retrieval never executes third-party embed HTML. Login walls, rate limits or missing metadata produce a clear manual-image fallback.
 - Optimized image uploads, plus direct image URLs. Public display media is separate from private CRM documents. Uploaded raster images are flattened/re-encoded in the browser; backend checks file signatures, type, size, owner identity, origin and AAL2.

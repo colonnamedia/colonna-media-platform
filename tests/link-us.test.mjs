@@ -377,6 +377,19 @@ test("Link Us editor adds, reorders, fetches previews, edits hero and saves usin
   select.dispatchEvent(new w.Event("change", { bubbles: true }));
   await wait();
   assert(d.querySelector(".links-theme-blue"));
+  assert.equal(d.querySelectorAll('.links-layout-hero').length,1);
+  const featureInputs=()=>[...d.querySelectorAll('.links-edit-card')].map(card=>card.querySelectorAll('input[type="checkbox"]')[1]);
+  featureInputs()[1].click();await wait();
+  assert.equal(d.querySelectorAll('.links-layout-hero').length,2);
+  featureInputs()[0].click();await wait();
+  assert.equal(d.querySelector('.links-cards article h2').textContent,'Photography');
+  for(let i=0;i<6;i++){if(!featureInputs()[i].checked){featureInputs()[i].click();await wait();}}
+  assert.equal(d.querySelectorAll('.links-layout-hero').length,6);
+  assert.equal(d.querySelectorAll('.links-layout-link').length,0);
+  for(let i=0;i<6;i++){featureInputs()[i].click();await wait();}
+  assert.equal(d.querySelectorAll('.links-layout-hero').length,0);
+  assert.equal(d.querySelectorAll('.links-layout-link').length,6);
+
   d.querySelector("form").dispatchEvent(
     new w.Event("submit", { bubbles: true, cancelable: true }),
   );

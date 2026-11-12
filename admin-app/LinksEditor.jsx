@@ -312,11 +312,13 @@ export default function LinksEditor({ load, save, fetchPreview, uploadImage }) {
                     {index + 1}. {item.title}
                   </span>
                   <span className="link-block-status">
-                    {item.layout === "link"
-                      ? "Compact link"
-                      : item.layout === "hero"
-                        ? "Hero box"
-                        : "Image card"}{" "}
+                    {item.featured
+                      ? "Pinned · large featured box"
+                      : item.layout === "link"
+                        ? "Compact link"
+                        : item.layout === "hero"
+                          ? "Hero box"
+                          : "Image card"}{" "}
                     · {item.enabled ? "Visible" : "Hidden"}
                   </span>
                 </summary>
@@ -358,13 +360,12 @@ export default function LinksEditor({ load, save, fetchPreview, uploadImage }) {
                 )}
                 <div className="form-grid">
                   {select(
-                    "Block style",
-                    item.layout,
+                    "Regular card style (when not featured)",
+                    item.layout === "card" ? "card" : "link",
                     (v) => itemPatch(item.id, { layout: v }),
                     [
                       ["link", "Compact link"],
                       ["card", "Image card"],
-                      ["hero", "Hero box · full width"],
                     ],
                   )}
                   {field(
@@ -460,7 +461,7 @@ export default function LinksEditor({ load, save, fetchPreview, uploadImage }) {
                         itemPatch(item.id, { featured: e.target.checked })
                       }
                     />{" "}
-                    Featured badge
+                    Pin as featured · large box at top
                   </label>
                   <button
                     type="button"
@@ -499,8 +500,8 @@ export default function LinksEditor({ load, save, fetchPreview, uploadImage }) {
                         thumbnail: "",
                         alt: "",
                         enabled: false,
-                        featured: false,
-                        layout,
+                        featured: layout === "hero",
+                        layout: layout === "hero" ? "link" : layout,
                         image_fit: "cover",
                         image_position: "center",
                         aspect: "landscape",

@@ -390,3 +390,32 @@
     box-shadow: 0 12px 25px #171c3811;
   }
 }
+.links-compact-image {
+  position: relative;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.links-compact-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: #171c38d9;
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 11px;
+  padding-left: 2px;
+}
+.links-layout-link.is-playing {
+  flex-wrap: wrap;
+}
+.links-layout-link > .links-player {
+  flex-basis: 100%;
+  width: 100%;
+}

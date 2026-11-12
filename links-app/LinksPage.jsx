@@ -45,7 +45,16 @@ function LinkCard({ item }) {
   const url = videoURL(item),
     platform = platformInfo(url),
     embed = embedURL(item);
-  const layout = item.layout || (item.featured ? "hero" : "card");
+  const layout = item.featured
+    ? "hero"
+    : item.layout === "card"
+      ? "card"
+      : "link";
+  const CompactTag = item.playback === "embed" && embed ? "button" : "a";
+  const compactProps =
+    CompactTag === "button"
+      ? { type: "button", onClick: () => setPlaying(true) }
+      : { href: url, ...destination(url) };
   const thumbnail =
     item.thumbnail ||
     (platform.name === "YouTube" && platform.id
@@ -75,9 +84,9 @@ function LinkCard({ item }) {
   );
   return (
     <article
-      className={`links-card links-layout-${layout} links-aspect-${item.aspect || "landscape"}${item.featured ? " links-featured" : ""}`}
+      className={`links-card links-layout-${layout} links-aspect-${item.aspect || "landscape"}${item.featured ? " links-featured" : ""}${playing ? " is-playing" : ""}`}
     >
-      {layout !== "link" &&
+      {(layout !== "link" || playing) &&
         (playing && embed ? (
           <div className="links-player">
             <iframe
@@ -111,10 +120,9 @@ function LinkCard({ item }) {
           </a>
         ))}
       {layout === "link" && thumbnail && (
-        <a
+        <CompactTag
           className="links-compact-image"
-          href={url}
-          {...destination(url)}
+          {...compactProps}
           aria-label={item.title}
         >
           <Picture
@@ -129,7 +137,12 @@ function LinkCard({ item }) {
               objectPosition: item.image_position || "center",
             }}
           />
-        </a>
+          {platform.video && (
+            <span className="links-compact-play" aria-hidden="true">
+              ▶
+            </span>
+          )}
+        </CompactTag>
       )}
       <div className="links-card-body">
         <div className="links-card-meta">
@@ -151,9 +164,13 @@ function LinkCard({ item }) {
   );
 }
 export default function LinksPage({ config = DEFAULT_LINKS, preview = false }) {
-  const items = config.items.filter(
+  const visible = config.items.filter(
     (item) => item.enabled && safePublicURL(videoURL(item)),
   );
+  const items = [
+    ...visible.filter((item) => item.featured),
+    ...visible.filter((item) => !item.featured),
+  ];
   const logo =
     config.logo === "/assets/img/colonna-logo-full.png"
       ? brandLogo
