@@ -55,11 +55,7 @@ function LinkCard({ item }) {
     CompactTag === "button"
       ? { type: "button", onClick: () => setPlaying(true) }
       : { href: url, ...destination(url) };
-  const thumbnail =
-    item.thumbnail ||
-    (platform.name === "YouTube" && platform.id
-      ? `https://i.ytimg.com/vi/${platform.id}/hqdefault.jpg`
-      : "");
+  const thumbnail = item.thumbnail || "";
   const image = (
     <>
       <Picture
@@ -86,7 +82,7 @@ function LinkCard({ item }) {
     <article
       className={`links-card links-layout-${layout} links-aspect-${item.aspect || "landscape"}${item.featured ? " links-featured" : ""}${playing ? " is-playing" : ""}`}
     >
-      {(layout !== "link" || playing) &&
+      {((layout !== "link" && thumbnail) || playing) &&
         (playing && embed ? (
           <div className="links-player">
             <iframe

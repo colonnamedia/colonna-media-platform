@@ -342,7 +342,7 @@ test("Link Us owner API stores rich blocks, preserves old config, uploads only i
 test("Link Us editor adds, reorders, fetches previews, edits hero and saves using the actual components", async () => {
   const result = await build({
     stdin: {
-      contents: `import React from 'react';import {createRoot} from 'react-dom/client';import LinksEditor from './admin-app/LinksEditor.jsx';import {DEFAULT_LINKS} from './lib/site/links-content.js';createRoot(document.getElementById('root')).render(<LinksEditor load={async()=>({config:DEFAULT_LINKS,version:0})} save={async value=>{window.saved=value;return {...value,version:1}}} fetchPreview={async url=>({title:'Auto fetched title',thumbnail:'/assets/img/marketing-photography-cafe.webp',notice:'Preview found'})}/>);`,
+      contents: `import React from 'react';import {createRoot} from 'react-dom/client';import LinksEditor from './admin-app/LinksEditor.jsx';import {DEFAULT_LINKS} from './lib/site/links-content.js';createRoot(document.getElementById('root')).render(<LinksEditor load={async()=>window.persisted||({config:DEFAULT_LINKS,version:0})} save={async value=>{window.saved=value;window.persisted={...value,version:1};return window.persisted}} uploadImage={async value=>{window.uploaded=value;return {url:"/owner-photo.webp"}}} fetchPreview={async url=>({title:'Auto fetched title',thumbnail:'/assets/img/marketing-photography-cafe.webp',notice:'Preview found'})}/>);`,
       resolveDir: process.cwd(),
       loader: "jsx",
     },
@@ -372,23 +372,107 @@ test("Link Us editor adds, reorders, fetches previews, edits hero and saves usin
   first.querySelector(".link-fetch-row button").click();
   await wait();
   assert(first.textContent.includes("Auto fetched title"));
+  assert(DEFAULT_LINKS.items.every((item) => item.thumbnail === ""));
+  assert.equal(
+    d.querySelectorAll(".links-cards img").length,
+    0,
+    "fetch does not silently insert an image",
+  );
+  button("Use fetched image").click();
+  await wait();
+  assert.equal(
+    d.querySelectorAll(".links-cards img").length,
+    1,
+    "explicitly chosen fetched image is shown",
+  );
+  const bytes = await fs.readFile("assets/img/marketing-photography-cafe.webp");
+  w.URL.createObjectURL = () => "blob:chosen-photo";
+  w.URL.revokeObjectURL = () => {};
+  w.Image = class {
+    width = 100;
+    height = 100;
+    set src(value) {
+      queueMicrotask(() => this.onload());
+    }
+  };
+  w.HTMLCanvasElement.prototype.getContext = () => ({
+    fillRect() {},
+    drawImage() {},
+  });
+  w.HTMLCanvasElement.prototype.toDataURL = () =>
+    "data:image/webp;base64," + bytes.toString("base64");
+  const photoInput = first.querySelector('input[type="file"]');
+  Object.defineProperty(photoInput, "files", {
+    configurable: true,
+    value: [new w.File([bytes], "my-photo.webp", { type: "image/webp" })],
+  });
+  photoInput.dispatchEvent(new w.Event("change", { bubbles: true }));
+  await wait();
+  await wait();
+  assert.equal(w.uploaded.mime, "image/webp");
+  assert.equal(
+    d.querySelector(".links-cards img").getAttribute("src"),
+    "/owner-photo.webp",
+    "upload replaces fetched thumbnail",
+  );
+  first.querySelector(".link-fetch-row button").click();
+  await wait();
+  assert.equal(
+    d.querySelector(".links-cards img").getAttribute("src"),
+    "/owner-photo.webp",
+    "refetch preserves chosen photo",
+  );
+  for (let retry = 0; first.closest("fieldset").disabled && retry < 40; retry++)
+    await wait();
+  assert.equal(first.closest("fieldset").disabled, false);
+  first.querySelector('button[aria-label="Remove Featured image"]').click();
+  await wait();
+  assert.equal(
+    d.querySelectorAll(".links-cards img").length,
+    0,
+    "remove stays blank",
+  );
+  first.querySelector(".link-fetch-row button").click();
+  await wait();
+  assert.equal(
+    d.querySelectorAll(".links-cards img").length,
+    0,
+    "refetch preserves blank",
+  );
+
   const select = d.querySelector("select");
   select.value = "blue";
   select.dispatchEvent(new w.Event("change", { bubbles: true }));
   await wait();
   assert(d.querySelector(".links-theme-blue"));
-  assert.equal(d.querySelectorAll('.links-layout-hero').length,1);
-  const featureInputs=()=>[...d.querySelectorAll('.links-edit-card')].map(card=>card.querySelectorAll('input[type="checkbox"]')[1]);
-  featureInputs()[1].click();await wait();
-  assert.equal(d.querySelectorAll('.links-layout-hero').length,2);
-  featureInputs()[0].click();await wait();
-  assert.equal(d.querySelector('.links-cards article h2').textContent,'Photography');
-  for(let i=0;i<6;i++){if(!featureInputs()[i].checked){featureInputs()[i].click();await wait();}}
-  assert.equal(d.querySelectorAll('.links-layout-hero').length,6);
-  assert.equal(d.querySelectorAll('.links-layout-link').length,0);
-  for(let i=0;i<6;i++){featureInputs()[i].click();await wait();}
-  assert.equal(d.querySelectorAll('.links-layout-hero').length,0);
-  assert.equal(d.querySelectorAll('.links-layout-link').length,6);
+  assert.equal(d.querySelectorAll(".links-layout-hero").length, 1);
+  const featureInputs = () =>
+    [...d.querySelectorAll(".links-edit-card")].map(
+      (card) => card.querySelectorAll('input[type="checkbox"]')[1],
+    );
+  featureInputs()[1].click();
+  await wait();
+  assert.equal(d.querySelectorAll(".links-layout-hero").length, 2);
+  featureInputs()[0].click();
+  await wait();
+  assert.equal(
+    d.querySelector(".links-cards article h2").textContent,
+    "Photography",
+  );
+  for (let i = 0; i < 6; i++) {
+    if (!featureInputs()[i].checked) {
+      featureInputs()[i].click();
+      await wait();
+    }
+  }
+  assert.equal(d.querySelectorAll(".links-layout-hero").length, 6);
+  assert.equal(d.querySelectorAll(".links-layout-link").length, 0);
+  for (let i = 0; i < 6; i++) {
+    featureInputs()[i].click();
+    await wait();
+  }
+  assert.equal(d.querySelectorAll(".links-layout-hero").length, 0);
+  assert.equal(d.querySelectorAll(".links-layout-link").length, 6);
 
   d.querySelector("form").dispatchEvent(
     new w.Event("submit", { bubbles: true, cancelable: true }),
@@ -400,5 +484,13 @@ test("Link Us editor adds, reorders, fetches previews, edits hero and saves usin
   assert.equal(w.saved.config.theme, "blue");
   assert.equal(w.saved.config.items[0].title, "Auto fetched title");
   assert(!d.querySelector("iframe"));
+  assert.equal(w.saved.config.items[0].thumbnail, "");
+  button("Reload saved content").click();
+  await wait();
+  assert.equal(
+    d.querySelectorAll(".links-cards img").length,
+    0,
+    "cleared image remains blank after save and reload",
+  );
   dom.window.close();
 });

@@ -5,7 +5,69 @@ import {
   embedURL,
 } from "../lib/site/links-content.js";
 import { linksSchema } from "../lib/site/links-schema.js";
-import LinksPage from "../links-app/LinksPage.jsx";
+import LinksPage, { PreviewImageContext } from "../links-app/LinksPage.jsx";
+
+function ImagePicker({ label, value, onChange, onUpload, disabled }) {
+  const images = React.useContext(PreviewImageContext);
+  return (
+    <section className="social-image-picker" aria-label={label}>
+      <div className="social-image-preview">
+        {value ? (
+          <img
+            key={value}
+            src={images[value] || value}
+            alt={label + " selected image"}
+            referrerPolicy="no-referrer"
+          />
+        ) : (
+          <span>No image selected</span>
+        )}
+      </div>
+      <div className="social-image-controls">
+        <strong>{label}</strong>
+        <p className="muted">
+          Choose your own image. A blank image stays blank.
+        </p>
+        <div className="actions">
+          <label
+            className={
+              "social-upload-button" + (disabled ? " is-disabled" : "")
+            }
+          >
+            <span>{value ? "Replace photo" : "Upload photo"}</span>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              disabled={disabled}
+              onChange={(e) => {
+                onUpload(e.target.files[0]);
+                e.target.value = "";
+              }}
+              aria-label={"Upload " + label}
+            />
+          </label>
+          {value && (
+            <button
+              type="button"
+              onClick={() => onChange("")}
+              aria-label={"Remove " + label}
+            >
+              Remove image
+            </button>
+          )}
+        </div>
+        <label className="field">
+          <span>{label} URL (optional)</span>
+          <input
+            value={value || ""}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="Upload above, or paste an image URL"
+          />
+        </label>
+      </div>
+    </section>
+  );
+}
 
 async function imagePayload(file) {
   if (
@@ -39,6 +101,7 @@ async function imagePayload(file) {
   }
 }
 export default function LinksEditor({ load, save, fetchPreview, uploadImage }) {
+  const [previewCandidates, setPreviewCandidates] = useState({});
   const [config, setConfig] = useState(null),
     [version, setVersion] = useState(0),
     [error, setError] = useState(""),
@@ -136,15 +199,21 @@ export default function LinksEditor({ load, save, fetchPreview, uploadImage }) {
                 ...i,
                 title: result.title || i.title,
                 description: result.description || i.description,
-                thumbnail: result.thumbnail || i.thumbnail,
-                alt: result.title || i.alt,
                 youtube_id: "",
               }
             : i,
         ),
       }));
+      setPreviewCandidates((c) => ({
+        ...c,
+        [item.id]: { ...result, destination: item.url },
+      }));
       setDirty(true);
-      setNotice(result.notice);
+      setNotice(
+        result.thumbnail
+          ? "Link preview fetched. Your image was kept. Choose ‘Use fetched image’ only if you want to replace it."
+          : result.notice,
+      );
     } catch (e) {
       setError(e.message);
     } finally {
@@ -188,20 +257,6 @@ export default function LinksEditor({ load, save, fetchPreview, uploadImage }) {
       </select>
     </label>
   );
-  const uploadField = (label, key, id) => (
-    <label className="field link-upload">
-      <span>{label}</span>
-      <input
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        disabled={!uploadImage || !!pending}
-        onChange={(e) => {
-          upload(e.target.files[0], key, id);
-          e.target.value = "";
-        }}
-      />
-    </label>
-  );
   if (!config)
     return (
       <section className="panel">
@@ -215,7 +270,7 @@ export default function LinksEditor({ load, save, fetchPreview, uploadImage }) {
         <div className="panel-head">
           <div>
             <span className="links-admin-kicker">Your mini website</span>
-            <h2>Link Us</h2>
+            <h2>Social links</h2>
             <p className="muted">
               Build /link-us with your brand, featured content, and social
               profiles.
@@ -260,14 +315,6 @@ export default function LinksEditor({ load, save, fetchPreview, uploadImage }) {
                   ["blue", "Colonna blue"],
                   ["dark", "Midnight"],
                 ])}
-                {field("Logo image URL (optional)", config.logo, (v) =>
-                  set("logo", v),
-                )}
-                {uploadField("Upload logo", "logo")}
-                {field("Hero image URL (optional)", config.hero_image, (v) =>
-                  set("hero_image", v),
-                )}
-                {uploadField("Upload hero image", "hero_image")}
                 {field(
                   "Hero image description",
                   config.hero_alt,
@@ -287,6 +334,20 @@ export default function LinksEditor({ load, save, fetchPreview, uploadImage }) {
                   { required: true },
                 )}
               </div>
+              <ImagePicker
+                label="Logo"
+                value={config.logo}
+                onChange={(v) => set("logo", v)}
+                onUpload={(file) => upload(file, "logo")}
+                disabled={!uploadImage || !!pending}
+              />
+              <ImagePicker
+                label="Page hero image"
+                value={config.hero_image}
+                onChange={(v) => set("hero_image", v)}
+                onUpload={(file) => upload(file, "hero_image")}
+                disabled={!uploadImage || !!pending}
+              />
               <p className="muted">
                 Clear an image URL to hide it. Uploads are optimized for the web
                 and become public display images.
@@ -297,9 +358,10 @@ export default function LinksEditor({ load, save, fetchPreview, uploadImage }) {
               <span>{config.items.length}/24 blocks</span>
             </div>
             <p className="muted">
-              Paste a page, YouTube, TikTok, Instagram, or Threads link and
-              fetch its preview. You can always replace the image or text.
-              Private or restricted posts may not supply a preview.
+              Upload your own photos for thumbnails and featured boxes. Fetching
+              a link preview keeps your image unchanged; you decide whether to
+              use the fetched image. Check “Pin as featured” for a large
+              promotion at the top.
             </p>
             {config.items.map((item, index) => (
               <details
@@ -358,6 +420,40 @@ export default function LinksEditor({ load, save, fetchPreview, uploadImage }) {
                     destination URL to replace it.
                   </p>
                 )}
+                <ImagePicker
+                  label={item.featured ? "Featured image" : "Thumbnail"}
+                  value={item.thumbnail}
+                  onChange={(v) => itemPatch(item.id, { thumbnail: v })}
+                  onUpload={(file) => upload(file, "thumbnail", item.id)}
+                  disabled={!uploadImage || !!pending}
+                />
+                {previewCandidates[item.id]?.destination === item.url &&
+                  previewCandidates[item.id]?.thumbnail && (
+                    <div className="social-preview-choice">
+                      <img
+                        src={previewCandidates[item.id].thumbnail}
+                        alt="Fetched link preview candidate"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div>
+                        <p>
+                          Optional image from this link. It will only replace
+                          your photo if you choose it.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            itemPatch(item.id, {
+                              thumbnail: previewCandidates[item.id].thumbnail,
+                              alt: previewCandidates[item.id].title || item.alt,
+                            })
+                          }
+                        >
+                          Use fetched image
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 <div className="form-grid">
                   {select(
                     "Regular card style (when not featured)",
@@ -386,10 +482,6 @@ export default function LinksEditor({ load, save, fetchPreview, uploadImage }) {
                     (v) => itemPatch(item.id, { label: v }),
                     { maxLength: 80, required: true },
                   )}
-                  {field("Thumbnail URL (optional)", item.thumbnail, (v) =>
-                    itemPatch(item.id, { thumbnail: v }),
-                  )}
-                  {uploadField("Upload thumbnail", "thumbnail", item.id)}
                   {field(
                     "Image description",
                     item.alt,

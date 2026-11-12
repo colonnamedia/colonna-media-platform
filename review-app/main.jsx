@@ -90,7 +90,10 @@ function Review() {
   );
   const [tab, setTab] = useState("Links page"),
     [content, setContent] = useState(() =>
-      read("cm-links-review", { config: DEFAULT_LINKS, version: 0 }),
+      read("cm-links-review-owner-images-v2", {
+        config: DEFAULT_LINKS,
+        version: 0,
+      }),
     ),
     [inquiries, setInquiries] = useState(() =>
       read("cm-inquiries-review", seed),
@@ -100,7 +103,10 @@ function Review() {
     const saved = { config, version: content.version + 1 };
     setContent(saved);
     try {
-      localStorage.setItem("cm-links-review", JSON.stringify(saved));
+      localStorage.setItem(
+        "cm-links-review-owner-images-v2",
+        JSON.stringify(saved),
+      );
     } catch {}
     return saved;
   };
@@ -134,7 +140,7 @@ function Review() {
             </p>
           </div>
           <nav aria-label="Review sections">
-            {["Links page", "Link Us editor", "Lead reporting", "Coverage"].map(
+            {["Links page", "Social links editor", "Lead reporting", "Coverage"].map(
               (name) => (
                 <button
                   key={name}
@@ -148,9 +154,9 @@ function Review() {
           </nav>
         </header>
         {tab === "Links page" && <LinksPage config={content.config} preview />}
-        {tab === "Link Us editor" && (
+        {tab === "Social links editor" && (
           <main className="review-dashboard">
-            <h1>Link Us content studio</h1>
+            <h1>Social links content studio</h1>
             <p className="muted">
               These are the controls integrated into the protected dashboard.
               Changes here affect sample content in this preview.
@@ -160,7 +166,7 @@ function Review() {
               save={save}
               fetchPreview={async () => ({
                 title: "Example preview title",
-                thumbnail: DEFAULT_LINKS.items[1].thumbnail,
+                thumbnail: "/assets/img/marketing-photography-cafe.webp",
                 notice:
                   "Offline example only. The protected admin fetches the actual URL’s available preview.",
               })}

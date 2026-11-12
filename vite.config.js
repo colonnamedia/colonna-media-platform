@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { dirname, resolve } from "node:path";
 import { readFileSync } from "node:fs";
-import { DEFAULT_LINKS } from "./lib/site/links-content.js";
+import { LINKS_IMAGE_ASSETS } from "./lib/site/links-content.js";
 import { fileURLToPath } from "node:url";
 
 const rootDir = dirname(fileURLToPath(import.meta.url));
@@ -22,11 +22,11 @@ export default defineConfig({
     {
       name: "stable-links-thumbnails",
       generateBundle() {
-        for (const item of DEFAULT_LINKS.items) {
+        for (const thumbnail of LINKS_IMAGE_ASSETS) {
           this.emitFile({
             type: "asset",
-            fileName: item.thumbnail.slice(1),
-            source: readFileSync(resolve(rootDir, "." + item.thumbnail)),
+            fileName: thumbnail.slice(1),
+            source: readFileSync(resolve(rootDir, "." + thumbnail)),
           });
         }
       },
