@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 20424)
-Total output lines: 2536
-
 import React, { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import { createClient } from "@supabase/supabase-js";
@@ -1375,7 +1372,58 @@ function App() {
                       : tab === "Agreements"
                         ? "Clear terms. Specific scope. A preserved signed record."
                         : tab === "Templates"
-                          ? "Reusable wo…424 tokens truncated…key={label}>
+                          ? "Reusable wording for your master agreement and selected services."
+                          : "Your private Colonna Media workspace."}
+              </p>
+            </div>
+            <div className="actions">
+              {tab === "Contacts" && (
+                <button onClick={exportContacts}>
+                  <Download size={16} />
+                  Export filtered
+                </button>
+              )}
+              {![
+                "Settings",
+                "Templates",
+                "Lead reporting",
+                "Social links",
+              ].includes(tab) && (
+                <button
+                  className="primary"
+                  onClick={() =>
+                    setModal({
+                      type:
+                        tab === "Jobs"
+                          ? "job"
+                          : tab === "Agreements"
+                            ? "agreement"
+                            : "contact",
+                    })
+                  }
+                >
+                  <Plus size={18} />
+                  {tab === "Jobs"
+                    ? "New job"
+                    : tab === "Agreements"
+                      ? "New agreement"
+                      : "Add contact"}
+                </button>
+              )}
+            </div>
+          </div>
+          <Banner>{message}</Banner>
+          {error && (
+            <div className="error" role="alert">
+              {error}
+            </div>
+          )}
+          {busy && <p role="status">Saving…</p>}
+          {tab === "Overview" && (
+            <>
+              <div className="stats">
+                {stats.map(([label, value, desc], i) => (
+                  <article key={label}>
                     <span className={"stat-icon s" + i}>
                       {i === 0 ? (
                         <Users />
