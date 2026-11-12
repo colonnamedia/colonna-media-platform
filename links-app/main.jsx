@@ -13,6 +13,18 @@ function PublicLinks() {
       })
       .catch(() => {});
   }, []);
+  useEffect(() => {
+    document.title = `${config.title} | ${config.brand_name || "Colonna Media"}`;
+    for (const selector of [
+      'meta[name="description"]',
+      'meta[property="og:description"]',
+    ]) {
+      document.querySelector(selector)?.setAttribute("content", config.intro);
+    }
+    document
+      .querySelector('meta[property="og:title"]')
+      ?.setAttribute("content", document.title);
+  }, [config.title, config.brand_name, config.intro]);
   return <LinksPage config={config} />;
 }
 createRoot(document.getElementById("root")).render(<PublicLinks />);

@@ -21,6 +21,8 @@ import {
 } from "../lib/crm/server.js";
 import { linksSchema } from "../lib/site/links-schema.js";
 import { DEFAULT_LINKS } from "../lib/site/links-content.js";
+import { getLinkPreview, previewURL } from "../lib/site/link-preview.js";
+import { decodeLinkImage } from "../lib/site/link-media.js";
 import { z } from "zod";
 export default async function handler(req, res) {
   headers(res);
@@ -81,7 +83,10 @@ export default async function handler(req, res) {
       );
       return res
         .status(200)
-        .json(record || { config: DEFAULT_LINKS, version: 0 });
+        .json({
+          config: linksSchema.parse(record?.config || DEFAULT_LINKS),
+          version: record?.version || 0,
+        });
     }
     if (action === "events" && req.method === "GET") {
       const id = z.string().uuid().parse(req.query.id);
@@ -131,17 +136,15 @@ export default async function handler(req, res) {
           stage: z.enum(["new", "contacted", "qualified", "proposal", "won"]),
         })
         .parse(input);
-      return res
-        .status(200)
-        .json(
-          check(
-            await client.rpc("crm_set_inquiry_stage", {
-              inquiry_id: id,
-              next_stage: stage,
-              owner_id: actor.id,
-            }),
-          ),
-        );
+      return res.status(200).json(
+        check(
+          await client.rpc("crm_set_inquiry_stage", {
+            inquiry_id: id,
+            next_stage: stage,
+            owner_id: actor.id,
+          }),
+        ),
+      );
     }
     if (action === "links-save") {
       const config = linksSchema.parse(input.config);
@@ -156,6 +159,37 @@ export default async function handler(req, res) {
           .status(409)
           .json({ error: "Content changed. Reload before saving." });
       return res.status(200).json(check(result));
+    }
+    if (action === "links-preview") {
+      const url = z.string().trim().max(2048).parse(input.url);
+      try {
+        previewURL(url);
+      } catch (e) {
+        return res.status(400).json({ error: e.message });
+      }
+      return res.status(200).json(await getLinkPreview(url));
+    }
+    if (action === "links-image") {
+      const image = decodeLinkImage(input);
+      const bucket = client.storage.from("crm-link-media");
+      const uploaded = await bucket.upload(image.path, image.bytes, {
+        contentType: image.mime,
+        cacheControl: "31536000",
+        upsert: false,
+      });
+      if (uploaded.error)
+        return res
+          .status(503)
+          .json({
+            error:
+              "Image upload is unavailable. Try again or use an image URL.",
+          });
+      await audit(client, "links", actor.id, "image_uploaded", actor.id, {
+        path: image.path,
+      });
+      return res
+        .status(200)
+        .json({ url: bucket.getPublicUrl(image.path).data.publicUrl });
     }
     if (action === "archive") {
       const { entity, id, archived } = z

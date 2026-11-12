@@ -1102,7 +1102,7 @@ function App() {
     ["Agreements", FileSignature],
     ["Inquiries", Inbox],
     ["Lead reporting", SlidersHorizontal],
-    ["Social links", ArrowUpRight],
+    ["Link Us", ArrowUpRight],
     ["Templates", ClipboardList],
     ["Settings", Settings2],
   ];
@@ -1383,12 +1383,9 @@ function App() {
                   Export filtered
                 </button>
               )}
-              {![
-                "Settings",
-                "Templates",
-                "Lead reporting",
-                "Social links",
-              ].includes(tab) && (
+              {!["Settings", "Templates", "Lead reporting", "Link Us"].includes(
+                tab,
+              ) && (
                 <button
                   className="primary"
                   onClick={() =>
@@ -1787,10 +1784,12 @@ function App() {
               }
             />
           )}
-          {tab === "Social links" && (
+          {tab === "Link Us" && (
             <LinksEditor
               load={() => request("links")}
               save={(value) => request("links-save", value)}
+              fetchPreview={(url) => request("links-preview", { url })}
+              uploadImage={(value) => request("links-image", value)}
             />
           )}
           {tab === "Inquiries" && (

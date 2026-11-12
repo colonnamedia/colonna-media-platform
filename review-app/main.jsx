@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import AttributionReport from "../admin-app/Attribution.jsx";
 import LinksEditor from "../admin-app/LinksEditor.jsx";
-import LinksPage from "../links-app/LinksPage.jsx";
+import LinksPage, { PreviewImageContext } from "../links-app/LinksPage.jsx";
 import { DEFAULT_LINKS } from "../lib/site/links-content.js";
 import { linksSchema } from "../lib/site/links-schema.js";
 import "../admin-app/style.css";
@@ -85,6 +85,9 @@ function read(key, fallback) {
   }
 }
 function Review() {
+  const [previewImages, setPreviewImages] = useState(
+    () => window.__previewImages || {},
+  );
   const [tab, setTab] = useState("Links page"),
     [content, setContent] = useState(() =>
       read("cm-links-review", { config: DEFAULT_LINKS, version: 0 }),
@@ -120,134 +123,150 @@ function Review() {
     } catch {}
   };
   return (
-    <div className="review-app">
-      <header className="review-toolbar">
-        <div>
-          <strong>Colonna Media · Review preview</strong>
-          <p>
-            Sample data and browser-only edits · production is unchanged · email
-            delivery disabled
-          </p>
-        </div>
-        <nav aria-label="Review sections">
-          {[
-            "Links page",
-            "Dashboard controls",
-            "Lead reporting",
-            "Coverage",
-          ].map((name) => (
-            <button
-              key={name}
-              className={name === tab ? "primary" : ""}
-              onClick={() => setTab(name)}
-            >
-              {name}
-            </button>
-          ))}
-        </nav>
-      </header>
-      {tab === "Links page" && <LinksPage config={content.config} preview />}
-      {tab === "Dashboard controls" && (
-        <main className="review-dashboard">
-          <h1>Social links editor</h1>
-          <p className="muted">
-            These are the controls integrated into the protected dashboard.
-            Changes here affect sample content in this preview.
-          </p>
-          <LinksEditor load={async () => content} save={save} />
-        </main>
-      )}
-      {tab === "Lead reporting" && (
-        <main className="review-dashboard">
-          <AttributionReport inquiries={inquiries} onStage={stage} />
-        </main>
-      )}
-      {tab === "Coverage" && (
-        <main className="review-dashboard">
-          <section className="panel">
-            <h1>Pages &amp; inquiry forms covered</h1>
-            <table>
-              <thead>
-                <tr>
-                  <th>Page</th>
-                  <th>Form</th>
-                  <th>Role</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  [
-                    "/contact",
-                    "contact-inquiry",
-                    "Main inquiry form · multiple services",
-                  ],
-                  [
-                    "/start",
-                    "start-inquiry",
-                    "Landing page inquiry form · multiple services",
-                  ],
-                  [
-                    "/web-design-ads",
-                    "web-design-inquiry",
-                    "Website advertising landing page",
-                  ],
-                  [
-                    "/google-ads-management",
-                    "google-ads-inquiry",
-                    "Google Ads advertising landing page",
-                  ],
-                  [
-                    "/photography",
-                    "photography-inquiry",
-                    "Portfolio/service page with direct inquiry form",
-                  ],
-                  [
-                    "/photography-ads",
-                    "Redirect only",
-                    "Permanent redirect to /photography",
-                  ],
-                  [
-                    "/google-meta-ads-pittsburgh",
-                    "Links to /contact",
-                    "Service guide · selected service travels in the link",
-                  ],
-                  [
-                    "/social-media-management-pittsburgh",
-                    "Links to /contact",
-                    "Service guide · social-media selection",
-                  ],
-                  [
-                    "Other public service pages",
-                    "Links to /contact or /start",
-                    "Attribution retained during navigation",
-                  ],
-                  [
-                    "/links",
-                    "No inquiry form",
-                    "Editable service and social link cards",
-                  ],
-                ].map((row) => (
-                  <tr key={row[0]}>
-                    {row.map((value, i) => (
-                      <td key={i}>{value}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+    <PreviewImageContext.Provider value={previewImages}>
+      <div className="review-app">
+        <header className="review-toolbar">
+          <div>
+            <strong>Colonna Media · Review preview</strong>
+            <p>
+              Sample data and browser-only edits · Link Us expansion is
+              unpublished · email delivery disabled
+            </p>
+          </div>
+          <nav aria-label="Review sections">
+            {["Links page", "Link Us editor", "Lead reporting", "Coverage"].map(
+              (name) => (
+                <button
+                  key={name}
+                  className={name === tab ? "primary" : ""}
+                  onClick={() => setTab(name)}
+                >
+                  {name}
+                </button>
+              ),
+            )}
+          </nav>
+        </header>
+        {tab === "Links page" && <LinksPage config={content.config} preview />}
+        {tab === "Link Us editor" && (
+          <main className="review-dashboard">
+            <h1>Link Us content studio</h1>
             <p className="muted">
-              The legacy React contact component is instrumented for
-              compatibility, but the live Vercel /contact route uses the main
-              HTML form.
+              These are the controls integrated into the protected dashboard.
+              Changes here affect sample content in this preview.
             </p>
-            <p className="notice">
-              No visit-to-lead rates. Visit data is not connected. Production
-              migration and deployment await your review.
-            </p>
-          </section>
-        </main>
-      )}
-    </div>
+            <LinksEditor
+              load={async () => content}
+              save={save}
+              fetchPreview={async () => ({
+                title: "Example preview title",
+                thumbnail: DEFAULT_LINKS.items[1].thumbnail,
+                notice:
+                  "Offline example only. The protected admin fetches the actual URL’s available preview.",
+              })}
+              uploadImage={async ({ mime, data }) => {
+                const url = "/review-upload/" + crypto.randomUUID();
+                setPreviewImages((images) => ({
+                  ...images,
+                  [url]: `data:${mime};base64,${data}`,
+                }));
+                return { url };
+              }}
+            />
+          </main>
+        )}
+        {tab === "Lead reporting" && (
+          <main className="review-dashboard">
+            <AttributionReport inquiries={inquiries} onStage={stage} />
+          </main>
+        )}
+        {tab === "Coverage" && (
+          <main className="review-dashboard">
+            <section className="panel">
+              <h1>Pages &amp; inquiry forms covered</h1>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Page</th>
+                    <th>Form</th>
+                    <th>Role</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    [
+                      "/contact",
+                      "contact-inquiry",
+                      "Main inquiry form · multiple services",
+                    ],
+                    [
+                      "/start",
+                      "start-inquiry",
+                      "Landing page inquiry form · multiple services",
+                    ],
+                    [
+                      "/web-design-ads",
+                      "web-design-inquiry",
+                      "Website advertising landing page",
+                    ],
+                    [
+                      "/google-ads-management",
+                      "google-ads-inquiry",
+                      "Google Ads advertising landing page",
+                    ],
+                    [
+                      "/photography",
+                      "photography-inquiry",
+                      "Portfolio/service page with direct inquiry form",
+                    ],
+                    [
+                      "/photography-ads",
+                      "Redirect only",
+                      "Permanent redirect to /photography",
+                    ],
+                    [
+                      "/google-meta-ads-pittsburgh",
+                      "Links to /contact",
+                      "Service guide · selected service travels in the link",
+                    ],
+                    [
+                      "/social-media-management-pittsburgh",
+                      "Links to /contact",
+                      "Service guide · social-media selection",
+                    ],
+                    [
+                      "Other public service pages",
+                      "Links to /contact or /start",
+                      "Attribution retained during navigation",
+                    ],
+                    [
+                      "/links",
+                      "No inquiry form",
+                      "Editable service and social link cards",
+                    ],
+                  ].map((row) => (
+                    <tr key={row[0]}>
+                      {row.map((value, i) => (
+                        <td key={i}>{value}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="muted">
+                The legacy React contact component is instrumented for
+                compatibility, but the live Vercel /contact route uses the main
+                HTML form.
+              </p>
+              <p className="notice">
+                No visit-to-lead rates. Visit data is not connected. Production
+                migration and deployment await your review.
+              </p>
+            </section>
+          </main>
+        )}
+      </div>
+    </PreviewImageContext.Provider>
   );
 }
 createRoot(document.getElementById("root")).render(<Review />);

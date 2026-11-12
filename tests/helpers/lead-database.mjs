@@ -21,7 +21,7 @@ export const TOKEN = (aal) =>
 export async function leadDatabase() {
   const database = new PGlite();
   await database.exec(
-    "create role anon; create role authenticated; create role service_role; create schema extensions; create schema storage; create table storage.buckets(id text,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);",
+    "create role anon; create role authenticated; create role service_role; create schema extensions; create schema storage; create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);",
   );
   let schema = await fs.readFile(
     new URL("../../database/crm-schema.sql", import.meta.url),
@@ -45,7 +45,7 @@ export async function leadDatabase() {
     ),
   );
   await database.exec("grant usage on schema public to service_role;");
-  const state = { externalRequests: [], failDatabase: false };
+  const state = { externalRequests: [], failDatabase: false, uploads: [] };
   const reply = (body, status = 200) =>
     new Response(JSON.stringify(body), {
       status,
@@ -74,6 +74,16 @@ export async function leadDatabase() {
         aud: "authenticated",
         role: "authenticated",
         factors: [],
+      });
+    }
+    if (
+      target.pathname.startsWith("/storage/v1/object/crm-link-media/links/") &&
+      options.method === "POST"
+    ) {
+      state.uploads.push(target.pathname);
+      return reply({
+        Key: target.pathname.split("/storage/v1/object/")[1],
+        Id: randomUUID(),
       });
     }
     if (state.failDatabase)

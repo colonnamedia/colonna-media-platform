@@ -1,20 +1,60 @@
 import React, { useState, useEffect } from "react";
-import { DEFAULT_LINKS } from "../lib/site/links-content.js";
+import {
+  DEFAULT_LINKS,
+  platformInfo,
+  embedURL,
+} from "../lib/site/links-content.js";
 import { linksSchema } from "../lib/site/links-schema.js";
 import LinksPage from "../links-app/LinksPage.jsx";
-export default function LinksEditor({ load, save }) {
+
+async function imagePayload(file) {
+  if (
+    !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
+    file.size > 12 * 1024 * 1024
+  )
+    throw new Error("Choose a JPEG, PNG, or WebP image under 12 MB.");
+  const src = URL.createObjectURL(file);
+  try {
+    const image = await new Promise((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = () => reject(new Error("This image could not be opened."));
+      i.src = src;
+    });
+    const scale = Math.min(1, 1600 / Math.max(image.width, image.height)),
+      canvas = document.createElement("canvas");
+    canvas.width = Math.round(image.width * scale);
+    canvas.height = Math.round(image.height * scale);
+    const context = canvas.getContext("2d");
+    context.fillStyle = "#fff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    // Flatten and re-encode public display images; no original EXIF is uploaded.
+    const data = canvas.toDataURL("image/webp", 0.86).split(",")[1];
+    if (data.length > 2800000)
+      throw new Error("Please choose a smaller image.");
+    return { mime: "image/webp", data };
+  } finally {
+    URL.revokeObjectURL(src);
+  }
+}
+export default function LinksEditor({ load, save, fetchPreview, uploadImage }) {
   const [config, setConfig] = useState(null),
     [version, setVersion] = useState(0),
     [error, setError] = useState(""),
     [notice, setNotice] = useState(""),
     [busy, setBusy] = useState(false),
-    [preview, setPreview] = useState(false);
+    [preview, setPreview] = useState(true),
+    [dirty, setDirty] = useState(false),
+    [pending, setPending] = useState(""),
+    [socialType, setSocialType] = useState("Threads");
   async function reload() {
     setError("");
     try {
       const data = await load();
-      setConfig(data.config);
+      setConfig(linksSchema.parse(data.config));
       setVersion(data.version);
+      setDirty(false);
     } catch (e) {
       setError(e.message);
     }
@@ -22,30 +62,37 @@ export default function LinksEditor({ load, save }) {
   useEffect(() => {
     reload();
   }, []);
-  if (!config)
-    return (
-      <section className="panel">
-        <p>{error || "Loading your links page…"}</p>
-        <button onClick={reload}>Reload</button>
-      </section>
-    );
-  const set = (key, value) => {
-    setConfig({ ...config, [key]: value });
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
+  function update(fn) {
+    setConfig((current) => (typeof fn === "function" ? fn(current) : fn));
+    setDirty(true);
     setNotice("");
-  };
-  const itemSet = (index, key, value) =>
-    set(
-      "items",
-      config.items.map((item, i) =>
-        i === index ? { ...item, [key]: value } : item,
+  }
+  const set = (key, value) => update((c) => ({ ...c, [key]: value }));
+  function itemPatch(id, patch) {
+    update((c) => ({
+      ...c,
+      items: c.items.map((item) =>
+        item.id === id ? { ...item, ...patch } : item,
       ),
-    );
-  function move(index, direction) {
-    const items = [...config.items],
-      target = index + direction;
-    if (target < 0 || target >= items.length) return;
-    [items[index], items[target]] = [items[target], items[index]];
-    set("items", items);
+    }));
+  }
+  function move(index, delta) {
+    update((c) => {
+      const items = [...c.items],
+        to = index + delta;
+      if (to < 0 || to >= items.length) return c;
+      [items[index], items[to]] = [items[to], items[index]];
+      return { ...c, items };
+    });
   }
   async function submit(e) {
     e.preventDefault();
@@ -55,7 +102,7 @@ export default function LinksEditor({ load, save }) {
     if (!parsed.success) {
       setError(
         parsed.error.issues
-          .map((issue) => issue.path.join(".") + " · " + issue.message)
+          .map((i) => i.path.join(".") + " · " + i.message)
           .join("\n"),
       );
       return;
@@ -63,10 +110,11 @@ export default function LinksEditor({ load, save }) {
     setBusy(true);
     try {
       const data = await save({ config: parsed.data, version });
-      setConfig(data.config);
+      setConfig(linksSchema.parse(data.config));
       setVersion(data.version);
+      setDirty(false);
       setNotice(
-        "Links page saved. The public page uses this order and content.",
+        "Link Us page saved. Your page now uses this content and order.",
       );
     } catch (e) {
       setError(e.message);
@@ -74,120 +122,334 @@ export default function LinksEditor({ load, save }) {
       setBusy(false);
     }
   }
-  const field = (label, value, onChange, other = {}) => (
+  async function populate(item) {
+    if (!fetchPreview) return;
+    setPending(item.id);
+    setError("");
+    try {
+      const result = await fetchPreview(item.url);
+      setConfig((c) => ({
+        ...c,
+        items: c.items.map((i) =>
+          i.id === item.id && i.url === item.url
+            ? {
+                ...i,
+                title: result.title || i.title,
+                description: result.description || i.description,
+                thumbnail: result.thumbnail || i.thumbnail,
+                alt: result.title || i.alt,
+                youtube_id: "",
+              }
+            : i,
+        ),
+      }));
+      setDirty(true);
+      setNotice(result.notice);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setPending("");
+    }
+  }
+  async function upload(file, key, id) {
+    if (!file || !uploadImage) return;
+    setPending(id || key);
+    setError("");
+    try {
+      const result = await uploadImage(await imagePayload(file));
+      if (id) itemPatch(id, { [key]: result.url });
+      else set(key, result.url);
+      setNotice("Image uploaded. Save the page to use it publicly.");
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setPending("");
+    }
+  }
+  const field = (label, value, onChange, props = {}) => (
     <label className="field">
       <span>{label}</span>
       <input
-        value={value}
+        value={value ?? ""}
         onChange={(e) => onChange(e.target.value)}
-        {...other}
+        {...props}
       />
     </label>
   );
+  const select = (label, value, onChange, options) => (
+    <label className="field">
+      <span>{label}</span>
+      <select value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map(([id, name]) => (
+          <option key={id} value={id}>
+            {name}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+  const uploadField = (label, key, id) => (
+    <label className="field link-upload">
+      <span>{label}</span>
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        disabled={!uploadImage || !!pending}
+        onChange={(e) => {
+          upload(e.target.files[0], key, id);
+          e.target.value = "";
+        }}
+      />
+    </label>
+  );
+  if (!config)
+    return (
+      <section className="panel">
+        <p>{error || "Loading Link Us…"}</p>
+        <button onClick={reload}>Reload</button>
+      </section>
+    );
   return (
-    <>
+    <div className={"link-us-workspace" + (preview ? " with-preview" : "")}>
       <section className="panel links-editor">
         <div className="panel-head">
           <div>
-            <h2>Your social links page</h2>
+            <span className="links-admin-kicker">Your mini website</span>
+            <h2>Link Us</h2>
             <p className="muted">
-              Edit the content, thumbnails, and display order for /links.
+              Build /links with your brand, featured content, and social
+              profiles.
             </p>
+            <a href="/links" target="_blank" rel="noopener noreferrer">
+              Open public page ↗
+            </a>
           </div>
-          <button onClick={() => setPreview(!preview)}>
-            {preview ? "Hide" : "Preview"} layout
+          <button type="button" onClick={() => setPreview(!preview)}>
+            {preview ? "Hide" : "Show"} preview
           </button>
         </div>
         <form onSubmit={submit}>
-          <fieldset disabled={busy}>
-            <div className="form-grid">
-              {field(
-                "Page headline",
-                config.title,
-                (value) => set("title", value),
-                { maxLength: 100, required: true },
-              )}
-              {field(
-                "Introduction",
-                config.intro,
-                (value) => set("intro", value),
-                { maxLength: 400 },
-              )}
-              {field(
-                "Contact button label",
-                config.contact_label,
-                (value) => set("contact_label", value),
-                { required: true },
-              )}
-              {field(
-                "Contact destination",
-                config.contact_url,
-                (value) => set("contact_url", value),
-                { required: true },
-              )}
+          <fieldset disabled={busy || !!pending}>
+            <details className="link-editor-section" open>
+              <summary>Brand &amp; hero</summary>
+              <div className="form-grid">
+                {field(
+                  "Brand name",
+                  config.brand_name,
+                  (v) => set("brand_name", v),
+                  { maxLength: 80, required: true },
+                )}
+                {field(
+                  "Short eyebrow / location",
+                  config.kicker,
+                  (v) => set("kicker", v),
+                  { maxLength: 120 },
+                )}
+                {field("Page headline", config.title, (v) => set("title", v), {
+                  maxLength: 100,
+                  required: true,
+                })}
+                {field(
+                  "Short description",
+                  config.intro,
+                  (v) => set("intro", v),
+                  { maxLength: 400 },
+                )}
+                {select("Page colors", config.theme, (v) => set("theme", v), [
+                  ["light", "Light · white & blue"],
+                  ["blue", "Colonna blue"],
+                  ["dark", "Midnight"],
+                ])}
+                {field("Logo image URL (optional)", config.logo, (v) =>
+                  set("logo", v),
+                )}
+                {uploadField("Upload logo", "logo")}
+                {field("Hero image URL (optional)", config.hero_image, (v) =>
+                  set("hero_image", v),
+                )}
+                {uploadField("Upload hero image", "hero_image")}
+                {field(
+                  "Hero image description",
+                  config.hero_alt,
+                  (v) => set("hero_alt", v),
+                  { maxLength: 200 },
+                )}
+                {field(
+                  "Contact button label",
+                  config.contact_label,
+                  (v) => set("contact_label", v),
+                  { maxLength: 80, required: true },
+                )}
+                {field(
+                  "Contact destination",
+                  config.contact_url,
+                  (v) => set("contact_url", v),
+                  { required: true },
+                )}
+              </div>
+              <p className="muted">
+                Clear an image URL to hide it. Uploads are optimized for the web
+                and become public display images.
+              </p>
+            </details>
+            <div className="link-section-head">
+              <h3>Links &amp; featured content</h3>
+              <span>{config.items.length}/24 blocks</span>
             </div>
-            <h3>Service &amp; featured cards</h3>
             <p className="muted">
-              Use site paths or HTTPS links. YouTube IDs add a video play
-              treatment and open the video on YouTube.
+              Paste a page, YouTube, TikTok, Instagram, or Threads link and
+              fetch its preview. You can always replace the image or text.
+              Private or restricted posts may not supply a preview.
             </p>
             {config.items.map((item, index) => (
-              <section className="links-edit-card" key={item.id}>
-                <div className="panel-head">
-                  <h4>
+              <details
+                className="links-edit-card"
+                key={item.id}
+                open={config.items.length < 3 ? true : undefined}
+              >
+                <summary>
+                  <span>
                     {index + 1}. {item.title}
-                  </h4>
-                  <div className="actions">
-                    <button
-                      type="button"
-                      aria-label={"Move " + item.title + " up"}
-                      disabled={index === 0}
-                      onClick={() => move(index, -1)}
-                    >
-                      ↑ Up
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={"Move " + item.title + " down"}
-                      disabled={index === config.items.length - 1}
-                      onClick={() => move(index, 1)}
-                    >
-                      ↓ Down
-                    </button>
-                  </div>
+                  </span>
+                  <span className="link-block-status">
+                    {item.layout === "link"
+                      ? "Compact link"
+                      : item.layout === "hero"
+                        ? "Hero box"
+                        : "Image card"}{" "}
+                    · {item.enabled ? "Visible" : "Hidden"}
+                  </span>
+                </summary>
+                <div className="actions link-order">
+                  <button
+                    type="button"
+                    aria-label={"Move " + item.title + " up"}
+                    disabled={index === 0}
+                    onClick={() => move(index, -1)}
+                  >
+                    ↑ Up
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={"Move " + item.title + " down"}
+                    disabled={index === config.items.length - 1}
+                    onClick={() => move(index, 1)}
+                  >
+                    ↓ Down
+                  </button>
                 </div>
+                <div className="link-fetch-row">
+                  {field("Destination URL", item.url, (v) =>
+                    itemPatch(item.id, { url: v, youtube_id: "" }),
+                  )}
+                  <button
+                    type="button"
+                    disabled={!fetchPreview || !item.url || !!pending}
+                    onClick={() => populate(item)}
+                  >
+                    {pending === item.id ? "Working…" : "Fetch preview"}
+                  </button>
+                </div>
+                {item.youtube_id && (
+                  <p className="muted">
+                    Legacy YouTube video ID: {item.youtube_id}. Change the
+                    destination URL to replace it.
+                  </p>
+                )}
                 <div className="form-grid">
-                  {[
-                    ["Title", "title"],
-                    ["Description", "description"],
-                    ["Button label", "label"],
-                    ["Destination URL", "url"],
-                    ["Thumbnail URL", "thumbnail"],
-                    ["Image description", "alt"],
-                    ["YouTube video ID (optional)", "youtube_id"],
-                  ].map(([label, key]) => (
-                    <React.Fragment key={key}>
-                      {field(
-                        label,
-                        item[key],
-                        (value) => itemSet(index, key, value),
-                        {
-                          required:
-                            key !== "youtube_id" && key !== "description",
-                        },
-                      )}
-                    </React.Fragment>
-                  ))}
+                  {select(
+                    "Block style",
+                    item.layout,
+                    (v) => itemPatch(item.id, { layout: v }),
+                    [
+                      ["link", "Compact link"],
+                      ["card", "Image card"],
+                      ["hero", "Hero box · full width"],
+                    ],
+                  )}
+                  {field(
+                    "Title",
+                    item.title,
+                    (v) => itemPatch(item.id, { title: v }),
+                    { maxLength: 100, required: true },
+                  )}
+                  {field(
+                    "Description",
+                    item.description,
+                    (v) => itemPatch(item.id, { description: v }),
+                    { maxLength: 300 },
+                  )}
+                  {field(
+                    "Button label",
+                    item.label,
+                    (v) => itemPatch(item.id, { label: v }),
+                    { maxLength: 80, required: true },
+                  )}
+                  {field("Thumbnail URL (optional)", item.thumbnail, (v) =>
+                    itemPatch(item.id, { thumbnail: v }),
+                  )}
+                  {uploadField("Upload thumbnail", "thumbnail", item.id)}
+                  {field(
+                    "Image description",
+                    item.alt,
+                    (v) => itemPatch(item.id, { alt: v }),
+                    { maxLength: 200 },
+                  )}
+                  {select(
+                    "Image shape",
+                    item.aspect,
+                    (v) => itemPatch(item.id, { aspect: v }),
+                    [
+                      ["landscape", "Landscape"],
+                      ["square", "Square"],
+                      ["portrait", "Portrait"],
+                    ],
+                  )}
+                  {select(
+                    "Image crop",
+                    item.image_fit,
+                    (v) => itemPatch(item.id, { image_fit: v }),
+                    [
+                      ["cover", "Fill the box"],
+                      ["contain", "Show entire image"],
+                    ],
+                  )}
+                  {select(
+                    "Image focal point",
+                    item.image_position,
+                    (v) => itemPatch(item.id, { image_position: v }),
+                    [
+                      ["top", "Top"],
+                      ["center", "Center"],
+                      ["bottom", "Bottom"],
+                    ],
+                  )}
+                  {select(
+                    "Video behavior",
+                    item.playback,
+                    (v) => itemPatch(item.id, { playback: v }),
+                    [
+                      ["link", "Open original post"],
+                      ["embed", "Click to play here · YouTube / TikTok"],
+                    ],
+                  )}
                 </div>
+                {item.playback === "embed" && !embedURL(item) && (
+                  <p className="muted">
+                    This {platformInfo(item.url).name} link opens the original
+                    post. In-page playback is available for direct YouTube and
+                    TikTok video URLs.
+                  </p>
+                )}
                 <div className="actions">
                   <label className="check">
                     <input
                       type="checkbox"
                       checked={item.enabled}
                       onChange={(e) =>
-                        itemSet(index, "enabled", e.target.checked)
+                        itemPatch(item.id, { enabled: e.target.checked })
                       }
-                    />
+                    />{" "}
                     Visible
                   </label>
                   <label className="check">
@@ -195,10 +457,10 @@ export default function LinksEditor({ load, save }) {
                       type="checkbox"
                       checked={item.featured}
                       onChange={(e) =>
-                        itemSet(index, "featured", e.target.checked)
+                        itemPatch(item.id, { featured: e.target.checked })
                       }
-                    />
-                    Featured
+                    />{" "}
+                    Featured badge
                   </label>
                   <button
                     type="button"
@@ -206,80 +468,136 @@ export default function LinksEditor({ load, save }) {
                     onClick={() =>
                       set(
                         "items",
-                        config.items.filter((_, i) => i !== index),
+                        config.items.filter((i) => i.id !== item.id),
                       )
                     }
                   >
-                    Remove card
+                    Remove block
                   </button>
                 </div>
-              </section>
+              </details>
             ))}
-            <button
-              type="button"
-              disabled={config.items.length >= 24}
-              onClick={() =>
-                set("items", [
-                  ...config.items,
-                  {
-                    ...DEFAULT_LINKS.items[0],
-                    id: crypto.randomUUID(),
-                    title: "New featured item",
-                    featured: false,
-                  },
-                ])
-              }
-            >
-              + Add card or video
-            </button>
-            <h3>Social profiles</h3>
-            {config.socials.map((social, index) => (
-              <div className="social-edit-row" key={index}>
-                {field("Profile label", social.label, (value) =>
-                  set(
-                    "socials",
-                    config.socials.map((s, i) =>
-                      i === index ? { ...s, label: value } : s,
+            <div className="actions link-add-blocks">
+              {[
+                ["link", "Compact link"],
+                ["card", "Image card"],
+                ["hero", "Hero box"],
+              ].map(([layout, label]) => (
+                <button
+                  type="button"
+                  key={layout}
+                  disabled={config.items.length >= 24}
+                  onClick={() =>
+                    set("items", [
+                      ...config.items,
+                      {
+                        id: crypto.randomUUID(),
+                        title: "New " + label.toLowerCase(),
+                        description: "",
+                        label: "Learn more",
+                        url: "",
+                        thumbnail: "",
+                        alt: "",
+                        enabled: false,
+                        featured: false,
+                        layout,
+                        image_fit: "cover",
+                        image_position: "center",
+                        aspect: "landscape",
+                        playback: "link",
+                        youtube_id: "",
+                      },
+                    ])
+                  }
+                >
+                  + {label}
+                </button>
+              ))}
+            </div>
+            <details className="link-editor-section" open>
+              <summary>Social profiles</summary>
+              <p className="muted">
+                Add only the profiles you use. Threads can stay hidden until you
+                have an account.
+              </p>
+              {config.socials.map((social, index) => (
+                <div className="social-edit-row" key={index}>
+                  {field("Profile label", social.label, (value) =>
+                    set(
+                      "socials",
+                      config.socials.map((s, i) =>
+                        i === index ? { ...s, label: value } : s,
+                      ),
                     ),
-                  ),
-                )}
-                {field("Profile URL", social.url, (value) =>
-                  set(
-                    "socials",
-                    config.socials.map((s, i) =>
-                      i === index ? { ...s, url: value } : s,
+                  )}
+                  {field("Profile URL", social.url, (value) =>
+                    set(
+                      "socials",
+                      config.socials.map((s, i) =>
+                        i === index ? { ...s, url: value } : s,
+                      ),
                     ),
-                  ),
+                  )}
+                  <label className="check">
+                    <input
+                      type="checkbox"
+                      checked={social.enabled}
+                      onChange={(e) =>
+                        set(
+                          "socials",
+                          config.socials.map((s, i) =>
+                            i === index
+                              ? { ...s, enabled: e.target.checked }
+                              : s,
+                          ),
+                        )
+                      }
+                    />{" "}
+                    Visible
+                  </label>
+                  <button
+                    type="button"
+                    aria-label={"Remove " + social.label}
+                    onClick={() =>
+                      set(
+                        "socials",
+                        config.socials.filter((_, i) => i !== index),
+                      )
+                    }
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <div className="actions">
+                {select(
+                  "Add a platform",
+                  socialType,
+                  setSocialType,
+                  [
+                    "Instagram",
+                    "TikTok",
+                    "YouTube",
+                    "Threads",
+                    "Facebook",
+                    "LinkedIn",
+                    "Other",
+                  ].map((s) => [s, s]),
                 )}
                 <button
                   type="button"
-                  aria-label={"Remove " + social.label}
+                  disabled={config.socials.length >= 8}
                   onClick={() =>
-                    set(
-                      "socials",
-                      config.socials.filter((_, i) => i !== index),
-                    )
+                    set("socials", [
+                      ...config.socials,
+                      { label: socialType, url: "", enabled: false },
+                    ])
                   }
                 >
-                  Remove
+                  + Add profile
                 </button>
               </div>
-            ))}
-            <button
-              type="button"
-              disabled={config.socials.length >= 8}
-              onClick={() =>
-                set("socials", [
-                  ...config.socials,
-                  {
-                    label: "Profile",
-                    url: "https://www.instagram.com/colonna_media/",
-                  },
-                ])
-              }
-            >
-              + Add social profile
-            </button>
+            </details>
             {error && (
               <p className="error" role="alert">
                 {error}
@@ -292,23 +610,44 @@ export default function LinksEditor({ load, save }) {
             )}
             <div className="actions links-save">
               <button className="primary" type="submit">
-                {busy ? "Saving…" : "Save links page"}
+                {busy ? "Saving…" : "Save Link Us page"}
               </button>
-              <button type="button" onClick={reload}>
+              <button
+                type="button"
+                onClick={() => {
+                  if (
+                    !dirty ||
+                    window.confirm("Discard unsaved Link Us edits and reload?")
+                  )
+                    reload();
+                }}
+              >
                 Reload saved content
               </button>
+              <span className="muted" role="status">
+                {pending
+                  ? "Working…"
+                  : dirty
+                    ? "Unsaved changes"
+                    : "Saved content"}
+              </span>
             </div>
           </fieldset>
         </form>
       </section>
       {preview && (
-        <section
-          className="links-inline-preview"
-          aria-label="Social links layout preview"
+        <aside
+          className="link-us-preview"
+          aria-label="Live mobile layout preview"
         >
-          <LinksPage config={config} preview />
-        </section>
+          <div className="link-preview-heading">
+            Live page preview <span>Unsaved changes appear here</span>
+          </div>
+          <div className="link-preview-phone">
+            <LinksPage config={config} preview />
+          </div>
+        </aside>
       )}
-    </>
+    </div>
   );
 }
