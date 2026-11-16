@@ -9,7 +9,7 @@ create table public.crm_contacts (
 create table public.crm_jobs (
  id uuid primary key default gen_random_uuid(),created_at timestamptz not null default now(),contact_id uuid not null references public.crm_contacts(id),
  title text not null,services jsonb not null,mode text not null check(mode in ('one-time','recurring')),status text not null check(status in ('planned','active','paused','completed','cancelled')),
- start_date text not null,end_date text not null default '',auto_close boolean not null default false,scope text not null default '',monthly_cents bigint not null default 0 check(monthly_cents>=0),
+ start_date text not null,end_date text not null default '',auto_close boolean not null default false,scope text not null default '',monthly_cents bigint not null default 0 check(monthly_cents>=0),project_cents bigint not null default 0 check(project_cents>=0),
  check(end_date='' or end_date>=start_date),check(not auto_close or (mode='one-time' and end_date<>''))
 );
 create table public.crm_agreements (

@@ -7,6 +7,7 @@ import {
   effectiveJobStatus,
   isActiveJob,
   nyDate,
+  draftTerms,
 } from "../lib/crm/domain.js";
 import {
   requireAdmin,
@@ -27,6 +28,22 @@ const job = {
   end_date: "2026-11-10",
   auto_close: true,
 };
+test("saved job pricing generates complete recurring or one-time agreements", () => {
+  const recurring = jobSchema.parse({ ...job, mode: "recurring", auto_close: false, end_date: "", monthly_cents: 42500, scope: "Eight social media posts per month.", services: ["social-media"] });
+  const recurringTerms = draftTerms(recurring);
+  assert.match(recurringTerms, /\$425\.00 per month/);
+  assert.match(recurringTerms, /continues until cancelled/);
+  assert.match(recurringTerms, /Eight social media posts/);
+  assert.match(recurringTerms, /no fixed end date/);
+  assert.match(recurringTerms, /https:\/\/colonnamedia\.com\/service-payment-terms/);
+  assert.doesNotMatch(recurringTerms, /\[[^\]]+\]|Specify |DRAFT —/i);
+  const oneTime = jobSchema.parse({ ...job, project_cents: 17500, scope: "One portrait session." });
+  assert.equal(oneTime.project_cents, 17500);
+  assert.match(draftTerms(oneTime), /one-time service/);
+  assert.doesNotMatch(draftTerms(oneTime), /renews monthly|Specify |\[[^\]]+\]/i);
+  assert.deepEqual(paymentPlan(oneTime.project_cents, 100), [{ label: "Full payment", amount_cents: 17500, due: "Before work begins" }]);
+  assert.deepEqual(paymentPlan(oneTime.project_cents, 50).map(p => p.amount_cents), [8750, 8750]);
+});
 test("50% down and custom phase schedules preserve cents", () => {
   for (let c = 1; c < 100000; c += 137) {
     const p = paymentPlan(c);

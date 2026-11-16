@@ -47,6 +47,9 @@ const empty = {
   templates: [],
 };
 const escapeCSV = (v) => '"' + String(v ?? "").replaceAll('"', '""') + '"';
+const agreementPrice = (s) => s.job.mode === "recurring"
+  ? `${money(s.job.monthly_cents)} / month${s.total_cents ? ` + ${money(s.total_cents)} setup` : ""}`
+  : money(s.total_cents);
 async function request(action, data) {
   const session = await auth.auth.getSession();
   const r = await fetch(`/api/crm?action=${action}`, {
@@ -577,6 +580,7 @@ function JobForm({ initial, contacts, onSave }) {
     auto_close: false,
     scope: "",
     monthly_cents: 0,
+    project_cents: 0,
     ...initial,
   });
   const update = (k, x) => set({ ...v, [k]: x });
@@ -667,6 +671,14 @@ function JobForm({ initial, contacts, onSave }) {
             }
           />
         )}
+        <Input
+          label={v.mode === "recurring" ? "One-time setup fee ($, optional)" : "One-time project price ($)"}
+          type="number"
+          min="0"
+          step="0.01"
+          value={(v.project_cents || 0) / 100}
+          onChange={(e) => update("project_cents", Math.round(Number(e.target.value) * 100))}
+        />
       </div>
       <h3>Services included</h3>
       <Services value={v.services} onChange={(s) => update("services", s)} />
@@ -710,7 +722,8 @@ function AgreementForm({
     [title, setTitle] = useState("Service agreement"),
     [date, setDate] = useState(nyDate()),
     [total, setTotal] = useState(0),
-    [percent, setPercent] = useState(50),
+    [percent, setPercent] = useState(100),
+    [paymentChoice, setPaymentChoice] = useState("full"),
     [payments, setPayments] = useState([]),
     [terms, setTerms] = useState(""),
     [reviewed, setReviewed] = useState(false),
@@ -724,8 +737,23 @@ function AgreementForm({
     setReviewed(false);
   }
   useEffect(() => {
+    if (!job) return;
+    setTitle(`${job.title} — Service Agreement`);
+    setTotal((job.project_cents || 0) / 100);
+    setPaymentChoice("full");
+    setPercent(100);
     generate();
   }, [jobId]);
+  useEffect(() => {
+    if (!total) {
+      setPayments([]);
+      setReviewed(false);
+      return;
+    }
+    if (paymentChoice === "custom") return;
+    setPayments(paymentPlan(Math.round(total * 100), paymentChoice === "half" ? 50 : 100));
+    setReviewed(false);
+  }, [total, paymentChoice]);
   if (!jobs.length)
     return (
       <p>
@@ -773,7 +801,7 @@ function AgreementForm({
           onChange={(e) => setDate(e.target.value)}
         />
         <Input
-          label="One-time project / setup total ($)"
+          label={job.mode === "recurring" ? "One-time setup fee ($, optional)" : "One-time project total ($)"}
           type="number"
           min="0"
           step="0.01"
@@ -784,14 +812,24 @@ function AgreementForm({
       </div>
       {job.mode === "recurring" && (
         <Banner>
-          Recurring fee: {money(job.monthly_cents)}/month. State billing dates,
-          initial service period, term, renewal, and cancellation in the
-          agreement below. The installment total here is for one-time work or
-          setup.
+          {money(job.monthly_cents)}/month, recurring until cancelled.
+          Pricing, scope, and dates are filled from the saved job. Card authorization is collected separately at checkout.
         </Banner>
       )}
+      {total > 0 && <>
+      <Select
+        label="How should the one-time amount be paid?"
+        options={[
+          { value: "full", label: "Full payment upfront" },
+          { value: "half", label: "Half down / half on delivery" },
+          { value: "custom", label: "Custom payment schedule" },
+        ]}
+        value={paymentChoice}
+        onChange={(e) => setPaymentChoice(e.target.value)}
+      />
       <div className="split-heading">
         <h3>Payment schedule</h3>
+        {paymentChoice === "custom" &&
         <div className="inline">
           <label>
             Down payment %{" "}
@@ -812,7 +850,7 @@ function AgreementForm({
           >
             Apply split
           </button>
-        </div>
+        </div>}
       </div>
       {payments.map((p, i) => (
         <div className="payment-row" key={i}>
@@ -871,12 +909,13 @@ function AgreementForm({
       ))}
       <button
         type="button"
-        onClick={() =>
+        onClick={() => {
+          setPaymentChoice("custom");
           setPayments([
             ...payments,
             { label: "Milestone payment", amount_cents: 0, due: "" },
-          ])
-        }
+          ]);
+        }}
       >
         + Add phase / installment
       </button>
@@ -891,10 +930,11 @@ function AgreementForm({
         Scheduled {money(payments.reduce((s, p) => s + p.amount_cents, 0))} of{" "}
         {money(Math.round(total * 100))}
       </p>
+      </>}
       <div className="split-heading">
         <h3>Agreement wording</h3>
         <button type="button" onClick={generate}>
-          Load template sections
+          Restore general agreement
         </button>
       </div>
       <textarea
@@ -913,8 +953,7 @@ function AgreementForm({
           checked={reviewed}
           onChange={(e) => setReviewed(e.target.checked)}
         />
-        I reviewed the complete scope, payment, cancellation, refund, and
-        service terms and removed all placeholders.
+        I reviewed the client, services, pricing, payment schedule, and agreement terms.
       </label>
       <div className="actions">
         <button type="button" onClick={() => setPreview(!preview)}>
@@ -954,9 +993,9 @@ function AgreementView({ snapshot: s }) {
       </p>
       <div className="summary-box">
         <strong>{s.services.join(" · ")}</strong>
-        <h2>
-          {money(s.total_cents)} <small>one-time total</small>
-        </h2>
+        {(s.total_cents > 0 || s.job.mode !== "recurring") && <h2>
+          {money(s.total_cents)} <small>{s.job.mode === "recurring" ? "one-time setup" : "one-time total"}</small>
+        </h2>}
         {s.payments.map((p, i) => (
           <div className="payment-summary" key={i}>
             <span>
@@ -1748,7 +1787,7 @@ function App() {
                               : a.status}
                           </span>
                         </td>
-                        <td>{money(a.snapshot.total_cents)}</td>
+                        <td>{agreementPrice(a.snapshot)}</td>
                         <td>
                           <div className="actions">
                             <button
@@ -2293,7 +2332,7 @@ function Profile({
           <div>
             <strong>{a.title}</strong>
             <small>
-              {a.status} · {money(a.snapshot.total_cents)}
+              {a.status} · {agreementPrice(a.snapshot)}
             </small>
           </div>
           <div className="actions">
