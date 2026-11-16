@@ -47,6 +47,7 @@ export default defineConfig({
         work: resolve(rootDir, "work.html"),
         about: resolve(rootDir, "about.html"),
         contact: resolve(rootDir, "contact.html"),
+        "service-payment-terms": resolve(rootDir, "service-payment-terms.html"),
         clients: resolve(rootDir, "clients.html"),
         "startup-marketing-pittsburgh": resolve(
           rootDir,

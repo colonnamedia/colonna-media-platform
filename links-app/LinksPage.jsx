@@ -110,6 +110,7 @@ export default function LinksPage({ config = DEFAULT_LINKS, preview = false }) {
             ))}
         </nav>
         <a href="/contact">Contact Anthony</a>
+        <a href="/service-payment-terms">Service &amp; Payment Terms</a>
         <p>© {new Date().getFullYear()} Colonna Media LLC · Pittsburgh, PA</p>
       </footer>
     </main>
