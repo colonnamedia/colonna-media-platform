@@ -565,6 +565,7 @@ function ContactForm({ initial, onSave }) {
   );
 }
 function JobForm({ initial, contacts, onSave }) {
+  const [ongoing, setOngoing] = useState(!initial?.end_date);
   const [v, set] = useState({
     contact_id: contacts[0]?.id || "",
     title: "",
@@ -583,7 +584,9 @@ function JobForm({ initial, contacts, onSave }) {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        onSave(v);
+        onSave(v.mode === "recurring" && ongoing
+          ? { ...v, end_date: "", auto_close: false }
+          : v);
       }}
     >
       <div className="form-grid">
@@ -607,9 +610,11 @@ function JobForm({ initial, contacts, onSave }) {
           label="Service type"
           options={["one-time", "recurring"]}
           value={v.mode}
-          onChange={(e) =>
-            set({ ...v, mode: e.target.value, auto_close: false })
-          }
+          onChange={(e) => {
+            const mode = e.target.value;
+            setOngoing(true);
+            set({ ...v, mode, auto_close: false, end_date: "" });
+          }}
         />
         <Select
           label="Status"
@@ -624,13 +629,32 @@ function JobForm({ initial, contacts, onSave }) {
           value={v.start_date}
           onChange={(e) => update("start_date", e.target.value)}
         />
-        <Input
-          label="Completion / end date"
-          type="date"
-          min={v.start_date}
-          value={v.end_date}
-          onChange={(e) => update("end_date", e.target.value)}
-        />
+        <div>
+          {v.mode === "recurring" && (
+            <label className="check">
+              <input
+                type="checkbox"
+                checked={ongoing}
+                onChange={(e) => {
+                  setOngoing(e.target.checked);
+                  if (e.target.checked) set({ ...v, end_date: "", auto_close: false });
+                }}
+              />
+              Ongoing / No end date
+            </label>
+          )}
+          {v.mode === "recurring" && ongoing ? (
+            <p className="muted">Continues until paused, completed, or cancelled under the agreement.</p>
+          ) : (
+            <Input
+              label="Completion / end date (optional)"
+              type="date"
+              min={v.start_date}
+              value={v.end_date}
+              onChange={(e) => update("end_date", e.target.value)}
+            />
+          )}
+        </div>
         {v.mode === "recurring" && (
           <Input
             label="Monthly management fee ($)"
