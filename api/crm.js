@@ -24,6 +24,8 @@ import { DEFAULT_LINKS } from "../lib/site/links-content.js";
 import { z } from "zod";
 import { agreementMail, mailFingerprint } from "../lib/crm/agreement-mail.js";
 import { createTestSigningToken, verifyTestSigningToken } from "../lib/crm/test-signing.js";
+import { FOLLOWUP_TEMPLATES } from "../lib/crm/followup-content.js";
+import { followupMail, followupFingerprint } from "../lib/crm/followup-mail.js";
 export default async function handler(req, res) {
   headers(res);
   try {
@@ -41,7 +43,7 @@ export default async function handler(req, res) {
     const client = db();
     const actor = await requireAdmin(req, client);
     if (action === "list" && req.method === "GET") {
-      const [contacts, jobs, agreements, inquiries, payments, templates, agreementEvents] =
+      const [contacts, jobs, agreements, inquiries, payments, templates, agreementEvents, followupEvents] =
         await Promise.all([
           allRows(client, "crm_contacts").then((data) => ({ data })),
           client
@@ -64,6 +66,7 @@ export default async function handler(req, res) {
             .limit(5000),
           client.from("crm_templates").select("*"),
           client.from("crm_events").select("entity_id,event,created_at").eq("entity", "agreement").in("event", ["client_email_accepted", "signed_email_accepted"]).order("created_at", { ascending: false }).limit(5000),
+          client.from("crm_events").select("entity_id,event,created_at,details").eq("entity", "contact").in("event", ["followup_test_email_accepted", "followup_email_accepted"]).order("created_at", { ascending: false }).limit(5000),
         ]);
       return res.status(200).json({
         contacts: check(contacts),
@@ -73,6 +76,7 @@ export default async function handler(req, res) {
         payments: check(payments),
         templates: check(templates),
         agreement_events: check(agreementEvents),
+        followup_events: check(followupEvents),
       });
     }
     if (action === "links" && req.method === "GET") {
@@ -215,6 +219,40 @@ export default async function handler(req, res) {
           .upsert({ ...t, updated_at: new Date().toISOString() }),
       );
       return res.status(200).json({ ok: true });
+    }
+    if (action === "followup-preview" || action === "followup-send") {
+      const params = z.object({
+        contact_id: z.string().uuid(),
+        service: z.enum(Object.keys(FOLLOWUP_TEMPLATES)),
+        kind: z.enum(["test", "client"]),
+        fingerprint: z.string().regex(/^[a-f0-9]{64}$/).optional(),
+        approved: z.literal(true).optional(),
+      }).parse(input);
+      const contact = check(await client.from("crm_contacts").select("id,name,email,business,archived_at").eq("id", params.contact_id).single());
+      if (contact.archived_at) throw Object.assign(new Error("Restore this contact before sending a follow-up."), { status: 409 });
+      z.string().email().parse(contact.email);
+      const draft = followupMail(contact, params.service, params.kind);
+      const fingerprint = followupFingerprint(draft);
+      if (action === "followup-preview") return res.status(200).json({ draft, fingerprint, template: FOLLOWUP_TEMPLATES[params.service].label });
+      if (!params.approved || params.fingerprint !== fingerprint)
+        throw Object.assign(new Error("Review the full follow-up email, recipients, and sending account before approving this send."), { status: 400 });
+      if (process.env.VERCEL_ENV !== "production" || !process.env.RESEND_API_KEY)
+        throw Object.assign(new Error("Follow-up email delivery is unavailable in this environment"), { status: 503 });
+      const sent = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json", ...(params.kind === "client" ? { "Idempotency-Key": `followup-${contact.id}-${params.service}-${fingerprint}` } : {}) },
+        body: JSON.stringify({ ...draft, ...(draft.bcc.length ? {} : { bcc: undefined }) }),
+      });
+      const result = await sent.json().catch(() => ({}));
+      if (!sent.ok || !result.id) throw Object.assign(new Error("Email provider did not accept this follow-up. Check the draft and retry."), { status: 502 });
+      try {
+        await audit(client, "contact", contact.id, params.kind === "test" ? "followup_test_email_accepted" : "followup_email_accepted", actor.id, {
+          provider_id: result.id, service: params.service, to: draft.to, bcc: draft.bcc, subject: draft.subject,
+        });
+      } catch (error) {
+        console.error("Follow-up email accepted but audit failed", result.id, error);
+      }
+      return res.status(200).json({ accepted: true, provider_id: result.id });
     }
     if (action === "contact" || action === "job") {
       const table = action === "contact" ? "crm_contacts" : "crm_jobs";

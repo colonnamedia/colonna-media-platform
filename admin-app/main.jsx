@@ -38,6 +38,7 @@ import AttributionReport, {
 } from "./Attribution.jsx";
 import LinksEditor from "./LinksEditor.jsx";
 import { attributionSource } from "../lib/lead/attribution.js";
+import { FOLLOWUP_TEMPLATES } from "../lib/crm/followup-content.js";
 let auth;
 const empty = {
   contacts: [],
@@ -47,6 +48,7 @@ const empty = {
   payments: [],
   templates: [],
   agreement_events: [],
+  followup_events: [],
 };
 const escapeCSV = (v) => '"' + String(v ?? "").replaceAll('"', '""') + '"';
 const agreementPrice = (s) => s.job.mode === "recurring"
@@ -1023,6 +1025,33 @@ function AgreementView({ snapshot: s }) {
     </>
   );
 }
+function FollowupPicker({ contact, onReview }) {
+  const [service, setService] = useState(contact.services?.find((key) => FOLLOWUP_TEMPLATES[key]) || "photography");
+  const [preview, setPreview] = useState(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    let active = true;
+    setPreview(null);
+    setError("");
+    request("followup-preview", { contact_id: contact.id, service, kind: "client" })
+      .then((result) => { if (active) setPreview(result.draft); })
+      .catch((e) => { if (active) setError(e.message); });
+    return () => { active = false; };
+  }, [contact.id, service]);
+  return <div className="followup-picker">
+    <p>Choose a service and check the designed email for {contact.name}. Sending a test is optional; it goes only to your inbox. The contact email requires its own final approval.</p>
+    <Select label="Follow-up service" value={service} onChange={(e) => setService(e.target.value)} options={Object.entries(FOLLOWUP_TEMPLATES).map(([value, t]) => ({ value, label: t.label }))} />
+    {error && <p className="error" role="alert">{error}</p>}
+    {preview ? <>
+      <p><strong>Subject:</strong> {preview.subject}</p>
+      <iframe className="email-preview-frame" title={`${FOLLOWUP_TEMPLATES[service].label} email design preview`} sandbox="" srcDoc={preview.html} />
+      <div className="actions">
+        <button onClick={() => onReview(contact, service, "test")}>Review test email to myself</button>
+        <button className="primary" onClick={() => onReview(contact, service, "client")}>Review email to {contact.name}</button>
+      </div>
+    </> : !error && <p role="status">Loading email preview…</p>}
+  </div>;
+}
 function App() {
   const previewOpened = useRef(false);
   const [config, setConfig] = useState(null),
@@ -1122,6 +1151,11 @@ function App() {
       const preview = await request("mail-preview", params);
       setModal({ type: "mail", value: { agreement, params: { ...params, ...(preview.test_token ? { token: preview.test_token } : {}) }, ...preview } });
     });
+  const reviewFollowup = (contact, service, kind) => act(async () => {
+    const params = { contact_id: contact.id, service, kind };
+    const preview = await request("followup-preview", params);
+    setModal({ type: "followup-review", value: { contact, params, ...preview } });
+  });
   const prepareClientSend = (agreement) => act(async () => {
     const issued = await request("issue", { id: agreement.id });
     await refresh();
@@ -2109,6 +2143,8 @@ function App() {
               "sign-preview": "Signing page preview — owner only",
               "confirm-agreement": "Confirm saved agreement wording",
               mail: "Review email before sending",
+              followup: "Follow-up email",
+              "followup-review": "Approve this follow-up email",
               view: "Agreement record",
               link: "Signing link created",
               payment: "Record a received payment",
@@ -2247,6 +2283,28 @@ function App() {
                 })}>{modal.value.params.kind === "test" ? "Approve and send test to me" : modal.value.params.kind === "client" ? "Approve and send to client" : "Approve and send signed notice to me"}</button>
               </div>
             )}
+            {modal.type === "followup" && <FollowupPicker contact={modal.value} onReview={reviewFollowup} />}
+            {modal.type === "followup-review" && <div className="mail-review">
+              <p>This action sends one specific email only. Check the complete message, sender, and recipients before approving it.</p>
+              <dl>
+                <dt>From</dt><dd>{modal.value.draft.from}</dd>
+                <dt>To</dt><dd>{modal.value.draft.to.join(", ")}</dd>
+                {modal.value.draft.bcc.length > 0 && <><dt>Bcc (owner copy)</dt><dd>{modal.value.draft.bcc.join(", ")}</dd></>}
+                <dt>Reply to</dt><dd>{modal.value.draft.reply_to}</dd>
+                <dt>Subject</dt><dd>{modal.value.draft.subject}</dd>
+              </dl>
+              <h3>Designed email</h3>
+              <iframe className="email-preview-frame" title="Complete follow-up email design" sandbox="" srcDoc={modal.value.draft.html} />
+              <h3>Complete email text</h3>
+              <pre className="mail-body">{modal.value.draft.text}</pre>
+              <button className="primary" disabled={busy} onClick={() => act(async () => {
+                const kind = modal.value.params.kind;
+                await request("followup-send", { ...modal.value.params, fingerprint: modal.value.fingerprint, approved: true });
+                await refresh();
+                setModal(null);
+                setMessage(kind === "test" ? "Practice follow-up accepted for delivery to your inbox. The contact was not emailed." : "Follow-up accepted for delivery to the contact. An owner copy was included.");
+              })}>{modal.value.params.kind === "test" ? "Approve and send test to me" : `Approve and send to ${modal.value.contact.name}`}</button>
+            </div>}
             {modal.type === "payment" && (
               <PaymentForm
                 job={modal.value}
@@ -2298,6 +2356,7 @@ function App() {
             agreements={data.agreements.filter(
               (a) => a.contact_id === selected,
             )}
+            followupEvents={data.followup_events.filter((e) => e.entity_id === selected)}
             payments={data.payments.filter((p) => p.contact_id === selected)}
             edit={() => {
               setModal({ type: "contact", value: getContact(selected) });
@@ -2309,6 +2368,10 @@ function App() {
             }}
             addAgreement={(jobId) => {
               setModal({ type: "agreement", value: { job_id: jobId } });
+              setSelected(null);
+            }}
+            emailFollowup={() => {
+              setModal({ type: "followup", value: getContact(selected) });
               setSelected(null);
             }}
             reviewAgreement={(agreement) => {
@@ -2351,10 +2414,12 @@ function Profile({
   inquiries = [],
   jobs,
   agreements,
+  followupEvents = [],
   payments,
   edit,
   addJob,
   addAgreement,
+  emailFollowup,
   reviewAgreement,
   confirmAgreement,
   issueAgreement,
@@ -2372,6 +2437,7 @@ function Profile({
       </p>
       <div className="actions">
         <button onClick={edit}>Edit contact</button>
+        <button onClick={emailFollowup}>Email follow-up</button>
         <button className="primary" onClick={addJob}>
           Add job
         </button>
@@ -2381,6 +2447,7 @@ function Profile({
           </button>
         )}
       </div>
+      {followupEvents.length > 0 && <section aria-label="Follow-up email activity"><h3>Follow-up emails</h3>{followupEvents.slice(0, 8).map((event, index) => <p className="muted" key={`${event.created_at}-${index}`}>{new Date(event.created_at).toLocaleString("en-US", { timeZone: "America/New_York" })} · {FOLLOWUP_TEMPLATES[event.details?.service]?.label || "Follow-up"} · {event.event === "followup_test_email_accepted" ? "Test accepted for delivery to owner" : "Accepted for delivery to contact"}</p>)}</section>}
       <h3>Notes</h3>
       <p className="terms">{c.notes || "No notes yet."}</p>
       <h3>Inquiry sources &amp; campaigns</h3>
