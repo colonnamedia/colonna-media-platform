@@ -8,6 +8,7 @@ import {
   isActiveJob,
   nyDate,
   draftTerms,
+  updateAgreementDate,
 } from "../lib/crm/domain.js";
 import {
   requireAdmin,
@@ -43,6 +44,13 @@ test("saved job pricing generates complete recurring or one-time agreements", ()
   assert.doesNotMatch(draftTerms(oneTime), /renews monthly|Specify |\[[^\]]+\]/i);
   assert.deepEqual(paymentPlan(oneTime.project_cents, 100), [{ label: "Full payment", amount_cents: 17500, due: "Before work begins" }]);
   assert.deepEqual(paymentPlan(oneTime.project_cents, 50).map(p => p.amount_cents), [8750, 8750]);
+});
+test("agreement date in generated wording follows date edits without changing job schedule", () => {
+  const terms = draftTerms(job, [], "2026-11-17");
+  const changed = updateAgreementDate(terms, "2026-11-17", "2026-11-19");
+  assert.match(changed, /Agreement date\n2026-11-19/);
+  assert.doesNotMatch(changed, /Agreement date\n2026-11-17/);
+  assert.match(changed, /Service starts 2026-11-01/);
 });
 test("50% down and custom phase schedules preserve cents", () => {
   for (let c = 1; c < 100000; c += 137) {

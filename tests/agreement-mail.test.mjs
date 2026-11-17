@@ -21,6 +21,7 @@ test("agreement mail drafts distinguish owner test, client with owner copy, and 
   assert.deepEqual(testMail.bcc, []);
   assert.match(testMail.subject, /^TEST/);
   assert.doesNotMatch(testMail.text, /sign#[A-Za-z0-9_-]{43}/);
+  assert.match(testMail.text, new RegExp(`admin\\?agreement-preview=${a.id}`));
   assert.match(testMail.text, /\$425\.00 per month/);
   assert.match(testMail.text, /complete specific agreement/);
   assert.doesNotMatch(testMail.html, /<No HTML execution>/);

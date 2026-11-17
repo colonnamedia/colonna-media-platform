@@ -26,6 +26,7 @@ import {
   money,
   paymentPlan,
   draftTerms,
+  updateAgreementDate,
   nyDate,
   effectiveJobStatus,
   isActiveJob,
@@ -733,7 +734,7 @@ function AgreementForm({
   const contact = contacts.find((c) => c.id === job?.contact_id);
   function generate() {
     if (!job) return;
-    const text = draftTerms(job, templates);
+    const text = draftTerms(job, templates, date);
     setTerms(text);
     setReviewed(false);
   }
@@ -799,7 +800,12 @@ function AgreementForm({
           type="date"
           required
           value={date}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={(e) => {
+            const nextDate = e.target.value;
+            setTerms((current) => updateAgreementDate(current, date, nextDate));
+            setDate(nextDate);
+            setReviewed(false);
+          }}
         />
         <Input
           label={job.mode === "recurring" ? "One-time setup fee ($, optional)" : "One-time project total ($)"}
@@ -1018,6 +1024,7 @@ function AgreementView({ snapshot: s }) {
   );
 }
 function App() {
+  const previewOpened = useRef(false);
   const [config, setConfig] = useState(null),
     [recovery, setRecovery] = useState(
       new URLSearchParams(window.location.hash.slice(1)).get("type") ===
@@ -1073,6 +1080,19 @@ function App() {
       document.removeEventListener("visibilitychange", updateOnReturn);
     };
   }, [ready]);
+  useEffect(() => {
+    if (!ready || previewOpened.current) return;
+    const url = new URL(window.location.href);
+    const id = url.searchParams.get("agreement-preview");
+    if (!id) return;
+    const agreement = data.agreements.find((item) => item.id === id);
+    if (!agreement) return;
+    previewOpened.current = true;
+    url.searchParams.delete("agreement-preview");
+    window.history.replaceState(null, "", url);
+    setTab("Agreements");
+    setModal({ type: "sign-preview", value: agreement });
+  }, [ready, data.agreements]);
   const today = nyDate();
   const getContact = (id) => data.contacts.find((c) => c.id === id);
   const clientJobs = (id) => data.jobs.filter((j) => j.contact_id === id);
@@ -1109,6 +1129,15 @@ function App() {
       setModal(null);
       setMessage("Saved successfully.");
     });
+  const saveAgreement = (value) => act(async () => {
+    const result = await request("agreement", value);
+    const next = await request("list");
+    setData(next);
+    setTab("Agreements");
+    const agreement = next.agreements.find((item) => item.id === result.id);
+    setModal({ type: "saved-agreement", value: agreement });
+    setMessage("Agreement draft saved. Review the signing page and test email before sending it to the client.");
+  });
   const setArchive = (entity, id, archived) =>
     act(async () => {
       await request("archive", { entity, id, archived });
@@ -1819,6 +1848,7 @@ function App() {
                             >
                               Review
                             </button>
+                            <button onClick={() => setModal({ type: "sign-preview", value: a })}>Preview signing page</button>
                             {a.status === "draft" && (
                               <button onClick={() => reviewMail(a, "test")}>Review test email</button>
                             )}
@@ -2093,6 +2123,9 @@ function App() {
               contact: modal.value?.id ? "Edit contact" : "New contact",
               job: modal.value?.id ? "Edit job" : "New job",
               agreement: "Create agreement",
+              "saved-agreement": "Agreement draft saved — next steps",
+              "sign-preview": "Signing page preview — owner only",
+              mail: "Review email before sending",
               view: "Agreement record",
               link: "Signing link created",
               payment: "Record a received payment",
@@ -2126,9 +2159,16 @@ function App() {
                 contacts={data.contacts}
                 templates={data.templates}
                 initialJobId={modal.value?.job_id}
-                onSave={(v) => save("agreement", v)}
+                onSave={saveAgreement}
               />
             )}{" "}
+            {modal.type === "saved-agreement" && <div className="agreement-next">
+              <p>Your draft is saved in this client's Agreements file. The test is sent only to you after you review and approve the complete email.</p>
+              <button onClick={() => setModal({ type: "sign-preview", value: modal.value })}>Preview the client's signing page and signature box</button>
+              <button className="primary" onClick={() => reviewMail(modal.value, "test")}>Review and send test to myself</button>
+              <p>After the test looks right, return to Agreements and select <strong>Create signing link</strong>, then review the client email.</p>
+            </div>}
+            {modal.type === "sign-preview" && <Signing previewRecord={modal.value} />}
             {modal.type === "view" && (
               <>
                 <AgreementView snapshot={modal.value.snapshot} />
@@ -2483,8 +2523,8 @@ function TemplateForm({ initial, onSave }) {
     </form>
   );
 }
-function Signing() {
-  const [record, setRecord] = useState(null),
+function Signing({ previewRecord = null }) {
+  const [record, setRecord] = useState(previewRecord),
     [error, setError] = useState(""),
     [name, setName] = useState(""),
     [consent, setConsent] = useState(false),
@@ -2496,6 +2536,7 @@ function Signing() {
     marked = useRef(false),
     token = useRef(location.hash.slice(1));
   useEffect(() => {
+    if (previewRecord) return;
     document.title = "Review & sign | Colonna Media";
     history.replaceState(null, "", location.pathname);
     fetch("/api/sign", { headers: { "X-Signing-Token": token.current } })
@@ -2505,7 +2546,7 @@ function Signing() {
         setRecord(j);
       })
       .catch((e) => setError(e.message));
-  }, []);
+  }, [previewRecord]);
   function point(e) {
     const r = canvas.current.getBoundingClientRect();
     return [
@@ -2534,6 +2575,7 @@ function Signing() {
   }
   async function submit(e) {
     e.preventDefault();
+    if (previewRecord) return;
     if (!marked.current) {
       setError("Please draw your signature.");
       return;
@@ -2568,7 +2610,7 @@ function Signing() {
     <main className="signing">
       <header>
         <Brand />
-        <span className="muted">Private agreement</span>
+        <span className="muted">{previewRecord ? "Owner preview · Signing disabled" : "Private agreement"}</span>
       </header>
       <article>
         {done ? (
@@ -2591,6 +2633,7 @@ function Signing() {
           </>
         ) : record ? (
           <>
+            {previewRecord && <p className="notice" role="status">This is exactly how the client signing page is laid out. This preview cannot sign or send the agreement.</p>}
             <AgreementView snapshot={record.snapshot} />
             <form onSubmit={submit}>
               <h2>Your signature</h2>
@@ -2633,10 +2676,10 @@ function Signing() {
                 to sign it.
               </label>
               <Banner>{error}</Banner>
-              <button className="primary wide" disabled={busy}>
+              <button className="primary wide" disabled={busy || Boolean(previewRecord)}>
                 {busy
                   ? "Saving your signed agreement…"
-                  : "Sign agreement & download copy"}
+                  : previewRecord ? "Signing disabled in preview" : "Sign agreement & download copy"}
               </button>
               <p className="muted">
                 Signing does not charge your card. Your signature, acceptance
