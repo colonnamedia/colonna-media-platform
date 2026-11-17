@@ -156,3 +156,35 @@ test("private test link opens and completes a practice signature without changin
     await db.close();
   }
 });
+
+test("saved drafts can be confirmed, then opened for client email without a misleading placeholder error", async () => {
+  const { leadDatabase, configureLeadTests, invoke, TOKEN, OWNER_ID } = await import("./helpers/lead-database.mjs");
+  const { default: crm } = await import("../api/crm.js");
+  configureLeadTests();
+  const db = await leadDatabase();
+  const originalFetch = globalThis.fetch;
+  try {
+    await db.database.exec("drop trigger crm_agreement_guard on public.crm_agreements");
+    await db.database.query("insert into public.crm_contacts(id,name,email,business,kind,stage) values($1,'Bud Client','bud@example.test','Example Magazine','client','won')", [OWNER_ID]);
+    await db.database.query("insert into public.crm_jobs(id,contact_id,title,services,mode,status,start_date,end_date,scope,monthly_cents) values($1,$1,'Social media','[\"social-media\"]','recurring','planned','2026-11-17','','Eight posts.',42500)", [OWNER_ID]);
+    await db.database.query("insert into public.crm_agreements(id,contact_id,job_id,title,agreement_date,total_cents,payments,terms,snapshot,status,terms_reviewed) values($1,$1,$1,$2,'2026-11-17',50000,$3,$4,$5,'draft',false)", [OWNER_ID, a.snapshot.title, JSON.stringify(a.snapshot.payments), a.snapshot.terms, JSON.stringify(a.snapshot)]);
+    globalThis.fetch = db.fetch;
+    const auth = { authorization: "Bearer " + TOKEN("aal2") };
+    let response = await invoke(crm, { query: { action: "issue" }, body: { id: OWNER_ID }, headers: auth });
+    assert.equal(response.status, 400);
+    assert.match(response.payload.error, /Review and confirm/);
+    response = await invoke(crm, { query: { action: "agreement-review" }, body: { id: OWNER_ID }, headers: auth });
+    assert.equal(response.status, 200);
+    response = await invoke(crm, { query: { action: "issue" }, body: { id: OWNER_ID }, headers: auth });
+    assert.equal(response.status, 200);
+    const first = response.payload.url;
+    response = await invoke(crm, { query: { action: "issue" }, body: { id: OWNER_ID }, headers: auth });
+    assert.equal(response.status, 200);
+    assert.notEqual(response.payload.url, first);
+    const saved = await db.database.query("select status,terms_reviewed from public.crm_agreements where id=$1", [OWNER_ID]);
+    assert.deepEqual(saved.rows[0], { status: "issued", terms_reviewed: true });
+  } finally {
+    globalThis.fetch = originalFetch;
+    await db.close();
+  }
+});

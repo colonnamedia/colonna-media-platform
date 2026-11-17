@@ -52,7 +52,7 @@ export default async function handler(req, res) {
           client
             .from("crm_agreements")
             .select(
-              "id,contact_id,job_id,title,status,created_at,signed_at,expires_at,pdf_path,snapshot",
+              "id,contact_id,job_id,title,status,created_at,signed_at,expires_at,pdf_path,snapshot,terms_reviewed",
             )
             .order("created_at", { ascending: false })
             .limit(5000),
@@ -287,6 +287,16 @@ export default async function handler(req, res) {
       await audit(client, "agreement", saved.id, "draft_created", actor.id);
       return res.status(200).json(saved);
     }
+    if (action === "agreement-review") {
+      const id = z.string().uuid().parse(input.id);
+      const a = check(await client.from("crm_agreements").select("id,status,snapshot").eq("id", id).single());
+      if (a.status !== "draft") throw Object.assign(new Error("Only saved drafts can be confirmed for sending."), { status: 409 });
+      if (/\[[^\]]+\]|DRAFT —|Specify /i.test(a.snapshot.terms))
+        throw Object.assign(new Error("This draft contains unfinished wording. Create a corrected draft before sending."), { status: 400 });
+      check(await client.from("crm_agreements").update({ terms_reviewed: true }).eq("id", id).eq("status", "draft").select("id").single());
+      await audit(client, "agreement", id, "wording_reviewed", actor.id);
+      return res.status(200).json({ ok: true });
+    }
     if (action === "issue") {
       const id = z.string().uuid().parse(input.id);
       const a = check(
@@ -294,19 +304,19 @@ export default async function handler(req, res) {
           .from("crm_agreements")
           .select("*")
           .eq("id", id)
-          .eq("status", "draft")
           .single(),
       );
-      if (
-        !a.terms_reviewed ||
-        /\[[^\]]+\]|DRAFT —|Specify /i.test(a.snapshot.terms)
-      )
+      if (!["draft", "issued"].includes(a.status))
+        throw Object.assign(new Error("This agreement can no longer be sent."), { status: 409 });
+      if (!a.terms_reviewed)
         throw Object.assign(
-          new Error(
-            "Complete the placeholder terms and confirm review before creating a signing link",
-          ),
+          new Error("Review and confirm the saved agreement wording before sending to the client."),
           { status: 400 },
         );
+      if (/\[[^\]]+\]|DRAFT —|Specify /i.test(a.snapshot.terms))
+        throw Object.assign(new Error("This draft contains unfinished wording. Create a corrected draft before sending."), { status: 400 });
+      const previous = check(await client.from("crm_events").select("id").eq("entity_id", id).eq("event", "client_email_accepted").limit(1));
+      if (previous.length) throw Object.assign(new Error("The client email was already accepted for delivery."), { status: 409 });
       const token = newToken();
       const expires = new Date(Date.now() + 30 * 86400000).toISOString();
       check(
@@ -318,11 +328,11 @@ export default async function handler(req, res) {
             expires_at: expires,
           })
           .eq("id", id)
-          .eq("status", "draft")
+          .eq("status", a.status)
           .select("id")
           .single(),
       );
-      await audit(client, "agreement", id, "link_created", actor.id, {
+      await audit(client, "agreement", id, a.status === "draft" ? "link_created" : "link_renewed", actor.id, {
         expires_at: expires,
       });
       return res.status(200).json({

@@ -1122,6 +1122,13 @@ function App() {
       const preview = await request("mail-preview", params);
       setModal({ type: "mail", value: { agreement, params: { ...params, ...(preview.test_token ? { token: preview.test_token } : {}) }, ...preview } });
     });
+  const prepareClientSend = (agreement) => act(async () => {
+    const issued = await request("issue", { id: agreement.id });
+    await refresh();
+    const params = { id: agreement.id, kind: "client", token: issued.url.split("#")[1] };
+    const preview = await request("mail-preview", params);
+    setModal({ type: "mail", value: { agreement, params, ...preview } });
+  });
   const save = (action, v) =>
     act(async () => {
       await request(action, v);
@@ -1802,31 +1809,19 @@ function App() {
           )}
           {tab === "Agreements" && (
             <section className="panel">
-              <div className="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Agreement</th>
-                      <th>Client</th>
-                      <th>Status</th>
-                      <th>Total</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+              <div className="agreement-list">
                     {data.agreements.map((a) => (
-                      <tr key={a.id}>
-                        <td>
+                      <article className="agreement-card" key={a.id}>
+                        <div className="agreement-card-head">
+                          <div>
                           <strong>{a.title}</strong>
-                          <small>{a.snapshot.agreement_date}</small>
+                          <small>{a.snapshot.client.business || a.snapshot.client.name} · Agreement date {a.snapshot.agreement_date} · {agreementPrice(a.snapshot)}</small>
+                          <small>Draft saved {new Date(a.created_at).toLocaleString("en-US", { timeZone: "America/New_York" })}</small>
+                          {a.status === "draft" && <small>{a.terms_reviewed ? "Wording confirmed · ready to send" : "Wording needs your confirmation"}</small>}
                           {data.agreement_events.some((e) => e.entity_id === a.id && e.event === "client_email_accepted") && <small>Client email accepted for delivery; owner copied</small>}
                           {data.agreement_events.some((e) => e.entity_id === a.id && e.event === "signed_email_accepted") && <small>Owner signature notice accepted for delivery</small>}
                           {a.status === "signed" && a.pdf_path && <small>Signed PDF saved privately</small>}
-                        </td>
-                        <td>
-                          {a.snapshot.client.business || a.snapshot.client.name}
-                        </td>
-                        <td>
+                          </div>
                           <span
                             className={
                               "pill " + (a.status === "signed" ? "green" : "")
@@ -1837,10 +1832,15 @@ function App() {
                               ? "expired"
                               : a.status}
                           </span>
-                        </td>
-                        <td>{agreementPrice(a.snapshot)}</td>
-                        <td>
-                          <div className="actions">
+                        </div>
+                          <div className="actions agreement-card-actions">
+                            {a.status === "draft" && !a.terms_reviewed && (
+                              <button className="primary" onClick={() => setModal({ type: "confirm-agreement", value: a })}>Confirm agreement wording</button>
+                            )}
+                            {((a.status === "draft" && a.terms_reviewed) ||
+                              (a.status === "issued" && !data.agreement_events.some((e) => e.entity_id === a.id && e.event === "client_email_accepted"))) && (
+                              <button className="primary" onClick={() => prepareClientSend(a)}>Send to client</button>
+                            )}
                             <button
                               onClick={() =>
                                 setModal({ type: "view", value: a })
@@ -1850,22 +1850,7 @@ function App() {
                             </button>
                             <button onClick={() => setModal({ type: "sign-preview", value: a })}>Preview signing page</button>
                             {a.status === "draft" && (
-                              <button onClick={() => reviewMail(a, "test")}>Review test email</button>
-                            )}
-                            {a.status === "draft" && (
-                              <button
-                                onClick={() =>
-                                  act(async () => {
-                                    const r = await request("issue", {
-                                      id: a.id,
-                                    });
-                                    await refresh();
-                                    setModal({ type: "link", value: { url: r.url, agreement: a } });
-                                  })
-                                }
-                              >
-                                Create signing link
-                              </button>
+                              <button onClick={() => reviewMail(a, "test")}>Send practice test to me</button>
                             )}
                             {["draft", "issued"].includes(a.status) && (
                               <button
@@ -1894,11 +1879,8 @@ function App() {
                               </button>
                             )}
                           </div>
-                        </td>
-                      </tr>
+                      </article>
                     ))}
-                  </tbody>
-                </table>
                 {!data.agreements.length && (
                   <Empty
                     title="Clear agreements start here."
@@ -2125,6 +2107,7 @@ function App() {
               agreement: "Create agreement",
               "saved-agreement": "Agreement draft saved — next steps",
               "sign-preview": "Signing page preview — owner only",
+              "confirm-agreement": "Confirm saved agreement wording",
               mail: "Review email before sending",
               view: "Agreement record",
               link: "Signing link created",
@@ -2163,12 +2146,22 @@ function App() {
               />
             )}{" "}
             {modal.type === "saved-agreement" && <div className="agreement-next">
-              <p>Your draft is saved in this client's Agreements file. The test is sent only to you after you review and approve the complete email.</p>
+              <p>Your draft is saved in this client's Agreements file. A practice email is optional. It lets you test the signature form, and it goes only to you after you approve its full message.</p>
               <button onClick={() => setModal({ type: "sign-preview", value: modal.value })}>Preview the client's signing page and signature box</button>
-              <button className="primary" onClick={() => reviewMail(modal.value, "test")}>Review and send test to myself</button>
-              <p>After the test looks right, return to Agreements and select <strong>Create signing link</strong>, then review the client email.</p>
+              <button onClick={() => reviewMail(modal.value, "test")}>Send practice test to myself</button>
+              <button className="primary" onClick={() => setModal({ type: "confirm-agreement", value: modal.value })}>Confirm wording, then send to client</button>
             </div>}
             {modal.type === "sign-preview" && <Signing previewRecord={modal.value} />}
+            {modal.type === "confirm-agreement" && <>
+              <p>Read the saved client, date, price, services, and full wording below. Confirming this enables the client email; it does not send anything yet.</p>
+              <AgreementView snapshot={modal.value.snapshot} />
+              <button className="primary" onClick={() => act(async () => {
+                await request("agreement-review", { id: modal.value.id });
+                await refresh();
+                setModal(null);
+                setMessage("Wording confirmed. Select Send to client on this agreement to review the email and approve delivery.");
+              })}>I reviewed this agreement — confirm wording</button>
+            </>}
             {modal.type === "view" && (
               <>
                 <AgreementView snapshot={modal.value.snapshot} />
@@ -2322,13 +2315,13 @@ function App() {
               setModal({ type: "view", value: agreement });
               setSelected(null);
             }}
+            confirmAgreement={(agreement) => {
+              setModal({ type: "confirm-agreement", value: agreement });
+              setSelected(null);
+            }}
             issueAgreement={(agreement) => {
               setSelected(null);
-              act(async () => {
-                const r = await request("issue", { id: agreement.id });
-                await refresh();
-                setModal({ type: "link", value: { url: r.url, agreement } });
-              });
+              prepareClientSend(agreement);
             }}
             downloadAgreement={(agreement) =>
               act(async () =>
@@ -2363,6 +2356,7 @@ function Profile({
   addJob,
   addAgreement,
   reviewAgreement,
+  confirmAgreement,
   issueAgreement,
   downloadAgreement,
 }) {
@@ -2426,11 +2420,8 @@ function Profile({
           </div>
           <div className="actions">
             <button onClick={() => reviewAgreement(a)}>Review</button>
-            {a.status === "draft" && (
-              <button onClick={() => issueAgreement(a)}>
-                Create signing link
-              </button>
-            )}
+            {a.status === "draft" && !a.terms_reviewed && <button onClick={() => confirmAgreement(a)}>Confirm wording</button>}
+            {a.status === "draft" && a.terms_reviewed && <button onClick={() => issueAgreement(a)}>Send to client</button>}
             {a.status === "signed" && (
               <button onClick={() => downloadAgreement(a)}>Signed PDF</button>
             )}

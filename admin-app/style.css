@@ -291,6 +291,14 @@ nav button.selected:before {
   gap: 9px;
   flex-wrap: wrap;
 }
+.agreement-list { display: grid; gap: 14px; }
+.agreement-card { border: 1px solid #e2e6f0; border-radius: 16px; padding: 20px; background: #fff; }
+.agreement-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.agreement-card-head strong { font-size: 16px; }
+.agreement-card-head small { display: block; color: #687188; margin-top: 6px; line-height: 1.5; }
+.agreement-card-actions { align-items: stretch; }
+.agreement-card-actions button { min-height: 40px; }
+@media (max-width: 600px) { .agreement-card { padding: 16px; } .agreement-card-actions button { flex: 1 1 100%; } }
 .stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
