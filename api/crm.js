@@ -22,6 +22,7 @@ import {
 import { linksSchema } from "../lib/site/links-schema.js";
 import { DEFAULT_LINKS } from "../lib/site/links-content.js";
 import { z } from "zod";
+import { agreementMail, mailFingerprint } from "../lib/crm/agreement-mail.js";
 export default async function handler(req, res) {
   headers(res);
   try {
@@ -39,7 +40,7 @@ export default async function handler(req, res) {
     const client = db();
     const actor = await requireAdmin(req, client);
     if (action === "list" && req.method === "GET") {
-      const [contacts, jobs, agreements, inquiries, payments, templates] =
+      const [contacts, jobs, agreements, inquiries, payments, templates, agreementEvents] =
         await Promise.all([
           allRows(client, "crm_contacts").then((data) => ({ data })),
           client
@@ -61,6 +62,7 @@ export default async function handler(req, res) {
             .order("created_at", { ascending: false })
             .limit(5000),
           client.from("crm_templates").select("*"),
+          client.from("crm_events").select("entity_id,event,created_at").eq("entity", "agreement").in("event", ["client_email_accepted", "signed_email_accepted"]).order("created_at", { ascending: false }).limit(5000),
         ]);
       return res.status(200).json({
         contacts: check(contacts),
@@ -69,6 +71,7 @@ export default async function handler(req, res) {
         inquiries: check(inquiries),
         payments: check(payments),
         templates: check(templates),
+        agreement_events: check(agreementEvents),
       });
     }
     if (action === "links" && req.method === "GET") {
@@ -324,6 +327,52 @@ export default async function handler(req, res) {
       return res.status(200).json({
         url: `${process.env.CRM_PUBLIC_ORIGIN || "https://www.colonnamedia.com"}/sign#${token}`,
       });
+    }
+    if (action === "mail-preview" || action === "mail-send") {
+      const params = z.object({
+        id: z.string().uuid(),
+        kind: z.enum(["test", "client", "signed"]),
+        token: z.string().regex(/^[A-Za-z0-9_-]{43}$/).optional(),
+        fingerprint: z.string().regex(/^[a-f0-9]{64}$/).optional(),
+        approved: z.literal(true).optional(),
+      }).parse(input);
+      const a = check(await client.from("crm_agreements").select("*").eq("id", params.id).single());
+      if (params.kind === "test" && a.status !== "draft" ||
+          params.kind === "client" && a.status !== "issued" ||
+          params.kind === "signed" && (a.status !== "signed" || !a.pdf_path))
+        throw Object.assign(new Error("Agreement status changed. Refresh and review it again."), { status: 409 });
+      let signingURL = "";
+      if (params.kind === "client") {
+        if (!params.token || hashToken(params.token) !== a.token_hash || new Date(a.expires_at) <= new Date())
+          throw Object.assign(new Error("Signing link is unavailable. Create a new agreement revision."), { status: 409 });
+        signingURL = `https://www.colonnamedia.com/sign#${params.token}`;
+      }
+      const draft = agreementMail(a, params.kind, signingURL);
+      const fingerprint = mailFingerprint(draft);
+      if (action === "mail-preview") return res.status(200).json({ draft, fingerprint });
+      if (!params.approved || params.fingerprint !== fingerprint)
+        throw Object.assign(new Error("Review the full email, recipients, and sending account before approving this send."), { status: 400 });
+      if (process.env.VERCEL_ENV !== "production" || !process.env.RESEND_API_KEY)
+        throw Object.assign(new Error("Agreement email delivery is unavailable in this environment"), { status: 503 });
+      if (params.kind !== "test") {
+        const previous = check(await client.from("crm_events").select("id").eq("entity_id", a.id).eq("event", `${params.kind}_email_accepted`).limit(1));
+        if (previous.length) throw Object.assign(new Error("This email was already accepted for delivery. Refresh the agreement record."), { status: 409 });
+      }
+      const sent = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json", ...(params.kind === "test" ? {} : { "Idempotency-Key": `agreement-${params.kind}-${a.id}-${fingerprint}` }) },
+        body: JSON.stringify({ ...draft, ...(draft.bcc.length ? {} : { bcc: undefined }) }),
+      });
+      const result = await sent.json().catch(() => ({}));
+      if (!sent.ok || !result.id) throw Object.assign(new Error("Email provider did not accept this email. Check the draft and retry."), { status: 502 });
+      try {
+        await audit(client, "agreement", a.id, `${params.kind}_email_accepted`, actor.id, {
+          provider_id: result.id, to: draft.to, bcc: draft.bcc,
+        });
+      } catch (error) {
+        console.error("Agreement email accepted but audit failed", result.id, error);
+      }
+      return res.status(200).json({ accepted: true, provider_id: result.id });
     }
     if (action === "revoke") {
       const id = z.string().uuid().parse(input.id);

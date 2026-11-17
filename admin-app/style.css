@@ -1254,3 +1254,4 @@ dd {
     gap: 18px;
   }
 }
+.mail-review dl{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px 16px;margin:18px 0}.mail-review dt{font-weight:700}.mail-review dd{margin:0;overflow-wrap:anywhere}.mail-body{white-space:pre-wrap;overflow-wrap:anywhere;background:#f6f7fb;border:1px solid #dfe3ed;padding:18px;border-radius:12px;font:14px/1.6 'Plus Jakarta Sans',sans-serif;max-height:50vh;overflow:auto}@media(max-width:600px){.mail-review dl{grid-template-columns:1fr;gap:2px}.mail-review dd{margin-bottom:9px}}

@@ -45,6 +45,7 @@ const empty = {
   inquiries: [],
   payments: [],
   templates: [],
+  agreement_events: [],
 };
 const escapeCSV = (v) => '"' + String(v ?? "").replaceAll('"', '""') + '"';
 const agreementPrice = (s) => s.job.mode === "recurring"
@@ -1062,6 +1063,16 @@ function App() {
         else setError("Unable to connect to the admin service.");
       });
   }, []);
+  useEffect(() => {
+    if (!ready) return;
+    const updateOnReturn = () => { if (document.visibilityState === "visible") refresh().catch(() => {}); };
+    window.addEventListener("focus", updateOnReturn);
+    document.addEventListener("visibilitychange", updateOnReturn);
+    return () => {
+      window.removeEventListener("focus", updateOnReturn);
+      document.removeEventListener("visibilitychange", updateOnReturn);
+    };
+  }, [ready]);
   const today = nyDate();
   const getContact = (id) => data.contacts.find((c) => c.id === id);
   const clientJobs = (id) => data.jobs.filter((j) => j.contact_id === id);
@@ -1085,6 +1096,12 @@ function App() {
       setBusy(false);
     }
   }
+  const reviewMail = (agreement, kind, token = "") =>
+    act(async () => {
+      const params = { id: agreement.id, kind, ...(token ? { token } : {}) };
+      const preview = await request("mail-preview", params);
+      setModal({ type: "mail", value: { agreement, params, ...preview } });
+    });
   const save = (action, v) =>
     act(async () => {
       await request(action, v);
@@ -1496,6 +1513,8 @@ function App() {
           {busy && <p role="status">Saving…</p>}
           {tab === "Overview" && (
             <>
+              {data.agreements.filter((a) => a.status === "signed" && a.signed_at).slice(0, 5).length > 0 && <section className="panel" aria-label="Recent signed agreements"><h2>Signed agreements saved</h2><p>Signed PDFs are stored privately in the client's profile. Review each record and approve an email notice if you want one sent.</p>{data.agreements.filter((a) => a.status === "signed" && a.signed_at).slice(0, 5).map((a) => <div className="work-item" key={a.id}><span>{a.snapshot.client.name} · {a.title} · {new Date(a.signed_at).toLocaleString("en-US", { timeZone: "America/New_York" })}</span>{data.agreement_events.some((e) => e.entity_id === a.id && e.event === "signed_email_accepted") ? <small>Owner notice accepted for delivery</small> : <button onClick={() => reviewMail(a, "signed")}>Review notice</button>}</div>)}</section>}
+
               <div className="stats">
                 {stats.map(([label, value, desc], i) => (
                   <article key={label}>
@@ -1771,6 +1790,9 @@ function App() {
                         <td>
                           <strong>{a.title}</strong>
                           <small>{a.snapshot.agreement_date}</small>
+                          {data.agreement_events.some((e) => e.entity_id === a.id && e.event === "client_email_accepted") && <small>Client email accepted for delivery; owner copied</small>}
+                          {data.agreement_events.some((e) => e.entity_id === a.id && e.event === "signed_email_accepted") && <small>Owner signature notice accepted for delivery</small>}
+                          {a.status === "signed" && a.pdf_path && <small>Signed PDF saved privately</small>}
                         </td>
                         <td>
                           {a.snapshot.client.business || a.snapshot.client.name}
@@ -1798,6 +1820,9 @@ function App() {
                               Review
                             </button>
                             {a.status === "draft" && (
+                              <button onClick={() => reviewMail(a, "test")}>Review test email</button>
+                            )}
+                            {a.status === "draft" && (
                               <button
                                 onClick={() =>
                                   act(async () => {
@@ -1805,7 +1830,7 @@ function App() {
                                       id: a.id,
                                     });
                                     await refresh();
-                                    setModal({ type: "link", value: r.url });
+                                    setModal({ type: "link", value: { url: r.url, agreement: a } });
                                   })
                                 }
                               >
@@ -1820,6 +1845,9 @@ function App() {
                               >
                                 Revoke
                               </button>
+                            )}
+                            {a.status === "signed" && !data.agreement_events.some((e) => e.entity_id === a.id && e.event === "signed_email_accepted") && (
+                              <button onClick={() => reviewMail(a, "signed")}>Review signed notice email</button>
                             )}
                             {a.status === "signed" && (
                               <button
@@ -2146,24 +2174,45 @@ function App() {
                 <Input
                   label="Private signing link — shown once"
                   readOnly
-                  value={modal.value}
+                  value={modal.value.url}
                 />
                 <button
                   className="primary"
                   onClick={() =>
                     act(async () => {
-                      await navigator.clipboard.writeText(modal.value);
+                      await navigator.clipboard.writeText(modal.value.url);
                       setMessage("Signing link copied.");
                     })
                   }
                 >
                   Copy link
                 </button>
-                <p className="muted">
-                  No email has been sent. If the link is lost, revoke this
-                  agreement and create a new draft.
-                </p>
+                <button className="primary" onClick={() => reviewMail(modal.value.agreement, "client", modal.value.url.split("#")[1])}>
+                  Review client email and owner copy
+                </button>
+                <p className="muted">No email has been sent yet. The owner copy is sent as Bcc after you approve the exact email. If the link is lost before sending, revoke this agreement and create a new draft.</p>
               </>
+            )}
+            {modal.type === "mail" && (
+              <div className="mail-review">
+                <p>Review the full message, recipients, and sending account. The button below approves this specific email only.</p>
+                <dl>
+                  <dt>From</dt><dd>{modal.value.draft.from}</dd>
+                  <dt>To</dt><dd>{modal.value.draft.to.join(", ")}</dd>
+                  {modal.value.draft.bcc.length > 0 && <><dt>Bcc (owner copy)</dt><dd>{modal.value.draft.bcc.join(", ")}</dd></>}
+                  <dt>Reply to</dt><dd>{modal.value.draft.reply_to}</dd>
+                  <dt>Subject</dt><dd>{modal.value.draft.subject}</dd>
+                </dl>
+                <h3>Complete email body</h3>
+                <pre className="mail-body">{modal.value.draft.text}</pre>
+                <button className="primary" disabled={busy} onClick={() => act(async () => {
+                  const kind = modal.value.params.kind;
+                  await request("mail-send", { ...modal.value.params, fingerprint: modal.value.fingerprint, approved: true });
+                  await refresh();
+                  setModal(null);
+                  setMessage(kind === "test" ? "Test email accepted for delivery to your inbox. The client was not emailed." : kind === "client" ? "Client email accepted for delivery. An owner copy was included." : "Signed-agreement notice accepted for delivery to your inbox.");
+                })}>{modal.value.params.kind === "test" ? "Approve and send test to me" : modal.value.params.kind === "client" ? "Approve and send to client" : "Approve and send signed notice to me"}</button>
+              </div>
             )}
             {modal.type === "payment" && (
               <PaymentForm
@@ -2238,7 +2287,7 @@ function App() {
               act(async () => {
                 const r = await request("issue", { id: agreement.id });
                 await refresh();
-                setModal({ type: "link", value: r.url });
+                setModal({ type: "link", value: { url: r.url, agreement } });
               });
             }}
             downloadAgreement={(agreement) =>
@@ -2332,7 +2381,7 @@ function Profile({
           <div>
             <strong>{a.title}</strong>
             <small>
-              {a.status} · {agreementPrice(a.snapshot)}
+              {a.status} · {agreementPrice(a.snapshot)}{a.status === "signed" && a.pdf_path ? " · Signed PDF stored privately" : ""}{a.signed_at ? " · " + new Date(a.signed_at).toLocaleString("en-US", { timeZone: "America/New_York" }) : ""}
             </small>
           </div>
           <div className="actions">
