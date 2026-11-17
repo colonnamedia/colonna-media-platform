@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { createRequire } from "node:module";
 import { agreementMail, mailFingerprint, AGREEMENT_FROM } from "../lib/crm/agreement-mail.js";
+import { createTestSigningToken, verifyTestSigningToken } from "../lib/crm/test-signing.js";
 const token = "A".repeat(43);
 const a = {
   id: "a7fbdb97-3fc6-45eb-8984-a32f476c674e",
@@ -15,13 +17,17 @@ const a = {
   },
 };
 test("agreement mail drafts distinguish owner test, client with owner copy, and signed notice", () => {
-  const testMail = agreementMail(a, "test");
+  process.env.CRM_SUPABASE_SECRET_KEY = "local-test-secret";
+  const testToken = createTestSigningToken(a.id);
+  const testMail = agreementMail(a, "test", `https://www.colonnamedia.com/sign-test#${testToken}`);
   assert.equal(testMail.from, AGREEMENT_FROM);
   assert.deepEqual(testMail.to, ["colonnamedia@gmail.com"]);
   assert.deepEqual(testMail.bcc, []);
   assert.match(testMail.subject, /^TEST/);
   assert.doesNotMatch(testMail.text, /sign#[A-Za-z0-9_-]{43}/);
-  assert.match(testMail.text, new RegExp(`admin\\?agreement-preview=${a.id}`));
+  assert.match(testMail.text, new RegExp(`sign-test#${a.id}`));
+  assert.equal(verifyTestSigningToken(testToken), a.id);
+  assert.throws(() => verifyTestSigningToken(testToken.slice(0, -1) + (testToken.endsWith("A") ? "B" : "A")));
   assert.match(testMail.text, /\$425\.00 per month/);
   assert.match(testMail.text, /complete specific agreement/);
   assert.doesNotMatch(testMail.html, /<No HTML execution>/);
@@ -69,14 +75,14 @@ test("owner-reviewed test and client emails require AAL2, exact draft approval a
     assert.deepEqual(response.payload.draft.to, ["colonnamedia@gmail.com"]);
     assert.equal(sent.length, 0);
     const preview = response.payload;
-    response = await invoke(crm, { query: { action: "mail-send" }, body: { id: OWNER_ID, kind: "test", approved: true, fingerprint: "0".repeat(64) }, headers: auth });
+    response = await invoke(crm, { query: { action: "mail-send" }, body: { id: OWNER_ID, kind: "test", token: preview.test_token, approved: true, fingerprint: "0".repeat(64) }, headers: auth });
     assert.equal(response.status, 400);
     process.env.VERCEL_ENV = "preview";
-    response = await invoke(crm, { query: { action: "mail-send" }, body: { id: OWNER_ID, kind: "test", approved: true, fingerprint: preview.fingerprint }, headers: auth });
+    response = await invoke(crm, { query: { action: "mail-send" }, body: { id: OWNER_ID, kind: "test", token: preview.test_token, approved: true, fingerprint: preview.fingerprint }, headers: auth });
     assert.equal(response.status, 503);
     assert.equal(sent.length, 0);
     process.env.VERCEL_ENV = "production";
-    response = await invoke(crm, { query: { action: "mail-send" }, body: { id: OWNER_ID, kind: "test", approved: true, fingerprint: preview.fingerprint }, headers: auth });
+    response = await invoke(crm, { query: { action: "mail-send" }, body: { id: OWNER_ID, kind: "test", token: preview.test_token, approved: true, fingerprint: preview.fingerprint }, headers: auth });
     assert.equal(response.status, 200);
     assert.equal(sent.length, 1);
     assert.deepEqual(sent[0].to, ["colonnamedia@gmail.com"]);
@@ -108,6 +114,45 @@ test("owner-reviewed test and client emails require AAL2, exact draft approval a
   } finally {
     globalThis.fetch = originalFetch;
     process.env.VERCEL_ENV = oldVercelEnv;
+    await db.close();
+  }
+});
+
+test("private test link opens and completes a practice signature without changing the client agreement", async () => {
+  const { leadDatabase, configureLeadTests, invoke, OWNER_ID } = await import("./helpers/lead-database.mjs");
+  const { default: sign } = await import("../api/sign.js");
+  const { PNG } = createRequire(import.meta.url)("pngjs");
+  configureLeadTests();
+  const db = await leadDatabase();
+  const originalFetch = globalThis.fetch;
+  try {
+    await db.database.exec("drop trigger crm_agreement_guard on public.crm_agreements");
+    await db.database.query("insert into public.crm_contacts(id,name,email,business,kind,stage) values($1,'Bud Client','bud@example.test','Example Magazine','client','won')", [OWNER_ID]);
+    await db.database.query("insert into public.crm_jobs(id,contact_id,title,services,mode,status,start_date,end_date,scope,monthly_cents) values($1,$1,'Social media','[\"social-media\"]','recurring','planned','2026-11-17','','Eight posts.',42500)", [OWNER_ID]);
+    await db.database.query("insert into public.crm_agreements(id,contact_id,job_id,title,agreement_date,total_cents,payments,terms,snapshot,snapshot_hash,status) values($1,$1,$1,$2,'2026-11-17',50000,$3,$4,$5,$6,'draft')", [OWNER_ID, a.snapshot.title, JSON.stringify(a.snapshot.payments), a.snapshot.terms, JSON.stringify(a.snapshot), "hash-for-test"]);
+    globalThis.fetch = db.fetch;
+    const token = createTestSigningToken(OWNER_ID);
+    let response = await invoke(sign, { method: "GET", query: { test: "1" }, headers: { "x-signing-token": token } });
+    assert.equal(response.status, 200);
+    assert.equal(response.payload.test, true);
+    response = await invoke(sign, { method: "GET", query: { test: "1" }, headers: { "x-signing-token": token.slice(0, -1) + (token.endsWith("A") ? "B" : "A") } });
+    assert.equal(response.status, 404);
+    const png = new PNG({ width: 120, height: 40 });
+    for (let y = 0; y < 40; y++) for (let x = 0; x < 120; x++) {
+      const i = (y * 120 + x) * 4;
+      png.data[i] = 255; png.data[i + 1] = 255; png.data[i + 2] = 255; png.data[i + 3] = 255;
+      if (y > 10 && y < 20 && x > 10 && x < 100) png.data[i] = 0;
+    }
+    response = await invoke(sign, { query: { test: "1" }, headers: { "x-signing-token": token }, body: { name: "Anthony Test", consent: true, signature: `data:image/png;base64,${PNG.sync.write(png).toString("base64")}` } });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers["Content-Type"], "application/pdf");
+    assert.equal(response.payload.subarray(0, 4).toString(), "%PDF");
+    const saved = await db.database.query("select status,signed_at,signer_name,pdf_path from public.crm_agreements where id=$1", [OWNER_ID]);
+    assert.equal(saved.rows[0].status, "draft");
+    assert.equal(saved.rows[0].signed_at, null);
+    assert.equal(saved.rows[0].pdf_path, null);
+  } finally {
+    globalThis.fetch = originalFetch;
     await db.close();
   }
 });

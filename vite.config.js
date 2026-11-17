@@ -43,6 +43,7 @@ export default defineConfig({
           : {}),
         admin: resolve(rootDir, "admin.html"),
         sign: resolve(rootDir, "sign.html"),
+        "sign-test": resolve(rootDir, "sign-test.html"),
         services: resolve(rootDir, "services.html"),
         work: resolve(rootDir, "work.html"),
         about: resolve(rootDir, "about.html"),

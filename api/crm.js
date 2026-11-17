@@ -23,6 +23,7 @@ import { linksSchema } from "../lib/site/links-schema.js";
 import { DEFAULT_LINKS } from "../lib/site/links-content.js";
 import { z } from "zod";
 import { agreementMail, mailFingerprint } from "../lib/crm/agreement-mail.js";
+import { createTestSigningToken, verifyTestSigningToken } from "../lib/crm/test-signing.js";
 export default async function handler(req, res) {
   headers(res);
   try {
@@ -332,7 +333,7 @@ export default async function handler(req, res) {
       const params = z.object({
         id: z.string().uuid(),
         kind: z.enum(["test", "client", "signed"]),
-        token: z.string().regex(/^[A-Za-z0-9_-]{43}$/).optional(),
+        token: z.string().max(200).optional(),
         fingerprint: z.string().regex(/^[a-f0-9]{64}$/).optional(),
         approved: z.literal(true).optional(),
       }).parse(input);
@@ -342,14 +343,19 @@ export default async function handler(req, res) {
           params.kind === "signed" && (a.status !== "signed" || !a.pdf_path))
         throw Object.assign(new Error("Agreement status changed. Refresh and review it again."), { status: 409 });
       let signingURL = "";
-      if (params.kind === "client") {
+      if (params.kind === "test") {
+        const testToken = action === "mail-preview" ? createTestSigningToken(a.id) : params.token;
+        if (verifyTestSigningToken(testToken) !== a.id)
+          throw Object.assign(new Error("Test signing link is invalid"), { status: 404 });
+        signingURL = `https://www.colonnamedia.com/sign-test#${testToken}`;
+      } else if (params.kind === "client") {
         if (!params.token || hashToken(params.token) !== a.token_hash || new Date(a.expires_at) <= new Date())
           throw Object.assign(new Error("Signing link is unavailable. Create a new agreement revision."), { status: 409 });
         signingURL = `https://www.colonnamedia.com/sign#${params.token}`;
       }
       const draft = agreementMail(a, params.kind, signingURL);
       const fingerprint = mailFingerprint(draft);
-      if (action === "mail-preview") return res.status(200).json({ draft, fingerprint });
+      if (action === "mail-preview") return res.status(200).json({ draft, fingerprint, ...(params.kind === "test" ? { test_token: signingURL.split("#")[1] } : {}) });
       if (!params.approved || params.fingerprint !== fingerprint)
         throw Object.assign(new Error("Review the full email, recipients, and sending account before approving this send."), { status: 400 });
       if (process.env.VERCEL_ENV !== "production" || !process.env.RESEND_API_KEY)

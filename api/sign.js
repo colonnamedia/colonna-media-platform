@@ -12,6 +12,7 @@ import {
 } from "../lib/crm/server.js";
 import { signSchema } from "../lib/crm/domain.js";
 import { signedPdf } from "../lib/crm/pdf.js";
+import { verifyTestSigningToken } from "../lib/crm/test-signing.js";
 export default async function handler(req, res) {
   headers(res);
   try {
@@ -19,25 +20,26 @@ export default async function handler(req, res) {
       return res.status(405).json({ error: "Method not allowed" });
     assertOrigin(req);
     const client = db();
-    const token = tokenFrom(req);
+    const testMode = req.query.test === "1";
+    const token = testMode ? String(req.headers["x-signing-token"] || "") : tokenFrom(req);
+    const testAgreementId = testMode ? verifyTestSigningToken(token) : "";
     const { data: a, error } = await client
       .from("crm_agreements")
       .select("id,snapshot,status,expires_at,snapshot_hash")
-      .eq("token_hash", hashToken(token))
+      .eq(testMode ? "id" : "token_hash", testMode ? testAgreementId : hashToken(token))
       .single();
     if (
       error ||
       !a ||
-      a.status !== "issued" ||
-      new Date(a.expires_at) <= new Date()
+      (testMode ? !["draft", "issued"].includes(a.status) : a.status !== "issued" || new Date(a.expires_at) <= new Date())
     )
       throw Object.assign(
         new Error("Signing link is invalid, completed, revoked, or expired"),
         { status: 404 },
       );
     if (req.method === "GET") {
-      await audit(client, "agreement", a.id, "opened", "private-link");
-      return res.status(200).json({ id: a.id, snapshot: a.snapshot });
+      if (!testMode) await audit(client, "agreement", a.id, "opened", "private-link");
+      return res.status(200).json({ id: a.id, snapshot: a.snapshot, test: testMode });
     }
     const input = signSchema.parse(body(req));
     const png = Buffer.from(input.signature.split(",")[1], "base64");
@@ -63,6 +65,7 @@ export default async function handler(req, res) {
         .split(",")[0]
         .slice(0, 100),
       user_agent: String(req.headers["user-agent"] || "").slice(0, 500),
+      test: testMode,
     };
     let file;
     try {
@@ -73,6 +76,11 @@ export default async function handler(req, res) {
       });
     }
     proof.pdf_sha256 = createHash("sha256").update(file).digest("hex");
+    if (testMode) {
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename="test-agreement-${a.id}.pdf"`);
+      return res.status(200).send(file);
+    }
     const path = `${a.id}/${randomUUID()}.pdf`;
     const upload = await client.storage
       .from("crm-agreements")

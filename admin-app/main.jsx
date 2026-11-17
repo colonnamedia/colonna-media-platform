@@ -1120,7 +1120,7 @@ function App() {
     act(async () => {
       const params = { id: agreement.id, kind, ...(token ? { token } : {}) };
       const preview = await request("mail-preview", params);
-      setModal({ type: "mail", value: { agreement, params, ...preview } });
+      setModal({ type: "mail", value: { agreement, params: { ...params, ...(preview.test_token ? { token: preview.test_token } : {}) }, ...preview } });
     });
   const save = (action, v) =>
     act(async () => {
@@ -2524,6 +2524,8 @@ function TemplateForm({ initial, onSave }) {
   );
 }
 function Signing({ previewRecord = null }) {
+  const testMode = location.pathname.startsWith("/sign-test") && !previewRecord;
+  const endpoint = testMode ? "/api/sign?test=1" : "/api/sign";
   const [record, setRecord] = useState(previewRecord),
     [error, setError] = useState(""),
     [name, setName] = useState(""),
@@ -2537,16 +2539,16 @@ function Signing({ previewRecord = null }) {
     token = useRef(location.hash.slice(1));
   useEffect(() => {
     if (previewRecord) return;
-    document.title = "Review & sign | Colonna Media";
+    document.title = testMode ? "Test signing page | Colonna Media" : "Review & sign | Colonna Media";
     history.replaceState(null, "", location.pathname);
-    fetch("/api/sign", { headers: { "X-Signing-Token": token.current } })
+    fetch(endpoint, { headers: { "X-Signing-Token": token.current } })
       .then(async (r) => {
         const j = await r.json();
         if (!r.ok) throw Error(j.error);
         setRecord(j);
       })
       .catch((e) => setError(e.message));
-  }, [previewRecord]);
+  }, [previewRecord, endpoint, testMode]);
   function point(e) {
     const r = canvas.current.getBoundingClientRect();
     return [
@@ -2583,7 +2585,7 @@ function Signing({ previewRecord = null }) {
     setBusy(true);
     setError("");
     try {
-      const r = await fetch("/api/sign", {
+      const r = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -2599,7 +2601,7 @@ function Signing({ previewRecord = null }) {
       const blob = await r.blob();
       setPdf(blob);
       setDone(true);
-      download(blob, "colonna-media-signed-agreement.pdf");
+      download(blob, testMode ? "colonna-media-test-signature.pdf" : "colonna-media-signed-agreement.pdf");
     } catch (e) {
       setError(e.message);
     } finally {
@@ -2610,30 +2612,28 @@ function Signing({ previewRecord = null }) {
     <main className="signing">
       <header>
         <Brand />
-        <span className="muted">{previewRecord ? "Owner preview · Signing disabled" : "Private agreement"}</span>
+        <span className="muted">{previewRecord ? "Owner preview · Signing disabled" : testMode ? "Test signing · no client changes" : "Private agreement"}</span>
       </header>
       <article>
         {done ? (
           <>
             <ShieldCheck size={42} />
-            <h1>Thank you, {name}.</h1>
-            <p>Your agreement has been signed and saved.</p>
+            <h1>{testMode ? "Test signature complete." : `Thank you, ${name}.`}</h1>
+            <p>{testMode ? "This practice signature was not stored in the client's file, and the client's agreement remains unsigned." : "Your agreement has been signed and saved."}</p>
             <button
               className="primary"
               onClick={() =>
-                download(pdf, "colonna-media-signed-agreement.pdf")
+                download(pdf, testMode ? "colonna-media-test-signature.pdf" : "colonna-media-signed-agreement.pdf")
               }
             >
-              Download your signed agreement
+              {testMode ? "Download test PDF" : "Download your signed agreement"}
             </button>
-            <p>
-              Keep this PDF for your records. Contact colonnamedia@gmail.com if
-              you need another copy.
-            </p>
+            {!testMode && <p>Keep this PDF for your records. Contact colonnamedia@gmail.com if you need another copy.</p>}
           </>
         ) : record ? (
           <>
             {previewRecord && <p className="notice" role="status">This is exactly how the client signing page is laid out. This preview cannot sign or send the agreement.</p>}
+            {testMode && <p className="notice" role="status"><strong>Practice signature.</strong> This test uses the client-style signing form. It produces a marked test PDF and does not sign, store, or change the client's agreement.</p>}
             <AgreementView snapshot={record.snapshot} />
             <form onSubmit={submit}>
               <h2>Your signature</h2>
@@ -2679,13 +2679,9 @@ function Signing({ previewRecord = null }) {
               <button className="primary wide" disabled={busy || Boolean(previewRecord)}>
                 {busy
                   ? "Saving your signed agreement…"
-                  : previewRecord ? "Signing disabled in preview" : "Sign agreement & download copy"}
+                  : previewRecord ? "Signing disabled in preview" : testMode ? "Submit practice signature & download test PDF" : "Sign agreement & download copy"}
               </button>
-              <p className="muted">
-                Signing does not charge your card. Your signature, acceptance
-                time, IP address, and browser information will be retained with
-                this agreement.
-              </p>
+              <p className="muted">{testMode ? "The practice signature is used only to generate the test PDF in this request. It is not retained in the client record." : "Signing does not charge your card. Your signature, acceptance time, IP address, and browser information will be retained with this agreement."}</p>
             </form>
           </>
         ) : (
