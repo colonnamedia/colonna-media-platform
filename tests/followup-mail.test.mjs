@@ -12,7 +12,7 @@ test("service follow-ups are personalized, branded, and keep owner tests separat
   assert.deepEqual(client.bcc, ["colonnamedia@gmail.com"]);
   assert.match(client.text, /headshots, your team at work, brand imagery/);
   assert.match(client.text, /Just reply to this email/);
-  assert.match(client.html, /colonna-logo-full.png/);
+  assert.match(client.html, /colonna-email-logo.png/);
   assert.match(client.html, /Reply with your details/);
   assert.doesNotMatch(client.html, /<Sample>/);
   const owner = followupMail(contact, "photography", "test");
