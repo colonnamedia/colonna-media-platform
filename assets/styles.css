@@ -504,3 +504,9 @@
 .client-proof a{display:inline-block;margin-top:18px;color:#fff;font-size:.8rem;font-weight:700;text-decoration:underline;text-underline-offset:4px}
 .client-proof a:hover{color:var(--yellow)}
 @media(max-width:600px){.client-proof{padding:24px 0}.client-proof h2{letter-spacing:.07em;font-size:.7rem}.client-proof-list{gap:12px 22px}.client-proof-list li{font-size:1.1rem}}
+
+.client-entry .client-services{color:var(--muted);font-size:14px;line-height:1.5;margin:10px 0 0}
+.client-entry .client-website{display:inline-block;color:var(--blue);font-size:14px;font-weight:700;margin-top:14px;text-underline-offset:3px}
+.client-entry .client-website:hover{text-decoration:underline}
+.client-entry .client-website:focus-visible{outline:3px solid var(--blue);outline-offset:4px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}

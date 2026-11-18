@@ -38,5 +38,13 @@
     "name": "Revitalize, or Die.",
     "image": "https://media.base44.com/images/public/user_68e7dc262584ab859e1a0096/b702f5e94_IMG_3680.png",
     "logo": null
+  },
+  {
+    "name": "MASRATH Magazine",
+    "image": "/assets/img/masrath-editorial.svg",
+    "imageAlt": "Editorial graphic for MASRATH Magazine",
+    "services": "Social media management · Campaign management",
+    "url": "https://masrath.com",
+    "logo": null
   }
 ]
